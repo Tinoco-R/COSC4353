@@ -4,20 +4,18 @@ import AdminHomePage from "./adminHomepage";
 import Sidebar from "./sidebar";
 import { BrowserRouter as Router, Routes, Route, Link, Navigate } from "react-router-dom";
 
+// Creates sidebar on the left side of the screen. Needs user authentication to be able to get the administrator OR volunteer homepage
 export default class SideBar extends Component {
     constructor(props) {
         super(props);
     }
 
     render() {
-        return (
-            <Router>
-                <Sidebar />
-            </Router>
-        );
+        return (<Sidebar />);
     }
 }
 
+// The given application as selected by the homepage.
 class App extends Component {
     constructor(props) {
         super(props);
@@ -25,14 +23,15 @@ class App extends Component {
 
     render() {
         return (
+            //<p>This is a test!</p>
             <AdminHomePage />
+            //<VolunteerHomePage />
         );
     }
 }
 
-const appDiv = document.getElementById("app");
-createRoot(appDiv).render(<App />);
-
-
 const sidebarDiv = document.getElementById("sidebar");
 createRoot(sidebarDiv).render(<SideBar />);
+
+const appDiv = document.getElementById("app");
+createRoot(appDiv).render(<App />);
