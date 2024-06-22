@@ -6,7 +6,7 @@ import ModifyEvent from "./modifyEvent"
 import EventAdministration from "./eventAdministration";
 import ManageNewRegistrations from "./manageNewRegistrations";
 import NotificationSetup from "./notificationSetup";
-import DefaultPage from "./DefaultPage"
+import DefaultPage from "./defaultPage"
 import ViewVolunteers from "./viewVolunteers"
 import AllAdminEvents from "./allAdminEvents"
 

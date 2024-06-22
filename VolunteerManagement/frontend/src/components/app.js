@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { createRoot } from "react-dom/client";
 import AdminHomePage from "./adminHomepage";
+import VolunteerHomePage from "./volunteerHomepage";
 import Sidebar from "./sidebar";
 import { BrowserRouter as Router, Routes, Route, Link, Navigate } from "react-router-dom";
 
@@ -24,8 +25,8 @@ class App extends Component {
     render() {
         return (
             //<p>This is a test!</p>
-            <AdminHomePage />
-            //<VolunteerHomePage />
+            //<AdminHomePage />
+            <VolunteerHomePage />
         );
     }
 }

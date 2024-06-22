@@ -28,3 +28,18 @@ html, body {
     background-color: black;
     color: white;
 }
+
+.responsiveBar {
+    background-color: rgb(29, 29, 228);
+    border-radius: 5%;
+}
+
+.eventsCalendar {
+    width: 60%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.inputValidationError {
+    color: rgb(255, 0, 0);
+}

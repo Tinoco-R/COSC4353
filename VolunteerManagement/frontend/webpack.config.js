@@ -1,3 +1,4 @@
+const { Minimize } = require('@material-ui/icons');
 const path = require("path");
 const webpack = require("webpack");
 
@@ -15,6 +16,12 @@ module.exports = {
         use: {
           loader: "babel-loader",
         },
+      },
+      {
+          test: /\.css$/,
+          use: {
+              loader: 'css-loader',
+          },
       },
     ],
   },
