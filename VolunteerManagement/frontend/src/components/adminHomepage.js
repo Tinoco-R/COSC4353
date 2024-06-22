@@ -42,8 +42,8 @@ export default class AdminHomePage extends Component {
                     <Route path='/Volunteers/Manage' element = {<ManageNewRegistrations />} />
 
                     // Notifications
-                    <Route path='/Notification' element = {<p>Notifications</p>} />
-                    <Route path='/Notification/Setup' element = {<NotificationSetup />} />
+                    <Route path='/Notifications' element = {<p>Notifications</p>} />
+                    <Route path='/Notifications/Setup' element = {<NotificationSetup />} />
                 </Routes>
             </Router>
         );

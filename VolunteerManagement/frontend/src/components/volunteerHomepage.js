@@ -23,7 +23,7 @@ export default class VolunteerHomePage extends Component {
             <Router>
                 <Routes>
                     // Home
-                    <Route path='/' element={<Navigate replace to = "/Home" />} />
+                    <Route path='/' element={<Navigate replace to = "/login" />} />
                     <Route path='/Home' element = {<p>Home</p>} />
 
                     // Login Pages

@@ -8,6 +8,8 @@ import { useForm } from "react-hook-form";
 
 import { useNavigate } from "react-router-dom";
 
+import AdminHomePage from "../adminHomepage";
+
 export function IncorrectUsernameOrPassword({ validated }){
 
     const [useValidate, setValidate] = useState("");
@@ -58,14 +60,18 @@ export default function Login(){
         // Redirecting the user to the landing page.
         //const navigate = useNavigate();
         var validCredentials = true;
+        var isAdmin = true;
 
         //const object = useRef();
 
         //if (validCredentials == true) {
             //object.current.props.history.push('/landing');
         //}
-        if (validCredentials){
+        if (!isAdmin){
             navigate("/landing") // credit for user redirection code:
+        }
+        else{
+            navigate('/Home')
         }
 
 

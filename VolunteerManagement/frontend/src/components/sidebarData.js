@@ -85,13 +85,13 @@ export const sidebarData = [
         row: 4,
         title: "Notifications",
         icon: <CallToActionSharpIcon />,
-        link: "/Notification",
+        link: "/Notifications",
         subNav: [
             {
                 item: "a",
                 title: "Setup Notification System",
                 icon: <EditNotificationsIcon />,
-                link: "/Notification/Setup"
+                link: "/Notifications/Setup"
             }
         ]
     } 

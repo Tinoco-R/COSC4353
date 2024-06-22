@@ -25,8 +25,8 @@ urlpatterns = [
     path('Volunteers/Manage', index),
 
     # Notifications
-    path('Notification', index),
-    path('Notification/Setup', index),
+    path('Notifications', index),
+    path('Notifications/Setup', index),
 
     # Volunteer Pages
     
