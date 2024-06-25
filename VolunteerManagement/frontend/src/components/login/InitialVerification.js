@@ -35,21 +35,7 @@ export default function InitialVerification(){
         <>
         <h1>Account verification</h1>
 
-        <p>Please provide an email for account verification</p>
 
-        <form className="emailInputForm">
-        <div className="emailField">
-                <label for='email'></label>
-                <input
-                type='text'
-                placeholder='example@email.com' 
-                 {...register('email', { required: 'Email is required', pattern: { value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i, message: 'Incorrect email address' } , maxLength: { value:50, message: 'Max length is 50'}} )} />
-                <p className='inputValidationError'>{errors.email?.message}</p>
-        </div>
-            <Link to='/email-address-received'>
-            <input type="submit" name="emailForVerificaton" value="Submit" ></input>
-            </Link>
-        </form>
 
         <p>You will receive an email with a link to verify your 
             account. Please click on the link to complete 

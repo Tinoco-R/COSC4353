@@ -10,11 +10,11 @@ import { useNavigate } from "react-router-dom";
 
 import AdminHomePage from "../adminHomepage";
 
-export function IncorrectUsernameOrPassword({ validated }){
+function IncorrectUsernameOrPassword({ validated }){
 
     const [useValidate, setValidate] = useState("");
 
-    if (validated == true){
+    if (validated == false){
         return(
             <p>
                 Unable to log in. Username does not exist
@@ -60,7 +60,7 @@ export default function Login(){
         // Redirecting the user to the landing page.
         //const navigate = useNavigate();
         var validCredentials = true;
-        var isAdmin = true;
+        var isAdmin = false;
 
         //const object = useRef();
 
@@ -101,9 +101,12 @@ export default function Login(){
             <IncorrectUsernameOrPassword />
 
             <div className="loginField">
-                <label for='Username'>Username</label>
-                <input {...register('Username', { required: 'Username is required', maxLength: { value: 25, message: 'Max length is 25'}} )} />
-                <p className='inputValidationError'>{errors.Username?.message}</p>
+                <label for='email'>Email</label>
+                <input
+                type='text'
+                placeholder='example@email.com' 
+                 {...register('email', { required: 'Email is required', pattern: { value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i, message: 'Incorrect email address' } , maxLength: { value:50, message: 'Max length is 50'}} )} />
+                <p className='inputValidationError'>{errors.email?.message}</p>
             </div>
 
             <div className="loginField">

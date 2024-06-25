@@ -34,10 +34,13 @@ export default function Signup(){
         <form className="loginForm" >
 
 
-            <div className="signupField">
-                <label for='Username'>Username</label>
-                <input {...register('Username', { required: 'Username is required', maxLength: { value: 25, message: 'Max length is 25'}} )} />
-                <p className='inputValidationError'>{errors.Username?.message}</p>
+            <div className="signupFIELD">
+                    <label for='email'>Email</label>
+                    <input
+                    type='text'
+                    placeholder='example@email.com' 
+                    {...register('email', { required: 'Email is required', pattern: { value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i, message: 'Incorrect email address' } , maxLength: { value:50, message: 'Max length is 50'}} )} />
+                    <p className='inputValidationError'>{errors.email?.message}</p>
             </div>
 
             <div className="signupField">
