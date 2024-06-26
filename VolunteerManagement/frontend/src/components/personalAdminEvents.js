@@ -37,7 +37,7 @@ export default class PersonalAdminEvents extends Component {
 
     newCard() {
         return(
-            <Card id="card" type="new" onClick={() => window.location.href += "/CreateEvent"} sx={{ minWidth: 100, minHeight: 140, bgcolor: theme.palette.primary.main, mb: 2 }}>
+            <Card id="card" type="new" onClick={() => window.location.href += "/create-event"} sx={{ minWidth: 100, minHeight: 140, bgcolor: theme.palette.primary.main, mb: 2 }}>
                 <CardContent sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
                     <AddCircleOutlineIcon sx={{ fontSize: '6rem' }} />
                 </CardContent>

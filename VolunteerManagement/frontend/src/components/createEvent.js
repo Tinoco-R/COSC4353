@@ -36,55 +36,21 @@ export default class CreateEvent extends Component {
             eventEnd: '',
             eventSkills: '',
             eventUrgency: '',
-            formIsValid: false,
+            isValid: false,
         }
-        
         this.handleSubmit = this.handleSubmit.bind(this);
-        this.handleInputChange = this.handleInputChange.bind(this);
-    }
-
-    validateInputs() {
-        // Check if all required inputs are entered
-        if (this.state.eventName === '' || this.state.eventDescription === '' || this.state.eventAddress === '' || this.state.eventCity === '' || this.state.eventState === '' || this.state.eventZip === '' || this.state.eventSkills === '' || this.state.eventUrgency === '') {
-            console.log(this.state.eventName, this.state.eventDescription, this.state.eventAddress, this.state.eventCity, this.state.eventState, this.state.eventZip, this.state.eventDate, this.state.eventStart, this.state.eventEnd, this.state.eventSkills, this.state.eventUrgency);
-            console.log("Empty required field detected");
-            return false;
-        }
-        // Event Name should be max 100 characters
-        if (this.state.eventName.length() > 100) {
-            console.log("Over 100 characters for event name")
-            return false;
-        }
-
-        // Event should be in the present or future, not the past
-        const currentDate = new Date();
-        const formattedDate = currentDate.toISOString().split('T')[0];
-        if (this.state.eventStart < currentDate) {
-            console.log("New events should occur in the future")
-            return false;
-        }
-
-        // Start time should be before end time
-        if (this.state.eventStart >= this.event.eventEnd) {
-            console.log("Invalid event times")
-            return false;
-        }
-        console.log("No issues in form")
-        return true;
-    }
-
-    handleInputChange(id, isValid) {
-        console.log(`Input ${id} is ${isValid? 'valid' : 'invalid'}`);
     }
 
     handleSubmit(event) {
-        event.preventDefault();
-        if (!this.validateInputs()) {
-            alert("Please fill out all required fields.");
-        }
+        /*event.preventDefault(); */
     }
 
     FlexboxGapStack() {
+        // Sets the maximum hours an event can be, and divdes options into equal intervals
+        const maxHours = 6;
+        const intervalsPerHour = 4;
+        const totalIntervals = maxHours * intervalsPerHour;
+
         return (
             <ThemeProvider theme={theme}>
                 <Grid container spacing={1}>
@@ -93,47 +59,119 @@ export default class CreateEvent extends Component {
                             <Stack spacing={{ xs: 1, sm: 2 }} direction="row" useFlexGap flexWrap="wrap">
                                 <Item>
                                     <label htmlFor="eventName">Event Name</label>
-                                    <Input type="text" label="Event Name" id="eventName" name="eventName" placeholder="Name" onValidityChange={(isValid) => this.handleInputChange('eventName', isValid)}/>
+                                    <Input type="text" label="Event Name" id="eventName" name="eventName" placeholder="Name" />
                                 </Item>
 
                                 <Item>
                                     <label htmlFor="eventDescription">Event Description</label>
-                                    <Input type="text" label="Event Description" id="eventDescription" name="eventDescription" placeholder="Description" onValidityChange={(isValid) => this.handleInputChange('eventDescription', isValid)}/>
+                                    <Input type="text" label="Event Description" id="eventDescription" name="eventDescription" placeholder="Description" />
                                 </Item>
 
                                 <Item>
                                     <label htmlFor="eventAddress">Location</label>
-                                    <Input type="text" label="Location" id="eventAddress" name="eventAddress" placeholder="Address" onValidityChange={(isValid) => this.handleInputChange('eventAddress', isValid)}/>
+                                    <Input type="text" label="Location" id="eventAddress" name="eventAddress" placeholder="Address" />
                                 </Item>
 
                                 <Item>
                                     <label htmlFor="eventCity">City</label>
-                                    <Input type="text" label="City" id="eventCity" name="eventCity" placeholder="City" onValidityChange={(isValid) => this.handleInputChange('eventCity', isValid)}/>
+                                    <Input type="text" label="City" id="eventCity" name="eventCity" placeholder="City" />
                                 </Item>
 
                                 <Item>
                                     <label htmlFor="eventState">State</label>
-                                    <Input type="text" label="State" id="eventState" name="eventState" placeholder="State" onValidityChange={(isValid) => this.handleInputChange('eventState', isValid)}/>
+                                    <Item type="inputItem">
+                                    <select id="eventState" name="eventState">
+                                        <option value="AL">Alabama</option>
+                                        <option value="AK">Alaska</option>
+                                        <option value="AZ">Arizona</option>
+                                        <option value="AR">Arkansas</option>
+                                        <option value="CA">California</option>
+                                        <option value="CO">Colorado</option>
+                                        <option value="CT">Connecticut</option>
+                                        <option value="DE">Delaware</option>
+                                        <option value="DC">District Of Columbia</option>
+                                        <option value="FL">Florida</option>
+                                        <option value="GA">Georgia</option>
+                                        <option value="HI">Hawaii</option>
+                                        <option value="ID">Idaho</option>
+                                        <option value="IL">Illinois</option>
+                                        <option value="IN">Indiana</option>
+                                        <option value="IA">Iowa</option>
+                                        <option value="KS">Kansas</option>
+                                        <option value="KY">Kentucky</option>
+                                        <option value="LA">Louisiana</option>
+                                        <option value="ME">Maine</option>
+                                        <option value="MD">Maryland</option>
+                                        <option value="MA">Massachusetts</option>
+                                        <option value="MI">Michigan</option>
+                                        <option value="MN">Minnesota</option>
+                                        <option value="MS">Mississippi</option>
+                                        <option value="MO">Missouri</option>
+                                        <option value="MT">Montana</option>
+                                        <option value="NE">Nebraska</option>
+                                        <option value="NV">Nevada</option>
+                                        <option value="NH">New Hampshire</option>
+                                        <option value="NJ">New Jersey</option>
+                                        <option value="NM">New Mexico</option>
+                                        <option value="NY">New York</option>
+                                        <option value="NC">North Carolina</option>
+                                        <option value="ND">North Dakota</option>
+                                        <option value="OH">Ohio</option>
+                                        <option value="OK">Oklahoma</option>
+                                        <option value="OR">Oregon</option>
+                                        <option value="PA">Pennsylvania</option>
+                                        <option value="RI">Rhode Island</option>
+                                        <option value="SC">South Carolina</option>
+                                        <option value="SD">South Dakota</option>
+                                        <option value="TN">Tennessee</option>
+                                        <option value="TX">Texas</option>
+                                        <option value="UT">Utah</option>
+                                        <option value="VT">Vermont</option>
+                                        <option value="VA">Virginia</option>
+                                        <option value="WA">Washington</option>
+                                        <option value="WV">West Virginia</option>
+                                        <option value="WI">Wisconsin</option>
+                                        <option value="WY">Wyoming</option>
+                                    </select>
+                                    </Item>
                                 </Item>
                                 
                                 <Item>
                                     <label htmlFor="eventZip">Zip Code</label>
-                                    <Input type="text" label="Zip Code" id="eventZip" name="eventZip" placeholder="Zip" onValidityChange={(isValid) => this.handleInputChange('eventZip', isValid)}/>
+                                    <Input type="text" label="Zip Code" id="eventZip" name="eventZip" placeholder="Zip" />
                                 </Item>
 
                                 <Item>
                                     <label htmlFor="eventDate">Event Date</label>
-                                    <Item type="inputItem"><input type="date" id="eventDate" name="eventDate" /></Item>
+                                    <Input type="date" id="eventDate" name="eventDate" placeholder="Date" label="Date" />
                                 </Item>
 
                                 <Item>
                                     <label htmlFor="eventStart">Start Time</label>
-                                    <Item type="inputItem"><input type="time" step="00:15" id="eventStart" name="eventStart" /></Item>
+                                    <Input type="time" step="00:15" id="eventStart" name="eventStart" />
                                 </Item>
 
                                 <Item>
-                                    <label htmlFor="eventEnd">End Time</label>
-                                    <Item type="inputItem"><input type="time" id="eventEnd" name="eventEnd" /></Item>
+                                    <label htmlFor="eventDuration">Duration</label>
+                                    <Item type="inputItem">
+                                    <select id="eventDuration" name="eventDuration">
+                                        {[...Array(totalIntervals)].map((_, index) => {
+                                            let minutes = (index % intervalsPerHour + 1) * 15;
+                                            let hours = Math.floor(index / intervalsPerHour);
+                                            
+                                            if (minutes % 60 === 0) {
+                                                minutes = 0;
+                                                hours += 1;
+                                            }
+                                            const formattedTime = `${hours}h${minutes}m`;
+                                            return (
+                                                <option key={index} value={formattedTime}>
+                                                    {`${hours}h ${minutes}m`}
+                                                </option>
+                                            );
+                                        })}
+                                    </select>
+                                    </Item>
                                 </Item>
 
                                 <Item>
@@ -149,7 +187,7 @@ export default class CreateEvent extends Component {
                                         <option value="skill6">Skill 6</option>
                                     </select>
                                     </Item>
-                                </Item>    *
+                                </Item>
                                 
                                 <Item>
                                     <label htmlFor="eventUrgency">Urgency Level</label>

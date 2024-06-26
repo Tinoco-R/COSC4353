@@ -1,33 +1,55 @@
-import React from 'react';
-import { sidebarData } from './sidebarData';
+import React, { useState} from 'react';
+import { adminData } from './adminData';
+import { volunteerData } from './volunteerData';
 
-function Sidebar() {
+function Sidebar( userType ) {
+  let sidebarData;
+  let prepend = "/" + userType.userType;
+
+  if (userType === "admin") {
+    sidebarData = adminData;
+  }
+  else if (userType === "volunteer") {
+    sidebarData = volunteerData;
+  }
+
   return (
-    <div className="SideBar">
-      <ul className="SideBarList">
-        {sidebarData.map((val, key) => {
-          const isActive = window.location.pathname === val.link || val.subNav?.some(subItem => window.location.pathname.startsWith(val.link + '/' + subItem.link));
-          console.log(`Key: ${key}, IsActive: ${isActive}`);
-          return (
-            <React.Fragment key={key}>
-              <li className={'row'} id={`${isActive? 'active' : ''}`} row={val.row} onClick={() => window.location.href = val.link}>
-                <div id="icon">{val.icon}</div>
-                <div id="title">{val.title}</div>
-              </li>
-              {isActive && val.subNav && (
-                <ul className="subNavList">
-                  {val.subNav.map((subVal, index) => (
-                    <li key={index} className="subNavItem" item={subVal.item} onClick={() => window.location.href = subVal.link}>
-                      <div id="icon">{subVal.icon}</div>
-                      <div id="title">{subVal.title}</div>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </React.Fragment>
-          );
-        })}
-      </ul>
+    <div id="SIDEBAR">
+      <div className="SideBar">
+        <ul className="SideBarList">
+          {adminData.map((val, key) => {
+            const isActiveRow = window.location.pathname === (prepend + "/" + val.link) || val.subNav?.some(subItem => window.location.pathname.startsWith(prepend + '/' + subItem.link));
+
+            return (
+              <React.Fragment key={key}>
+                <li className={'row'} id={`${isActiveRow? 'active' : ''}`} row={val.row} onClick={() => {
+                        window.location.href = `${prepend}/${val.link}`;
+                        }}>
+                  <div id="icon">{val.icon}</div>
+                  <div id="title">{val.title}</div>
+                </li>
+                {isActiveRow && val.subNav && (
+                  <ul className="subNavList" >
+                    {val.subNav.map((subVal, index) => {
+                      //const isActiveItem = window.location.pathname === (prepend + "/" + val.link + "/" + subVal.link);
+                      const isActiveItem = window.location.pathname === (prepend + "/" + subVal.link);
+
+                      return (
+                      <li key={index} className="subNavItem" id={`${isActiveItem? 'activeItem' : ''}`} item={subVal.item} onClick={() => {
+                        window.location.href = `${prepend}/${subVal.link}`;
+                        }}>
+                        <div id="icon">{subVal.icon}</div>
+                        <div id="title">{subVal.title}</div>
+                      </li>
+                    )}
+                  )}
+                  </ul>
+                )}
+              </React.Fragment>
+            );
+          })}
+        </ul>
+      </div>
     </div>
   );
 }

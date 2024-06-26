@@ -24,7 +24,7 @@ export default class VolunteerHomePage extends Component {
                 <Routes>
                     // Home
                     <Route path='/' element={<Navigate replace to = "/login" />} />
-                    <Route path='/Home' element = {<p>Home</p>} />
+                    <Route path='/volunteer/' element={<Navigate replace to = "/volunteer/landing" />} />
 
                     // Login Pages
                     <Route path='/login' element = {<Login />} />

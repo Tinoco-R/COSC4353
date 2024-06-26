@@ -7,31 +7,32 @@ urlpatterns = [
     # Admin Pages
     # Home
     path('', index),
-    path('Home', index),
+    path('/admin/', index),
+    path('admin/', index),
+    path('admin/home', index),
 
     # Events
-    path('Events', index),
-    path('Events/My', index),
-    path('Events/My/CreateEvent', index),
-    path('Events/My/<int:event_id>/', index),
-    path('Events/All', index),
-    path('Events/Administration', index),
-    path('Events/Administration/CreateEvent', index),
-    path('Events/Administration/ModifyEvent', index),
+    path('admin/events', index),
+    path('admin/events/my', index),
+    path('admin/events/my/create-event', index),
+    path('admin/events/my/<int:event_id>/', index),
+    path('admin/events/all', index),
+    path('admin/events/administration', index),
+    path('admin/events/administration/create-event', index),
+    path('admin/events/administration/modify-event', index),
 
     # Volunteers
-    path('Volunteers', index),
-    path('Volunteers/View', index),
-    path('Volunteers/Manage', index),
+    path('admin/volunteers', index),
+    path('admin/volunteers/view', index),
+    path('admin/volunteers/manage', index),
 
     # Notifications
-    path('Notifications', index),
-    path('Notifications/Setup', index),
+    path('admin/notifications', index),
+    path('admin/notifications/setup', index),
 
     # Volunteer Pages
     
     # path("", views.index, name="index"),
-    path("hello-webpack/", TemplateView.as_view(template_name='hello_webpack.html')), # polls/hello-webpack/
     path("landing/", views.index, name="index"),
     path("my-profile/", views.index, name="index"),
     path("login/", views.index, name="index"),

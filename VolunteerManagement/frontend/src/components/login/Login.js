@@ -60,7 +60,7 @@ export default function Login(){
         // Redirecting the user to the landing page.
         //const navigate = useNavigate();
         var validCredentials = true;
-        var isAdmin = false;
+        var isAdmin = true;
 
         //const object = useRef();
 
@@ -69,12 +69,12 @@ export default function Login(){
         //}
         if (!isAdmin){
             navigate("/landing") // credit for user redirection code:
+            window.location.reload();
         }
         else{
-            navigate('/Home')
+            navigate("/admin");
+            window.location.reload();
         }
-
-
     }
 
     /*

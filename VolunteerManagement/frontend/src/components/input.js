@@ -12,26 +12,111 @@ export default class Input extends React.Component {
       };
     }
 
-    handleValidityChange = (isValid) => {
-        console.log(isValid? 'Input is valid' : 'Input is not valid');
+    isEmpty(value) {
+      return value === undefined || value === null || value.trim().length === 0;
+    }
+
+    hasOnlyNumbers(value) {
+      for (let index = 0; index < value.length; index++) {
+        const element = value[index];
+        if (isNaN(element)) {
+          return false;
+        }
+      }
+      return true;
     }
 
     changeValue(event) {
         let value = event.target.value;
-        let type = event.target.type;
-        let isValid = true;
+        let id = event.target.id;
 
-        if (!value.trim() && (event.target.id === "eventName" || event.target.id === "eventDescription" || event.target.id === "eventAddress" || event.target.id === "eventCity" || event.target.id === "eventState" || event.target.id === "eventZip" || event.target.id === "eventSkills" || event.target.id === "eventUrgency")) {
+        console.log(id, value);
+        // Required fields
+        if ((id === "eventName" || id === "eventDescription" || id === "eventAddress" || id === "eventCity" || id === "eventState" || id === "eventZip" || id === "eventSkills" || id === "eventUrgency")) {
+          if (value.length === 0) {
             this.setState({ value, error: "This field cannot be empty." });
-            isValid = false;
+          }
+          else {
+            this.setState({ value, error: "" });
+            this.setState({ value: value }, () => {});              
+          }
         }
 
-        else {
+        // Event must be 100 characters or fewer
+        if (id === "eventName") {
+          if (value.length > 100) {
+            this.setState({ value, error: "Name cannot exceed 100 characters." });
+          }
+          else if (value.length === 0) {
+            this.setState({ value, error: "This field cannot be empty." });
+          }
+          else {
+            this.setState({ value, error: "" });
+            this.setState({ value: value }, () => {});
+          }
+        }
+        
+        else if (id === "eventAddress") {
+          const regex = /^[A-Za-z0-9.\-'#@%&\/]+$/;
+
+          if (!regex.test(value) && value !== "") {
+            this.setState({ value, error: "Invalid characters in address. Only 'A-Z', 'a-z', '0-9', '., #, -, @, %, &, /'." });
+          }
+          else if (!regex.test(value)) {
+            this.setState({ value, error: "This field cannot be empty." });
+          }
+          else {
+            this.setState({ value, error: "" });
+            this.setState({ value: value }, () => {});
+          }
+        }
+
+        else if (id === "eventCity") {
+          const regex = /^[A-Za-z.\-\/]+$/;
+
+          if (!regex.test(value) && value !== "") {
+            this.setState({ value, error: "Invalid characters in address. Only 'A-Z', 'a-z', '., /, -'." });
+          }
+          else if (value === "") {
+            this.setState({ value, error: "This field cannot be empty." });
+          }
+          else {
+            this.setState({ value, error: "" });
+            this.setState({ value: value }, () => {});
+          }
+        }
+
+        // Zip-code must be a numeric-value
+        else if (id === "eventZip") {
+          console.log(this.hasOnlyNumbers(value));
+          if (!this.hasOnlyNumbers(value) || value.length > 5) {
+            this.setState({ value, error: "Zip Code must be a 5 length string of numbers." });
+          }
+          else {
+            this.setState({ value, error: "" });
+            this.setState({ value: value }, () => {});
+          }
+        }
+
+        // Date: Must be a future or present date.
+        else if (id === "eventDate") {
+          const currentDate = new Date();
+          const formattedDate = currentDate.toISOString().split('T')[0];
+          console.log(value, formattedDate);
+          if (value < formattedDate) {
+              this.setState({ value, error: "New events should occur in the future." });
+              console.log("New events should occur in the future")
+          }
+          else {
+            this.setState({ value, error: "" });
+            this.setState({ value: value }, () => {});
+          }
+        }
+
+        else if (id === "eventStart") {
+            console.log(id, value);
             this.setState({ value, error: "" });
         }
-         if (this.props.onValidityChange()){
-            this.props.onValidityChange(isValid);
-         }
     }
 
     handleKeyPress(event) {

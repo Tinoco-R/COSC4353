@@ -23,27 +23,27 @@ export default class AdminHomePage extends Component {
             <Router>
                 <Routes>
                     // Home
-                    <Route path='/' element={<Navigate replace to = "/Home" />} />
-                    <Route path='/Home' element = {<DefaultPage />} />
+                    <Route path='/admin/' element={<Navigate replace to = "/admin/home" />} />
+                    <Route path='admin/home' element = {<DefaultPage />} />
 
                     // Events
-                    <Route path='/Events' element = {<p>Events</p>} />
-                    <Route path='/Events/My' element = {<PersonalAdminEvents />} />
-                    <Route path='/Events/My/CreateEvent' element={<Navigate replace to = "/Events/Administration/CreateEvent" />} />
-                    <Route path='/Events/My/:eventId' element={<EventDetails />} />
-                    <Route path='/Events/All' element = {<AllAdminEvents/>} />
-                    <Route path='/Events/Administration' element = {<EventAdministration />} />
-                    <Route path='/Events/Administration/CreateEvent' element = {<CreateEvent />} />
-                    <Route path='/Events/Administration/ModifyEvent' element = {<ModifyEvent />} />
+                    <Route path='admin/events' element = {<p>Events</p>} />
+                    <Route path='admin/events/my' element = {<PersonalAdminEvents />} />
+                    <Route path='admin/events/my/create-event' element={<CreateEvent />} />
+                    <Route path='admin/events/my/:eventId' element={<EventDetails />} />
+                    <Route path='admin/events/all' element = {<AllAdminEvents/>} />
+                    <Route path='admin/events/administration' element = {<EventAdministration />} />
+                    <Route path='admin/events/administration/create-event' element = {<CreateEvent />} />
+                    <Route path='admin/events/administration/modify-event' element = {<ModifyEvent />} />
 
                     // Volunteers
-                    <Route path='/Volunteers/' element = {<p>Volunteers</p>} />
-                    <Route path='/Volunteers/View' element = {<ViewVolunteers />} />
-                    <Route path='/Volunteers/Manage' element = {<ManageNewRegistrations />} />
+                    <Route path='admin/volunteers/' element = {<p>Volunteers</p>} />
+                    <Route path='admin/volunteers/View' element = {<ViewVolunteers />} />
+                    <Route path='admin/volunteers/Manage' element = {<ManageNewRegistrations />} />
 
                     // Notifications
-                    <Route path='/Notifications' element = {<p>Notifications</p>} />
-                    <Route path='/Notifications/Setup' element = {<NotificationSetup />} />
+                    <Route path='admin/notifications' element = {<p>Notifications</p>} />
+                    <Route path='admin/notifications/setup' element = {<NotificationSetup />} />
                 </Routes>
             </Router>
         );

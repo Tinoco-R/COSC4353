@@ -19,40 +19,40 @@ import EditNotificationsOutlinedIcon from '@mui/icons-material/EditNotifications
 
 // Need to get main panels for volunteer homepage and have the export return one of the lists below
 
-export const sidebarData = [
+export const volunteerData = [
     {
         row: 1,
         title: "Home",
         icon: <CottageIcon />,
-        link: "/Home",
+        link: "landing",
         subNav: []
     },
     // Events
     {
         row: 2,
-        title: "Events",
+        title: "SubNav1 Events",
         icon: <EventNoteSharpIcon />,
-        link: "/Events",
+        link: "events",
         subNav: [
             {
                 item: "a",
                 title: "My Events",
                 icon: <EventIcon />,
-                link: "/Events/My"
+                link: "events/my"
             },
             
             {
                 item: "b",
                 title: "All Events",
                 icon: <DateRangeIcon />,
-                link: "/Events/All"
+                link: "events/all"
             },
             
             {
                 item: "c",
-                title: "Event Administration",
+                title: "Event volunteeristration",
                 icon: <EditCalendarIcon />,
-                link: "/Events/Administration"
+                link: "events/volunteeristration"
             },
         ]
     },
@@ -60,22 +60,22 @@ export const sidebarData = [
     // Volunteers
     {
         row: 3,
-        title: "Volunteers",
+        title: "SubNav2 Volunteers",
         icon: <PeopleSharpIcon />,
-        link: "/Volunteers",
+        link: "volunteers",
         subNav: [
             {
                 item: "a",
                 title: "View Volunteers",
                 icon: <VolunteerActivismIcon />,
-                link: "/Volunteers/View"
+                link: "volunteers/view"
             },
         
             {
                 item: "b",
                 title: "Manage New Registrations",
                 icon: <ManageAccountsIcon />,
-                link: "/Volunteers/Manage"
+                link: "volunteers/manage"
             },
         ]
     },
@@ -83,15 +83,15 @@ export const sidebarData = [
     // Notifications
     {
         row: 4,
-        title: "Notifications",
+        title: "SubNav3 Notifications",
         icon: <CallToActionSharpIcon />,
-        link: "/Notifications",
+        link: "notifications",
         subNav: [
             {
                 item: "a",
                 title: "Setup Notification System",
                 icon: <EditNotificationsIcon />,
-                link: "/Notifications/Setup"
+                link: "notifications/setup"
             }
         ]
     } 
