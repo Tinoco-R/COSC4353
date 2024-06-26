@@ -94,11 +94,14 @@ export default function Login(){
 
     return (
         <>
-        <h1>Login</h1>
+        <h1>Helping Hands</h1>
+        <h2>Login</h2>
 
         <form className="loginForm" onSubmit={handleSubmit(onSubmit)} >
 
             <IncorrectUsernameOrPassword />
+
+            
 
             <div className="loginField">
                 <label for='email'>Email</label>

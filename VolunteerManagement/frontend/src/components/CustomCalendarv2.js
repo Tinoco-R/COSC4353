@@ -201,12 +201,13 @@ export class CustomCalendar extends React.Component{
           <>        
           {/*<h2>{month_displayed}</h2>*/}
 
-          <div className='eventsCalendar'> 
+          
           <h2 id="current_month_title">{month_displayed + ' ' + current_year}</h2>       
+          <div className='eventsCalendar'> 
           <Calendar 
               ref={this.calendarRef} /* https://github.com/nhn/toast-ui.react-calendar/blob/master/README.md */
               usageStatistics={false}
-              height="900px"
+              height="100%"
               view="month"
               gridSelection={false}
               isReadOnly={true}
@@ -221,11 +222,11 @@ export class CustomCalendar extends React.Component{
               useDetailPopup={true}
               template={template}
           />
-          <button onClick={this.handleClickPrevButton}>Prev</button>
-          <button onClick={this.handleClickNextButton}>Next</button>
+          <button className='monthNavigationButtons' onClick={this.handleClickPrevButton}>Prev</button>
+          <button className='monthNavigationButtons' onClick={this.handleClickNextButton}>Next</button>
           
           
-          </div>  
+          </div>
           </>
       );
   }

@@ -32,7 +32,6 @@ export default function LandingPageWithEvents(){
     return (
         <>
 
-            {/*<ResponsiveBar />*/}
             <MyEventsHeader />
 
             <CustomCalendar />

@@ -37,13 +37,11 @@ export default class VolunteerHomePage extends Component {
                     <Route path='/logout' element = {<Logout />} />
                     <Route path='/landing' element = {
                         <> 
-                        <ResponsiveBar />
                         <LandingPageWithEvents />
                         </>
                     }/>
                     <Route path='/my-profile' element = {
                         <> 
-                        <ResponsiveBar />
                         <MyProfile />
                         </>
                     }/>
