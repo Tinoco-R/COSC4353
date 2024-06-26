@@ -34,6 +34,7 @@ urlpatterns = [
     path("hello-webpack/", TemplateView.as_view(template_name='hello_webpack.html')), # polls/hello-webpack/
     path("landing/", views.index, name="index"),
     path("my-profile/", views.index, name="index"),
+    path("saved-changes-confirmation/", views.index, name="index"),
     path("login/", views.index, name="index"),
     path("sign-up/", views.index, name="index"),
     path("verification/", views.index, name="index"),
