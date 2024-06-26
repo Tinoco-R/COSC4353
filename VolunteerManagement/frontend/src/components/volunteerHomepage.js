@@ -11,6 +11,7 @@ import EmailAddressReceivedConfirmation from "./login/EmailAddressReceivedConfir
 import NotificationComponent from "./notification/NotificationComponent";
 
 import { BrowserRouter as Router, Routes, Route, Link, Navigate } from "react-router-dom";
+import SavedChangesConfirmation from "./MyProfileSavedChangesConfirmation";
 
 // Handles routing for all pages found within the volunteer site
 export default class VolunteerHomePage extends Component {
@@ -37,14 +38,17 @@ export default class VolunteerHomePage extends Component {
                     <Route path='/logout' element = {<Logout />} />
                     <Route path='/landing' element = {
                         <> 
-                        <ResponsiveBar />
                         <LandingPageWithEvents />
                         </>
                     }/>
                     <Route path='/my-profile' element = {
                         <> 
-                        <ResponsiveBar />
                         <MyProfile />
+                        </>
+                    }/>
+                    <Route path='/saved-changes-confirmation' element = {
+                        <> 
+                        <SavedChangesConfirmation />
                         </>
                     }/>
                     <Route path='/notification' element = {<NotificationComponent />} />

@@ -3,6 +3,30 @@ import { render } from "react-dom";
 
 import Calendar from '@toast-ui/react-calendar';
 
+
+// Imports needed for the material UI popup modal
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+
+// from: https://github.com/jonatanklosko/material-ui-confirm/?tab=readme-ov-file
+import { ConfirmProvider } from 'material-ui-confirm';
+import Button from 'react-multi-date-picker/components/button';
+import { useConfirm } from 'material-ui-confirm';
+//////////////
+
+
+//Popup component
+
+const popupComponent = () => {
+  return(
+      <ConfirmProvider>
+        <p>pop up</p>
+      </ConfirmProvider>
+  );
+};
+
+
+
 //import '@toast-ui/calendar/dist/toastui-calendar.min.css'; // Stylesheet for calendar
 
 // Imports needed for the pop up in the calendar;
@@ -128,8 +152,32 @@ const template = {
   },
 }
 
+const popupCall = () => {
+  return(
+    <popupComponent />
+  );
+};
+
+const clickEventHandler = (event) => {
+  console.log('clickEventHandler triggered');
+  // the event id of the event that was clicked is included in the event object
+  // guide: https://github.com/nhn/tui.calendar/blob/main/docs/en/apis/calendar.md#clickevent
+  console.log(event);
+
+  popupCall();
+  //<popupComponent />;
+  //alert();
+
+}
 
 
+
+
+
+
+
+
+// Calendar component
 
 export class CustomCalendar extends React.Component{
 
@@ -170,6 +218,20 @@ export class CustomCalendar extends React.Component{
       
     };
 
+    helper_function = () => {
+      const cal = this.calendarRef.current.getInstance();
+      // Attempting to show my own popup modals for the events in the calendar
+      cal.on({
+        'clickSchedule': function(e) {
+          console.log('clickSchedule triggered', e);
+        }
+      })
+
+      console.log('helper_function ran');
+    }
+
+    helper_function;
+
     // the prevbutton function, I implemented it using the
     // nextbutton "template"
     handleClickPrevButton = () => {
@@ -188,8 +250,15 @@ export class CustomCalendar extends React.Component{
       month_title.innerHTML = "";
       month_title.innerHTML = `${months_array[month_index] + ' ' + current_year}`;
       calendarInstance.prev();
+
+
+
     
     }
+
+
+
+
 
 
 
@@ -201,12 +270,13 @@ export class CustomCalendar extends React.Component{
           <>        
           {/*<h2>{month_displayed}</h2>*/}
 
-          <div className='eventsCalendar'> 
+          
           <h2 id="current_month_title">{month_displayed + ' ' + current_year}</h2>       
+          <div className='eventsCalendar'> 
           <Calendar 
               ref={this.calendarRef} /* https://github.com/nhn/toast-ui.react-calendar/blob/master/README.md */
               usageStatistics={false}
-              height="900px"
+              height="100%"
               view="month"
               gridSelection={false}
               isReadOnly={true}
@@ -217,15 +287,19 @@ export class CustomCalendar extends React.Component{
               calendars={calendars}
               events={initialEvents}
               onAfterRenderEvent={onAfterRenderEvent}
-              useFormPopup={true}
-              useDetailPopup={true}
+              useFormPopup={false}
+              useDetailPopup={false}
               template={template}
+              onClickEvent={clickEventHandler}
+              
           />
-          <button onClick={this.handleClickPrevButton}>Prev</button>
-          <button onClick={this.handleClickNextButton}>Next</button>
+          <button className='monthNavigationButtons' onClick={this.handleClickPrevButton}>Prev</button>
+          <button className='monthNavigationButtons' onClick={this.handleClickNextButton}>Next</button>
           
           
-          </div>  
+          </div>
+
+          <popupComponent />
           </>
       );
   }

@@ -7,6 +7,7 @@ import { useForm } from 'react-hook-form'; // https://www.youtube.com/watch?v=oS
 import Select, { InputActionMeta } from 'react-select'; // source: https://react-select.com/home
 
 import MultiDatePicker from './MultiDatePicker';
+import { Navigate, redirect, useNavigate } from 'react-router-dom';
 
 export default function MyProfile(){
 
@@ -119,6 +120,8 @@ export default function MyProfile(){
         { value: 'AZ', label: 'AZ'}
     ]
 
+    const navigate = useNavigate();
+
     const onSubmit = (data) => {
 
         if (date === ''){
@@ -129,6 +132,10 @@ export default function MyProfile(){
 
         console.log('My profile form submitted!');
         console.log(data); // just put them in the console for now
+
+        // Add some condition? Currently: automatically saying the input was verified
+
+        navigate('/saved-changes-confirmation');
     }
 
     //const { onBlur } = register('fullName');
@@ -155,7 +162,7 @@ export default function MyProfile(){
 
     return (
         <>
-        <h1>My Profile</h1>
+        <h1 className='myProfileTitle'>My Profile</h1>
         <form onSubmit={handleSubmit(onSubmit)}>
             <div className='myProfileFormBox'>
                 <label for='fullName'>Full Name</label>
@@ -183,6 +190,7 @@ export default function MyProfile(){
                     options={states}
                     onChange={(choice) => {setUserState(choice); stateChangeSignalForState(choice) }}
                     required
+                    sty
                      />
             </div>
             <div className='myProfileFormBox'>
@@ -209,15 +217,15 @@ export default function MyProfile(){
             
 
 
-        <div>
-            <p>Availability</p>
+        <div className='multiDatePickerInMyProfileForm'>
+            <p id='availabilityLabelMyProfileForm'>Availability</p>
             <MultiDatePicker 
                 required
                 />
         </div>
 
         <div className='myProfileFormSubmitButton'>
-                <input type='submit' value='Save' />
+                <input className='greenButtonStyle' type='submit' value='Save' />
             </div>
         </form>
 

@@ -99,7 +99,6 @@ export default function App() {
                     <Route exact path = "/landing"
                     element={ 
                         <>
-                        <ResponsiveBar />
                         <LandingPageWithEvents />
                         </>}
                      />
@@ -107,7 +106,6 @@ export default function App() {
                     <Route exact path = "/my-profile"
                     element={ 
                         <>
-                        <ResponsiveBar />
                         <MyProfile />
                         </>}
                      />
