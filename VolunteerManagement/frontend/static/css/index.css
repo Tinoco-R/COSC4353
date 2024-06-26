@@ -97,7 +97,7 @@ html, body {
 }
 
 .inputValidationError {
-    color: rgb(255, 0, 0);
+    color: rgb(243, 64, 64);
 }
 /*
 .eventsCalendar {
@@ -106,3 +106,39 @@ html, body {
     bottom: 0;
 }
 */
+
+
+/* Styling for my-profile page */
+.myProfileTitle {
+    color: #86C232;
+}
+
+.myProfileFormBox {
+    font-weight:bolder;
+}
+
+#availabilityLabelMyProfileForm {
+    font-weight: bolder;
+}
+
+.stateMultiSelect {
+    color: #222629;
+}
+
+.skillsMultiSelect {
+    color: #222629;
+}
+
+.multiDatePickerInMyProfileForm {
+    color: #222629;
+}
+
+.greenButtonStyle {
+    background-color: #86C232;
+    color: #222629;
+    border-radius: 5%;
+}
+
+.confirmationCheckMark {
+    font-size: 5em;
+}
