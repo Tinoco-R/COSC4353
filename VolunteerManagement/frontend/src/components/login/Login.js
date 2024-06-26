@@ -94,8 +94,8 @@ export default function Login(){
 
     return (
         <>
-        <h1>Helping Hands</h1>
-        <h2>Login</h2>
+        <h1 className="titleLoginPage">Helping Hands</h1>
+        <h2 className="loginTextInLoginPage">Login</h2>
 
         <form className="loginForm" onSubmit={handleSubmit(onSubmit)} >
 
