@@ -9,7 +9,7 @@ export default function Logout(){
         <>
         <p>You have successfully logged out!</p>
 
-        <Link to="/login">
+        <Link to="/login/">
         <GenericButton text={"Login"}/>
         </Link>
         </>

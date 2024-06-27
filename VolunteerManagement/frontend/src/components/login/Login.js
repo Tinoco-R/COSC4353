@@ -10,6 +10,8 @@ import { useNavigate } from "react-router-dom";
 
 import AdminHomePage from "../adminHomepage";
 
+import Swal from "sweetalert2";
+
 function IncorrectUsernameOrPassword({ validated }){
 
     const [useValidate, setValidate] = useState("");
@@ -59,19 +61,23 @@ export default function Login(){
         // Assuming they are correct.
         // Redirecting the user to the landing page.
         //const navigate = useNavigate();
-        var validCredentials = true;
+        var validCredentials = false;
         var isAdmin = true;
 
         //const object = useRef();
 
-        //if (validCredentials == true) {
-            //object.current.props.history.push('/landing');
-        //}
-        if (!isAdmin){
+        if (validCredentials == false) {
+            Swal.fire({
+                title: "<h5>Failed Login</h5>",
+                text: 'Incorrect credentials',
+                icon: 'error'
+            })
+        }
+        else if (!isAdmin){
             navigate("/landing") // credit for user redirection code:
             window.location.reload();
         }
-        else{
+        else {
             navigate("/admin");
             window.location.reload();
         }
