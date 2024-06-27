@@ -33,8 +33,8 @@ urlpatterns = [
     # Volunteer Pages
     
     # path("", views.index, name="index"),
-    path("landing/", views.index, name="index"),
-    path("my-profile/", views.index, name="index"),
+    path("volunteer/landing/", views.index, name="index"),
+    path("volunteer/my-profile/", views.index, name="index"),
     path("saved-changes-confirmation/", views.index, name="index"),
     path("login/", views.index, name="index"),
     path("sign-up/", views.index, name="index"),
