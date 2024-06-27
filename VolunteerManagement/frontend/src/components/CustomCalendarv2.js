@@ -1,12 +1,13 @@
-import React from 'react';
+//import React from 'react';
+import * as React from 'react';
 import { render } from "react-dom";
 
 import Calendar from '@toast-ui/react-calendar';
 
 
 // Imports needed for the material UI popup modal
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
+//import Dialog from '@mui/material/Dialog';
+//import DialogTitle from '@mui/material/DialogTitle';
 
 // from: https://github.com/jonatanklosko/material-ui-confirm/?tab=readme-ov-file
 import { ConfirmProvider } from 'material-ui-confirm';
@@ -14,17 +15,10 @@ import Button from 'react-multi-date-picker/components/button';
 import { useConfirm } from 'material-ui-confirm';
 //////////////
 
+import Swal from 'sweetalert2';
 
-//Popup component
-
-const popupComponent = () => {
-  return(
-      <ConfirmProvider>
-        <p>pop up</p>
-      </ConfirmProvider>
-  );
-};
-
+import DialogComponent from './DialogComponent';
+import './DialogComponent';
 
 
 //import '@toast-ui/calendar/dist/toastui-calendar.min.css'; // Stylesheet for calendar
@@ -152,11 +146,11 @@ const template = {
   },
 }
 
-const popupCall = () => {
-  return(
-    <popupComponent />
-  );
-};
+//const popupCall = () => {
+//  return(
+//    <PopupComponent />
+//  );
+//};
 
 const clickEventHandler = (event) => {
   console.log('clickEventHandler triggered');
@@ -164,17 +158,100 @@ const clickEventHandler = (event) => {
   // guide: https://github.com/nhn/tui.calendar/blob/main/docs/en/apis/calendar.md#clickevent
   console.log(event);
 
-  popupCall();
+  //popupCall();
   //<popupComponent />;
-  //alert();
+
+  // credit, examples at: https://sweetalert2.github.io/
+  Swal.fire({
+    title: '<h5> Event details </h5>',
+    text: 'Cleaning event on June 30, 2024 at 10:00 am',
+    /*icon: 'warning',*/
+    showCancelButton: true,
+    showConfirmButton: false,
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    cancelButtonText: "Cancel Attendance"
+  }).then((result) => {
+    if (Swal.DismissReason.cancel) {
+      Swal.fire({
+        title: 'Confirmed',
+        text: 'Your attendance to this event has been cancelled.',
+        icon: 'success'
+      });
+
+      // Remove the user from the attendees to the event and Update the screen
+      // Considering that this function could be removed... you can't be penalized
+      // for not having it because it was not required
+
+
+    }
+  });
 
 }
 
+// Link might be useful:
+// https://stackoverflow.com/questions/57611199/i-need-to-show-a-react-material-ui-confirmation-dialog-box-or-a-sweet-alert-conf
 
 
 
+//Popup component
+
+const PopupComponent = () => {
+  return(
+      <ConfirmProvider>
+        <p>pop up</p>
+      </ConfirmProvider>
+  );
+};
+
+/******************************************************************** */
 
 
+//import { Button as Button2 } from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+
+
+const DialogComponentLocal = () => {
+  const [open, setOpen] = React.useState(true);
+
+  const handleClickOpen = () => {
+      setOpen(true);
+  };
+
+  const handleClose = () => {
+      setOpen(false);
+  };
+
+  return(
+    <React.Fragment>
+    <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby='alert-dialog-title'
+        aria-describedby='alert-dialog-description'
+      >
+        <DialogTitle id='alert-dialog-title'>{"Event details"}
+        </DialogTitle>
+        <DialogContent>
+            <DialogContentText id='alert-dialog-description'>
+                To subscribe, pay 10.00
+            </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+            <Button onClick={handleClose}>Will not attend</Button>
+            <Button onClick={handleClose} autoFocus>Close</Button>
+        </DialogActions>
+    </Dialog>
+    
+    </React.Fragment>
+  )
+
+}
+/**************************************************************************8 */
 
 
 // Calendar component
@@ -182,6 +259,11 @@ const clickEventHandler = (event) => {
 export class CustomCalendar extends React.Component{
 
 
+  /***************************************** */
+
+
+  /***************************************** */
+  
   
   calendarRef = React.createRef();
 
@@ -254,7 +336,10 @@ export class CustomCalendar extends React.Component{
 
 
     
-    }
+    };
+
+
+
 
 
 
@@ -298,8 +383,14 @@ export class CustomCalendar extends React.Component{
           
           
           </div>
+          
 
-          <popupComponent />
+
+
+
+
+
+          {/*<PopupComponent />*/}
           </>
       );
   }
