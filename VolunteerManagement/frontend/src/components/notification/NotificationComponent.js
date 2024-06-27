@@ -11,7 +11,6 @@ import Swal from 'sweetalert2';
 
 export function ShowNotification(title, message){
 
-    
 
     // credit, examples at: https://sweetalert2.github.io/
     Swal.fire({
@@ -23,11 +22,12 @@ export function ShowNotification(title, message){
         confirmButtonColor: "#3085d6",
         cancelButtonColor: "#d33",
         cancelButtonText: "Close",
-        confirmButtonText: "Acknowledge"
-    }).then((result) => {
+        confirmButtonText: "Acknowledge",
+        allowOutsideClick: false
+    })//.then((result) => {
 
-        if (!result.isConfirmed) {
-            ShowNotification(title, message)
+        //if (!result.isConfirmed) {
+        //    ShowNotification(title, message)
         /*Swal.fire({
             title: 'Confirmed',
             text: 'Your attendance to this event has been cancelled.',
@@ -37,9 +37,9 @@ export function ShowNotification(title, message){
         // Remove the user from the attendees to the event and Update the screen
         // Considering that this function could be removed... you can't be penalized
         // for not having it because it was not required
-            console.log('Notification acknowledged by the user')
+        //    console.log('Notification acknowledged by the user');
 
-        }
-    });
+        //}
+    //});
 
 }
