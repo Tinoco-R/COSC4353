@@ -15,7 +15,7 @@ export default function ResponsiveBar(){
                 </div>
 
                 <div>
-                <Link to='/logout'>
+                <Link to='volunteer/logout'>
                     <GenericButton text='Log out'>
                     </GenericButton>
                 </Link>

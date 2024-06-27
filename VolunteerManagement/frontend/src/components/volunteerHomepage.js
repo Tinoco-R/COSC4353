@@ -35,7 +35,7 @@ export default class VolunteerHomePage extends Component {
                     <Route path='/email-address-received' element = {<EmailAddressReceivedConfirmation />} />
 
                     // Volunteer Homepage
-                    <Route path='/logout' element = {<Logout />} />
+                    <Route path='/volunteer/logout' element = {<Logout />} />
                     <Route path='/volunteer/landing' element = {
                         <> 
                         <LandingPageWithEvents />

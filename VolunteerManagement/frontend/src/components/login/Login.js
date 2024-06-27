@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 
 import GenericButton from "../GenericButton";
 
@@ -33,6 +33,10 @@ function IncorrectUsernameOrPassword({ validated }){
 
 
 export default function Login(){
+    // On load, refreshes if sidebar is detected
+    useEffect(() => {
+        findSidebar();
+    }, []); 
 
     
     // React Hook Form (code for how to integrate the form from: https://www.youtube.com/watch?v=oSIHZ9zKzVA)
@@ -74,8 +78,8 @@ export default function Login(){
             })
         }
         else if (!isAdmin){
-            navigate("/volunteer/landing") // credit for user redirection code:
-            //window.location.reload();
+            navigate("/volunteer/landing");
+            window.location.reload();
         }
         else {
             navigate("/admin");
@@ -91,6 +95,13 @@ export default function Login(){
     }
     */
 
+    // Refresh the login page if the sidebar is detected
+    function findSidebar () {
+        const sidebarDiv = document.getElementById("sidebar");
+        if (sidebarDiv && sidebarDiv.children.length !== 0) {
+            window.location.reload();
+        }
+    }
     
 
     function redirectUser (){
