@@ -74,8 +74,8 @@ export default function Login(){
             })
         }
         else if (!isAdmin){
-            navigate("/landing") // credit for user redirection code:
-            window.location.reload();
+            navigate("/volunteer/landing") // credit for user redirection code:
+            //window.location.reload();
         }
         else {
             navigate("/admin");
@@ -87,14 +87,14 @@ export default function Login(){
     const redirectUser = () => {
         console.log('on click event');
         const navigate = useNavigate();
-        navigate('/landing');
+        navigate('volunteer/landing');
     }
     */
 
     
 
     function redirectUser (){
-        //navigate("/landing")
+        //navigate("volunteer/landing")
         console.log('button clicked')
     }
 
@@ -125,7 +125,7 @@ export default function Login(){
 
             </div>
 
-            {/*<Link to='/landing'>*/}
+            {/*<Link to='volunteer/landing'>*/}
             <input type='submit' name='LogInButton' value='Login' onClick={(e) => redirectUser}></input> {/* https://developer.mozilla.org/en-US/docs/Web/HTML/Element/form */}
             {/*</Link>*/}
 

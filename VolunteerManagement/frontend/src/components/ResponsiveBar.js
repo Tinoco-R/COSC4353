@@ -8,7 +8,7 @@ export default function ResponsiveBar(){
         <>
             <div className='responsiveBar'>
                 <div>
-                <Link to="/my-profile">
+                <Link to="volunteer/my-profile">
                     <GenericButton text='My Profile'>
                     </GenericButton>
                 </Link>
