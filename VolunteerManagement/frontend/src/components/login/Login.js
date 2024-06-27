@@ -61,8 +61,8 @@ export default function Login(){
         // Assuming they are correct.
         // Redirecting the user to the landing page.
         //const navigate = useNavigate();
-        var validCredentials = false;
-        var isAdmin = true;
+        var validCredentials = true;
+        var isAdmin = false;
 
         //const object = useRef();
 

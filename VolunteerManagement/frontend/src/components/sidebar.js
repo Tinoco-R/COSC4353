@@ -5,19 +5,21 @@ import { volunteerData } from './volunteerData';
 function Sidebar( userType ) {
   let sidebarData;
   let prepend = "/" + userType.userType;
-
-  if (userType === "admin") {
+  console.log("prepend:", prepend)
+  if (userType.userType === "admin") {
+    console.log(1);
     sidebarData = adminData;
   }
-  else if (userType === "volunteer") {
+  else if (userType.userType === "volunteer") {
+    console.log(2);
     sidebarData = volunteerData;
   }
-
+  console.log(sidebarData);
   return (
     <div id="SIDEBAR">
       <div className="SideBar">
         <ul className="SideBarList">
-          {adminData.map((val, key) => {
+          {sidebarData.map((val, key) => {
             const isActiveRow = window.location.pathname === (prepend + "/" + val.link) || val.subNav?.some(subItem => window.location.pathname.startsWith(prepend + '/' + subItem.link));
 
             return (
