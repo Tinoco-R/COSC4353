@@ -11,7 +11,11 @@ import { useNavigate } from "react-router-dom";
 import AdminHomePage from "../adminHomepage";
 
 import Swal from "sweetalert2";
+<<<<<<< HEAD
 import { Button } from "@mui/material";
+=======
+import { ShowNotification } from "../notification/NotificationComponent";
+>>>>>>> 21189be4 (Added Notification System (function))
 
 function IncorrectUsernameOrPassword({ validated }){
 
@@ -118,6 +122,8 @@ export default function Login(){
         //navigate("volunteer/landing")
         console.log('button clicked')
     }
+
+    ShowNotification('Welcome!', 'Thank you for visiting our site for the first time');
 
     return (
         <>
