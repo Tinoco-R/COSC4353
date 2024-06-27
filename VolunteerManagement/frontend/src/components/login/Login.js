@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import AdminHomePage from "../adminHomepage";
 
 import Swal from "sweetalert2";
+import { Button } from "@mui/material";
 
 function IncorrectUsernameOrPassword({ validated }){
 
@@ -37,6 +38,16 @@ export default function Login(){
     useEffect(() => {
         findSidebar();
     }, []); 
+
+    // Enables admin toggle (to easily switch from volunteer or admin login without needing to change a hardcoded value here)
+/*     var isAdmin = true;
+    const toggleAdmin = () => {
+        isAdmin =!isAdmin;
+    }; */
+    const [isAdmin, setIsAdmin] = useState(true);
+    const toggleAdmin = () => {
+        setIsAdmin(!isAdmin);
+    };
 
     
     // React Hook Form (code for how to integrate the form from: https://www.youtube.com/watch?v=oSIHZ9zKzVA)
@@ -66,7 +77,6 @@ export default function Login(){
         // Redirecting the user to the landing page.
         //const navigate = useNavigate();
         var validCredentials = true;
-        var isAdmin = false;
 
         //const object = useRef();
 
@@ -163,6 +173,16 @@ export default function Login(){
             </div>
 
         </p>
+
+        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '100vh' }}>
+            <p>
+                Toggle Admin [For Development Purposes]
+                <p>Login Type: {isAdmin? 'Admin' : 'Volunteer'}</p>
+                <div>
+                    <button onClick={toggleAdmin}>Toggle Admin Login</button>
+                </div>
+            </p>
+        </div>
         </>
     
     );
