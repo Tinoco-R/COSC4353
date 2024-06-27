@@ -9,6 +9,8 @@ import NotificationSetup from "./notificationSetup";
 import DefaultPage from "./defaultPage"
 import ViewVolunteers from "./viewVolunteers"
 import AllAdminEvents from "./allAdminEvents"
+import VolunteerMatching from "./volunteerMatching"
+import Event from "./table/event"
 
 import { BrowserRouter as Router, Routes, Route, Link, Navigate } from "react-router-dom";
 
@@ -38,8 +40,10 @@ export default class AdminHomePage extends Component {
 
                     // Volunteers
                     <Route path='admin/volunteers/' element = {<p>Volunteers</p>} />
-                    <Route path='admin/volunteers/View' element = {<ViewVolunteers />} />
-                    <Route path='admin/volunteers/Manage' element = {<ManageNewRegistrations />} />
+                    <Route path='admin/volunteers/view' element = {<ViewVolunteers />} />
+                    <Route path='admin/volunteers/view' element = {<ViewVolunteers />} />
+                    <Route path='admin/volunteers/manage' element = {<ManageNewRegistrations />} />
+                    <Route path='admin/volunteers/matching' element = {<VolunteerMatching />} />
 
                     // Notifications
                     <Route path='admin/notifications' element = {<p>Notifications</p>} />

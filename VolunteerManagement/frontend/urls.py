@@ -25,6 +25,7 @@ urlpatterns = [
     path('admin/volunteers', index),
     path('admin/volunteers/view', index),
     path('admin/volunteers/manage', index),
+    path('admin/volunteers/matching', index),
 
     # Notifications
     path('admin/notifications', index),

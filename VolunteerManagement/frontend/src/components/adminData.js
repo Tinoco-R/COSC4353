@@ -16,6 +16,7 @@ import ManageAccountsOutlinedIcon from '@mui/icons-material/ManageAccountsOutlin
 import CallToActionSharpIcon from '@mui/icons-material/CallToActionSharp';
 import EditNotificationsIcon from '@mui/icons-material/EditNotifications';
 import EditNotificationsOutlinedIcon from '@mui/icons-material/EditNotificationsOutlined';
+import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 
 // Need to get main panels for volunteer homepage and have the export return one of the lists below
 
@@ -66,13 +67,20 @@ export const adminData = [
         subNav: [
             {
                 item: "a",
+                title: "Volunteer Matching",
+                icon: <AssignmentIndIcon />,
+                link: "volunteers/matching"
+            },
+
+            {
+                item: "b",
                 title: "View Volunteers",
                 icon: <VolunteerActivismIcon />,
                 link: "volunteers/view"
             },
         
             {
-                item: "b",
+                item: "c",
                 title: "Manage New Registrations",
                 icon: <ManageAccountsIcon />,
                 link: "volunteers/manage"
