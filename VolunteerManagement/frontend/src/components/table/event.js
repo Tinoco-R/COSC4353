@@ -1,45 +1,84 @@
-// Below from https://mui.com/material-ui/react-table/
+/* // Below from https://mui.com/material-ui/react-table/
 import * as React from 'react';
 import { DataGrid } from '@mui/x-data-grid';
+import { eventData } from "../eventAdminMatchingCardData.js";
 
 const columns = [
   { field: 'id', headerName: 'ID', width: 40 },
   { field: 'name', headerName: 'Name', width: 150 },
   { field: 'date', headerName: 'Date', width: 100 },
   { field: 'administrator', headerName: 'Administrator', width: 100 },
-  { field: 'urgency', headerName: 'Urgency', width: 100,},
-  { field: 'volunteers', headerName: 'Volunteers', width: 100,},
-  { field: 'skills', headerName: 'Skills', width: 150 },
+  { field: 'urgency', headerName: 'Urgency', width: 100 },
+  { field: 'volunteers', headerName: 'Volunteers', width: 100 },
+  { field: 'skills', headerName: 'Skills', width: 750 },
 ];
 
-const rows = [
-  { id: 1, name: "House Upgrade"     , date: '12/8/1290' , administrator: 'Jon'     , urgency: 'low'   , volunteers: '12/40' , skills: 'Paint, Move, Fix' },
-  { id: 2, name: "Warehouse Building", date: '5/2/2173'  , administrator: 'Cersei'  , urgency: 'low'   , volunteers: '23/40' , skills: 'Mpve, Build, Fix' },
-  { id: 3, name: "Brick Laying"      , date: '9/10/1864' , administrator: 'Jaime'   , urgency: 'medium', volunteers: '9/15'  , skills: 'Build, Strength' },
-  { id: 4, name: "Scaffold Setting"  , date: '3/17/2573' , administrator: 'Arya'    , urgency: 'high'  , volunteers: '18/20' , skills: 'Build' },
-  { id: 5, name: "Gardening"         , date: '7/15/2835' , administrator: 'Daenerys', urgency: 'medium', volunteers: '19/35' , skills: 'Plant, Care' },
-  { id: 6, name: "Box Building"      , date: '8/18/1396' , administrator:  null     , urgency: 'high'  , volunteers: '40/40' , skills: 'Tape, Boxes' },
-  { id: 7, name: "Litter Collecting" , date: '7/1/353'   , administrator: 'Ferrara' , urgency: 'high'  , volunteers: '16/25' , skills: '' },
-  { id: 8, name: "Food Preperation"  , date: '11/16/1778', administrator: 'Rossini' , urgency: 'low'   , volunteers: '48/50' , skills: 'Cook, Food-prep' },
-  { id: 9, name: "Clothing Giveaway" , date: '9/14/2657' , administrator: 'Harvey'  , urgency: 'medium', volunteers: '1/10'  , skills: '' },
-];
-
-export default function DataTable() {
+export default function DataTable( onSkillSelect ) {
   return (
-    <div style={{ height: 400, width: '55%', height: '80%' }}>
+    <div style={{ height: 400, width: '85%', height: '90%' }}>
       <DataGrid
-        rows={rows}
+        rows={eventData}
         columns={columns}
         initialState={{
           pagination: {
             paginationModel: { page: 0, pageSize: 5 },
           },
         }}
-        pageSizeOptions={[5, 10]}
+        pageSizeOptions={[5, 10, 20]}
         disableSelectionOnClick
         checkboxSelection
         disableMultipleSelection
+        disableMultipleRowSelection
+        selectionType="single"
+        // Get the list of skills for the selected row on the data table
+        onRowSelectionModelChange={(selectionModel) => {
+          let selectedRowId = selectionModel[0];
+          if (selectedRowId !== undefined) {
+            const selectedSkills = eventData[selectionModel[0] - 1].skills;
+            console.log(selectedSkills);
+          }
+        }}
+        sx={{
+          '.MuiDataGrid-row.Mui-selected:hover': {
+            backgroundColor: 'rgb(97 137 47 / 8%)',
+          },
+          '.MuiDataGrid-row.Mui-selected': {
+            backgroundColor: 'rgb(134 194 50 / 8%)',
+          },
+          '.css-12wnr2w-MuiButtonBase-root-MuiCheckbox-root.Mui-checked': {
+            color: '#86C232',
+          },
+          '.MuiTablePagination-selectIcon': {
+            color: 'white',
+          },
+          '.MuiTablePagination-actions-root': {
+            color: 'white',
+          },
+          '.MuiDataGrid-footerContainer': {
+            color: 'white',
+          },
+          '.MuiDataGrid-root': {
+            color: 'white',
+          },
+          '.css-rtrcn9-MuiTablePagination-root': {
+            color: 'white',
+          },
+          '.css-12wnr2w-MuiButtonBase-root-MuiCheckbox-root': {
+            color: 'white',
+          },
+          'MuiDataGrid-cellCheckbox': {
+            color: 'white',
+          },
+          '.MuiDataGrid-cell': {
+            color: 'white',
+          },
+          '.MuiDataGrid-row': {
+            '&.MuiDataGrid-cell': {
+              color: 'white',
+            },
+          },
+        }}
       />
     </div>
   );
-}
+} */

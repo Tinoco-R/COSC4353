@@ -11,6 +11,16 @@ import theme from "./themes";
 import { ThemeProvider } from "@emotion/react";
 import { cardData } from "./cardData";
 import Grid from '@mui/material/Grid';
+import { styled } from '@mui/system';
+
+const StyledLabel = styled('label')({
+    fontFamily: "'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif",
+});
+
+const CustomTypography = styled(Typography)(({ theme }) => ({
+    fontFamily: theme.typography.fontFamily,
+    color: theme.palette.secondary.main
+  }));  
 
 export default class PersonalAdminEvents extends Component {
     constructor(props) {
@@ -21,15 +31,15 @@ export default class PersonalAdminEvents extends Component {
         return(
             <Card id="card" event={data.event} onClick={() => window.location.href += "/" + data.event} sx={{ minWidth: 100, minHeight: 140, bgcolor: theme.palette.primary.main, mb: 2 }}>
                 <CardContent>
-                    <Typography variant="h5" component="div" className="location" color={theme.palette.secondary.main} gutterBottom>
+                    <CustomTypography variant="h5" component="div" className="location" gutterBottom>
                         {data.address}
-                    </Typography>
-                    <Typography sx={{ fontSize: 14, color: theme.palette.secondary.main }} gutterBottom>
+                    </CustomTypography>
+                    <CustomTypography gutterBottom>
                         {data.registered}/{data.required}
-                    </Typography>
-                    <Typography sx={{ fontSize: 14, color: theme.palette.secondary.main }} gutterBottom>
+                    </CustomTypography>
+                    <CustomTypography gutterBottom>
                         {data.date} {data.range}
-                    </Typography>
+                    </CustomTypography>
                 </CardContent>
             </Card>
         );
@@ -49,7 +59,9 @@ export default class PersonalAdminEvents extends Component {
         return (
             <ThemeProvider theme={theme}>
                 <div>
-                    <h1>My Events</h1>
+                    <StyledLabel>
+                        <h1>My Events</h1>
+                    </StyledLabel>
                     <Grid container spacing={2}>
                         {cardData.map((val, index) => {
                             return (

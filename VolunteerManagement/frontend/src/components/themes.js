@@ -1,14 +1,17 @@
 import { createTheme } from '@mui/material/styles';
 
 const theme = createTheme({
+  typography: {
+    fontFamily: "'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif",
+  },
   palette: {
     primary: {
-      main: '#17252A',
+      main: '#61892F',
       backColorMain: '#2f4050',
       backColorSecondary: '#293846'
     },
     secondary: {
-      main: '#DEF2F1',
+      main: '#000000',
     },
     error: {
       main: '#f44336',

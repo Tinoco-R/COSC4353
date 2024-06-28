@@ -4,9 +4,15 @@
     box-sizing: border-box;
   }
   
+  .createEvent {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    flex-direction: column;
+}
+
   body {
-    background: #000000;
-    background: linear-gradient(to right, #000000, #2f4050);
+    background: #222629;
   }
   
   .field {
@@ -14,12 +20,12 @@
     height: 56px;
     border-radius: 4px;
     position: relative;
-    background-color: #293846;
+    background-color: #61892F;
     transition: 0.3s background-color ease-in-out, 0.3s box-shadow ease-in-out;
   }
   
   .field:hover {
-    background-color: #2f4050;
+    background-color: #86C232;
     box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.05);
   }
   
@@ -35,7 +41,7 @@
   .field.active input + label {
     top: 4px;
     opacity: 1;
-    color: #2f4050;
+    color: #86C232;
   }
   
   .field.locked {
@@ -49,7 +55,7 @@
     padding: 0px 16px;
     border: none;
     border-radius: 4px;
-    font-family: "Gotham SSm A", "Gotham SSm B", sans-serif;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
     font-size: 16px;
     font-weight: 400;
     line-height: normal;
@@ -79,7 +85,7 @@
     position: absolute;
     top: 24px;
     left: 16px;
-    font-family: "Gotham SSm A", "Gotham SSm B", sans-serif;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
     font-size: 12px;
     font-weight: 600;
     line-height: 24px;
@@ -97,7 +103,7 @@
     position: absolute;
     top: 8px;
     left: 16px;
-    font-family: "Gotham SSm A", "Gotham SSm B", sans-serif;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
     font-size: 16px;
     font-weight: 400;
     line-height: 24px;

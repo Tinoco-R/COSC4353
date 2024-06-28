@@ -23,11 +23,7 @@ export default class SideBar extends Component {
         // Check if the url is for volunteers (load volunteer sidebar); redundant check
         const volunteerSidebarPattern = /^\/volunteer\/.*/;
         const isVolunteer = volunteerSidebarPattern.test(location.pathname);
-        
-        console.log("Pathname:", location.pathname);
-        console.log("RenderSidebar:", renderSidebar);
-        console.log("Is Admin:", isAdmin);
-        console.log("Is Volunteer:", isVolunteer);
+
         return (
         <>
         {renderSidebar && isAdmin && <Sidebar userType="admin" />}
@@ -51,9 +47,6 @@ class App extends Component {
         // Check if the url is for volunteers (load volunteer sidebar); redundant check
         const volunteerSidebarPattern = /^\/volunteer\/.*/;
         const isVolunteer = volunteerSidebarPattern.test(location.pathname);
-
-        console.log("Is Admin (App):", isAdmin);
-        console.log("Is Volunteer (App):", isVolunteer);
 
         // Render the correct homepage
         // The third row is currently implemented as volunteer pages do not yet have "/volunteer/" prepended to their urls
