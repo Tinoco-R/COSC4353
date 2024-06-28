@@ -8,7 +8,7 @@ import InitialVerification from "./login/InitialVerification";
 import ResetPassword from "./login/ResetPassword";
 import Logout from "./login/Logout";
 import EmailAddressReceivedConfirmation from "./login/EmailAddressReceivedConfirmation";
-import NotificationComponent from "./notification/NotificationComponent";
+import { ShowNotification } from "./notification/NotificationComponent";
 
 import { BrowserRouter as Router, Routes, Route, Link, Navigate } from "react-router-dom";
 import SavedChangesConfirmation from "./MyProfileSavedChangesConfirmation";
@@ -51,7 +51,7 @@ export default class VolunteerHomePage extends Component {
                         <SavedChangesConfirmation />
                         </>
                     }/>
-                    <Route path='/notification' element = {<NotificationComponent />} />
+                    <Route path='/notification' element = {<ShowNotification />} />
                 </Routes>
             </Router>
         );

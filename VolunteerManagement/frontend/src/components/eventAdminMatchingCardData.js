@@ -79,6 +79,9 @@ const volunteerUtilzation = [];
 function generateRandomFraction(maxRegistrations, minRequired) {
     const registrations = Math.floor(Math.random() * (maxRegistrations + 1)); // Up to maxRegistrations
     const required = Math.floor(Math.random() * (100 - minRequired + 1)) + minRequired; // Between minRequired and 100
+    if (registrations > required) {
+        return `(${required}/${registrations})`;
+    }
     return `(${registrations}/${required})`;
 }
 

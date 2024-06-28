@@ -41,7 +41,6 @@ export default class AdminHomePage extends Component {
                     // Volunteers
                     <Route path='admin/volunteers/' element = {<p>Volunteers</p>} />
                     <Route path='admin/volunteers/view' element = {<ViewVolunteers />} />
-                    <Route path='admin/volunteers/view' element = {<ViewVolunteers />} />
                     <Route path='admin/volunteers/manage' element = {<ManageNewRegistrations />} />
                     <Route path='admin/volunteers/matching' element = {<VolunteerMatching />} />
 
