@@ -12,6 +12,7 @@ import AdminHomePage from "../adminHomepage";
 
 import Swal from "sweetalert2";
 import { Button } from "@mui/material";
+import { ShowNotification } from "../notification/NotificationComponent";
 
 function IncorrectUsernameOrPassword({ validated }){
 
@@ -31,6 +32,8 @@ function IncorrectUsernameOrPassword({ validated }){
         )
     }
 }
+
+
 
 
 export default function Login(){
@@ -119,6 +122,7 @@ export default function Login(){
         console.log('button clicked')
     }
 
+
     return (
         <>
         <h1 className="titleLoginPage">Helping Hands</h1>
@@ -187,3 +191,6 @@ export default function Login(){
     
     );
 }
+
+// Show notification
+ShowNotification('Welcome!', 'Thank you for visiting our site for the first time');

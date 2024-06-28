@@ -166,13 +166,18 @@ const clickEventHandler = (event) => {
     title: '<h5> Event details </h5>',
     text: 'Cleaning event on June 30, 2024 at 10:00 am',
     /*icon: 'warning',*/
-    showCancelButton: true,
-    showConfirmButton: false,
+    showCancelButton: false,
+    showConfirmButton: true,
     confirmButtonColor: "#3085d6",
-    cancelButtonColor: "#d33",
-    cancelButtonText: "Cancel Attendance"
+    confirmButtonColor: "#d33",
+    confirmButtonText: "Cancel Attendance",
+    allowOutsideClick: true
   }).then((result) => {
-    if (Swal.DismissReason.cancel) {
+    //if (Swal.DismissReason.backdrop){
+    //  {};
+    //}
+    //if (Swal.DismissReason.cancel) {
+    if (result.isConfirmed) {
       Swal.fire({
         title: 'Confirmed',
         text: 'Your attendance to this event has been cancelled.',
