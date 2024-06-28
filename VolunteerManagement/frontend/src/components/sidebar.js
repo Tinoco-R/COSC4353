@@ -29,7 +29,6 @@ function Sidebar( userType ) {
                 {isActiveRow && val.subNav && (
                   <ul className="subNavList" >
                     {val.subNav.map((subVal, index) => {
-                      //const isActiveItem = window.location.pathname === (prepend + "/" + val.link + "/" + subVal.link);
                       const isActiveItem = window.location.pathname === (prepend + "/" + subVal.link);
 
                       return (

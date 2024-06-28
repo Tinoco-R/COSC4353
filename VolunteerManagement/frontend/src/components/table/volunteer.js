@@ -13,30 +13,7 @@ import { volunteerCardData } from "../volunteerAdminMatchingCardData";
 import Grid from '@mui/material/Grid';
 import Slider from '@mui/material/Slider';
 
-function valuetext(value) {
-    return value === 1? `${value} Matching Skill` : `${value} Matching Skills`;
-}
-// Slider code from: https://mui.com/material-ui/react-slider/
-function DiscreteSlider() {
-
-  return (
-    <Box sx={{ width: 100 }}>
-      <Slider
-        aria-label="Matched Skills Required"
-        defaultValue={0}
-        getAriaValueText={valuetext}
-        valueLabelFormat={valuetext}
-        valueLabelDisplay="on"
-        shiftStep={30}
-        step={1}
-        size="small"
-        marks={[{ value: 0 }, { value: 1 }, { value: 2 }, { value: 3 }]}
-        min={0}
-        max={3}
-      />
-    </Box>
-  );
-}
+// Slider code adapted from: https://mui.com/material-ui/react-slider/
 
 export default class VolunteerDetailsAdmin extends Component {
     constructor(props) {
@@ -57,6 +34,7 @@ export default class VolunteerDetailsAdmin extends Component {
     }
 
     filterVolunteersBySkills = ( skillsToMatch ) => {
+        // Selected skills are the skills of the selected event
         const { selectedSkills } = this.props;
         let volunteers = volunteerCardData;
 
@@ -81,7 +59,7 @@ export default class VolunteerDetailsAdmin extends Component {
                     }
                 }
             }
-            // Volunteer matched specified number of requirements
+            // Volunteer matched or exceeded specified number of required skills
             if (skillsLeft <= 0) {
                 filteredVolunteers.push(volunteer);
             }
@@ -160,8 +138,6 @@ export default class VolunteerDetailsAdmin extends Component {
     }
     render() {
         const matchingSkills = this.state.matchingSkills;
-        /* Slider Doesnt fully work yet
-         const filteredVolunteers = this.filterVolunteersBySkills( matchingSkills ); */
         const filteredVolunteers = this.filterVolunteersBySkills( matchingSkills );
         const maxCardsToShow = 10;
         const startIndex = this.state.currentIndex * maxCardsToShow;
@@ -177,8 +153,8 @@ export default class VolunteerDetailsAdmin extends Component {
                         <Slider
                             aria-label="Matched Skills Required"
                             defaultValue={0}
-                            getAriaValueText={valuetext}
-                            valueLabelFormat={valuetext}
+                            getAriaValueText={this.valuetext}
+                            valueLabelFormat={this.valuetext}
                             valueLabelDisplay="on"
                             shiftStep={30}
                             step={1}
@@ -190,7 +166,6 @@ export default class VolunteerDetailsAdmin extends Component {
 
                         />
                     </Box>
-                        {/* <DiscreteSlider onChange={(event, newValue) => console.log(`Slider value changed to: ${newValue}`)}></DiscreteSlider> */}
                         <Button onClick={() => this.setState({ currentIndex: Math.max(this.state.currentIndex - 1, 0) })} disabled={hasActiveSelections || this.state.currentIndex === 0} style={{backgroundColor: "#86C232"}}  variant="contained" type="submit" fontFamily="'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif" sx={{ mx: 1 }}>Previous</Button>
                         <Button onClick={() => this.setState({ currentIndex: this.state.currentIndex + 1, })} disabled={hasActiveSelections || this.state.currentIndex >= lastPossibleIndex} style={{backgroundColor: "#86C232"}}  variant="contained" type="submit" fontFamily="'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif" sx={{ mx: 1 }}>Next</Button>
                         <Button onClick={(this.toggleSkills)} style={{backgroundColor: "#86C232"}}  variant="contained" type="submit" fontFamily="'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif" sx={{ mx: 1 }}>Toggle Skills</Button>
