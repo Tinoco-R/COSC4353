@@ -11,7 +11,9 @@ import { useNavigate } from "react-router-dom";
 import AdminHomePage from "../adminHomepage";
 
 import Swal from "sweetalert2";
-import { Button } from "@mui/material";
+import { Button } from "@mui/material/Button";
+import Stack from '@mui/material/Stack'
+
 import { ShowNotification } from "../notification/NotificationComponent";
 
 function IncorrectUsernameOrPassword({ validated }){
@@ -151,6 +153,7 @@ export default function Login(){
             </div>
 
             {/*<Link to='volunteer/landing'>*/}
+            {/*<Button variant="contained" onClick={(e) => redirectUser}>Login</Button>*/}
             <input type='submit' name='LogInButton' value='Login' onClick={(e) => redirectUser}></input> {/* https://developer.mozilla.org/en-US/docs/Web/HTML/Element/form */}
             {/*</Link>*/}
 

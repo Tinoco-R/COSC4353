@@ -177,6 +177,7 @@ export default function MyProfile(){
             <div className='myProfileFormBox'>
                 <label for='Address2'>Address 2</label>
                 <input placeholder='Optional' {...register('Address2', { pattern: { value: /[a-z]|[A-Z]/, message: 'Invalid input, you must include at least one character'}, maxLength: { value: 100, message: 'Max length is 100'} }) } />
+                <p className='inputValidationError'>{errors.Address2?.message}</p>
             </div>
             <div className='myProfileFormBox'>
                 <label for='City'>City</label> {/* Per the regular expression, City will reject all inputs consisting only of numbers */}
