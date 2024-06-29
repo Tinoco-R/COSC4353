@@ -8,6 +8,7 @@ import { CustomCalendar } from './CustomCalendarv2';
 import { render, unmountComponentAtNode } from "react-dom";
 
 import { createRoot } from 'react-dom/client';
+import { ShowNotification } from "./notification/NotificationComponent";
 
 
 export default function LandingPageWithEvents(){
@@ -33,6 +34,7 @@ export default function LandingPageWithEvents(){
         <>
 
             {/*<ResponsiveBar />*/}
+            {ShowNotification('Welcome!', 'Thank you for visiting our site for the first time')}
             <MyEventsHeader />
 
             <CustomCalendar />

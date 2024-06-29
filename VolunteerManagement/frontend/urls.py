@@ -7,7 +7,6 @@ urlpatterns = [
     # Admin Pages
     # Home
     path('', index),
-    path('/admin/', index),
     path('admin/', index),
     path('admin/home', index),
 
@@ -35,6 +34,7 @@ urlpatterns = [
     
     # path("", views.index, name="index"),
     path("volunteer/landing/", views.index, name="index"),
+    path("volunteer/alerts/", views.index, name="index"),
     path("volunteer/my-profile/", views.index, name="index"),
     path("saved-changes-confirmation/", views.index, name="index"),
     path("login/", views.index, name="index"),

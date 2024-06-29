@@ -9,6 +9,7 @@ import ResetPassword from "./login/ResetPassword";
 import Logout from "./login/Logout";
 import EmailAddressReceivedConfirmation from "./login/EmailAddressReceivedConfirmation";
 import { ShowNotification } from "./notification/NotificationComponent";
+import Alerts from "./alerts";
 
 import { BrowserRouter as Router, Routes, Route, Link, Navigate } from "react-router-dom";
 import SavedChangesConfirmation from "./MyProfileSavedChangesConfirmation";
@@ -36,6 +37,7 @@ export default class VolunteerHomePage extends Component {
 
                     // Volunteer Homepage
                     <Route path='/volunteer/logout' element = {<Logout />} />
+                    <Route path='/volunteer/alerts' element = {<Alerts />} />
                     <Route path='/volunteer/landing' element = {
                         <> 
                         <LandingPageWithEvents />

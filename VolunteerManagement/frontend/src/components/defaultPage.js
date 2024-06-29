@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { ShowNotification } from "./notification/NotificationComponent";
 
 export default class DefaultPage extends Component {
     constructor(props) {
@@ -6,6 +7,6 @@ export default class DefaultPage extends Component {
     }
 
     render() {
-        return (<p>Home</p>);
+        ShowNotification('Welcome Admin!', 'This is your homepage.');
     }
 }

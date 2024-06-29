@@ -10,7 +10,7 @@ const columns = [
     { field: 'administrator', headerName: 'Administrator', flex: 2 },
     { field: 'description', headerName: 'Description', flex: 4 },
     { field: 'address', headerName: 'Address', flex: 4 },
-    { field: 'date', headerName: 'Date', flex: 1 },
+    { field: 'date', headerName: 'Date', flex: 2 },
     { field: 'time', headerName: 'Time', flex: 1 },
     { field: 'duration', headerName: 'Duration', flex: 1 },
     { field: 'skills', headerName: 'Skills', flex: 4 },
