@@ -29,9 +29,7 @@ export default function MultiDatePicker() {
             minDate={new Date()}
             format="MMMM DD YYYY"
             onChange={(data) => handleDateChange(data)}
-            plugins={[
-                <DatePanel />
-            ]}
+            required
         />
     )
 }
