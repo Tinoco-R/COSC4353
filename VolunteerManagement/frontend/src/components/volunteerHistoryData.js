@@ -1,4 +1,5 @@
 import { skillsData } from "./skillsData";
+import { stateData } from "./stateData";
 
 // https://www.randomlists.com/random-addresses?qty=40 for random addresses
 
@@ -82,6 +83,135 @@ const addresses = [
     "613 East Summit Court, Moses Lake, WA 98837"
 ];
 
+const streetAddresses = [
+    "2 N. Cross Street",
+    "8469 York Street",
+    "7753 Henry Smith Ave.",
+    "696 W. Lake View Street",
+    "18 Glendale Rd.",
+    "219 North Lakewood Lane",
+    "516 Newcastle Lane",
+    "455 Pineknoll Ave.",
+    "8827 East Blue Spring Lane",
+    "9614 N. Sycamore Dr.",
+    "7356 Glenholme Ave.",
+    "9360 Roehampton Lane",
+    "367 Railroad St.",
+    "658 Pierce St.",
+    "65 Squaw Creek St.",
+    "137 Beechwood St.",
+    "8 South Nut Swamp St.",
+    "378 Elizabeth Avenue",
+    "8177 W. Euclid St.",
+    "73 South Somerset St.",
+    "690 Trout Ave.",
+    "789 Addison Rd.",
+    "23 E. Hilldale Ave.",
+    "44 S. Hillside Drive",
+    "796 N. Paris Hill Dr.",
+    "6 Green Lane",
+    "69 Sherwood Ave.",
+    "8379 Squaw Creek Ave.",
+    "843 Lake Forest Drive",
+    "8355 North Squaw Creek Court",
+    "9089 NE. Greenview Street",
+    "180 Jones St.",
+    "998 Lexington St.",
+    "425 Tanglewood Drive",
+    "97 Piper Lane",
+    "7291 Prospect Dr.",
+    "98 SE. Oak Street",
+    "800 Halifax Street",
+    "527 State St.",
+    "613 East Summit Court"
+];
+
+const cities = [
+    "Hernando",
+    "Bakersfield",
+    "Erlanger",
+    "Northbrook",
+    "Saint Albans",
+    "Wisconsin Rapids",
+    "Fort Lauderdale",
+    "Far Rockaway",
+    "Gallatin",
+    "Oconomowoc",
+    "Miami",
+    "Everett",
+    "Lumberton",
+    "Edison",
+    "Orlando",
+    "Cleveland",
+    "El Paso",
+    "Hartford",
+    "Thornton",
+    "Brighton",
+    "Fleming Island",
+    "Melbourne",
+    "West Fargo",
+    "Dearborn",
+    "Dawsonville",
+    "Montgomery Village",
+    "La Crosse",
+    "Graham",
+    "Chevy Chase",
+    "Huntington",
+    "Allison Park",
+    "Oklahoma City",
+    "District Heights",
+    "Worcester",
+    "Elmont",
+    "North Attleboro",
+    "Reidsville",
+    "Fresh Meadows",
+    "Norman",
+    "Moses Lake"
+];
+
+const zipCodes = [
+    "38632",
+    "93306",
+    "41018",
+    "60062",
+    "11412",
+    "54494",
+    "33308",
+    "11691",
+    "37066",
+    "53066",
+    "33125",
+    "02149",
+    "28358",
+    "08817",
+    "32806",
+    "37312",
+    "79930",
+    "06106",
+    "80241",
+    "02135",
+    "32003",
+    "32904",
+    "58078",
+    "48124",
+    "30534",
+    "20886",
+    "54601",
+    "27253",
+    "20815",
+    "11743",
+    "15101",
+    "73112",
+    "20747",
+    "01604",
+    "11003",
+    "02760",
+    "27320",
+    "11365",
+    "73072",
+    "98837"
+];
+
 // Random dates from 2024-2027
 const dates = ["02/05/2024","03/20/2024","04/10/2024","05/25/2024","06/15/2024","07/30/2024","08/20/2024","09/05/2024","10/20/2024","11/15/2024","12/30/2024","01/25/2025","02/15/2025","03/30/2025","04/20/2025","05/25/2025","06/15/2025","07/30/2025","08/20/2025","09/05/2025","10/20/2025"];
 
@@ -142,4 +272,38 @@ function generateParticipation(firstNames, eventNames, administrators, descripti
     return participation;
 }
 
+// Generates participation with random data
+function generateEvents(eventNames, administrators, descriptions, streetAddresses, cities, zipCodes, dates, times, durationOptions, skillsData, urgencyLevels) {
+    let events = [];
+    for (let i = 0; i < eventNames.length; i++) {
+        let event = {
+            id: i + 1,
+            name: eventNames[i],
+            administrator: administrators[i],
+            description: descriptions[i],
+            address: streetAddresses[i],
+            city: cities[i],
+            state: stateData[i],
+            zip: zipCodes[i],
+            date: dates[i],
+            time: times[Math.floor(Math.random() * times.length)],
+            duration: durationOptions[Math.floor(Math.random() * durationOptions.length)],
+            skills: "",
+            urgency: urgencyLevels[Math.floor(Math.random() * urgencyLevels.length)],
+        };
+        for (let j = 0; j < 3; j++) {
+            let skillToAdd = skillsData[Math.floor(Math.random() * skillsData.length)];
+            if (!event.skills.includes(skillToAdd)) {
+                event.skills += `${skillToAdd}, `;
+            }
+        }
+        while (event.skills.endsWith(',') || event.skills.endsWith(' ')) {
+            event.skills = event.skills.slice(0, -1);
+        }
+        events.push(event);
+    }
+    return events;
+}
+
 export const volunteerHistoryData = generateParticipation(firstNames, eventNames, administrators, descriptions, addresses, dates, times, durationOptions, skillsData, urgencyLevels, participated);
+export const eventData = generateEvents(eventNames, administrators, descriptions, streetAddresses, cities, zipCodes, dates, times, durationOptions, skillsData, urgencyLevels);

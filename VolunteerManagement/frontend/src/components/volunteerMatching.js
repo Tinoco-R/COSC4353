@@ -3,16 +3,7 @@ import React, { Component } from "react";
 import { DataGrid } from '@mui/x-data-grid';
 import { eventData } from "./eventAdminMatchingCardData.js";
 import VolunteerDetailsAdmin from "./table/volunteer";
-
-const columns = [
-    { field: 'id', headerName: 'ID', flex: 1 },
-    { field: 'name', headerName: 'Name', flex: 2 },
-    { field: 'date', headerName: 'Date', flex: 1 },
-    { field: 'administrator', headerName: 'Administrator', flex: 2 },
-    { field: 'urgency', headerName: 'Urgency', flex: 1 },
-    { field: 'volunteers', headerName: 'Volunteers', flex: 1 },
-    { field: 'skills', headerName: 'Skills', flex: 5 },
-  ];
+import { eventMatchingColumns } from "./columns.js";
 
 export default class VolunteerMatching extends Component {
     constructor(props) {
@@ -36,7 +27,7 @@ export default class VolunteerMatching extends Component {
                     <div style={{ height: 400, width: "95%", height: "90%" }}>
                       <DataGrid
                           rows={eventData}
-                          columns={columns}
+                          columns={eventMatchingColumns}
                           initialState={{
                               pagination: { paginationModel: { page: 0, pageSize: 20 } },
                           }}

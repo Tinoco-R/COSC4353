@@ -73,14 +73,17 @@ export default class Input extends React.Component {
 
         // Addresses are limited to a set of legal characters.
         else if (id === "eventAddress") {
-          const regex = /^[A-Za-z0-9.\-'#@%&\/]+$/;
+          const regex = /^[A-Za-z0-9.\-'#@%&\/\s]+$/;
 
           if (!regex.test(value) && value !== "") {
-            this.setState({ value, error: "Invalid characters in address. Only 'A-Z', 'a-z', '0-9', '., #, -, @, %, &, /'." });
+            this.setState({ value, error: "Invalid characters in address. Only 'A-Z', 'a-z', '0-9', \" \' \', ., #, -, @, %, &, / \"." });
           }
           else if (!regex.test(value)) {
             this.setState({ value, error: "This field cannot be empty." });
           }
+          else if (/^[^A-Za-z0-9]/.test(value)) {
+            this.setState({ value, error: "First character cannot be a symbol." });
+        }
           else {
             this.setState({ value, error: "" });
             this.setState({ value: value }, () => {});

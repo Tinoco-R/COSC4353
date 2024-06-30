@@ -2,8 +2,6 @@ import React, { Component, isValidElement } from "react";
 import Stack from '@mui/material/Stack';
 import theme from "./themes";
 import { ThemeProvider } from "@emotion/react";
-import Paper from '@mui/material/Paper';
-import { styled } from '@mui/material/styles';
 import Grid from '@mui/material/Grid';
 import Input from "./input"
 import Button from '@mui/material/Button';
@@ -11,22 +9,7 @@ import MultipleSelect from './multipleSelect';
 import { skillsData } from "./skillsData";
 import { stateData } from "./stateData";
 import { urgencyData } from "./urgencyData";
-
-const StyledLabel = styled('label')({
-    fontFamily: "'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif",
-});
-
-const Item = styled(Paper)(({ theme, type }) => ({
-  padding: theme.spacing(2),
-  margin: theme.spacing(1),
-  fontSize: '1.5rem',
-  textAlign: 'center',
-  color: "white",
-  flexGrow: 1,
-  backgroundColor: type === 'background'? '#61892F' :
-                   type === 'inputItem'? '#61892F' : 
-                   type === 'yetAnotherType'? '#00FF00' : '#000000'
-}));
+import { Item, StyledLabel } from "./item";
 
 export default class CreateEvent extends Component {
     constructor(props) {
@@ -81,7 +64,7 @@ export default class CreateEvent extends Component {
         return (
             <ThemeProvider theme={theme}>
                 <Grid container spacing={1} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
-                    <Grid item xs={12} sm={6} md={4}>
+                    <Grid item xs={12} sm={6} md={5}>
                         <Item type="background">
                             <Stack spacing={{ xs: 1, sm: 2 }} direction="row" useFlexGap flexWrap="wrap">
                                 <Item>
@@ -95,8 +78,8 @@ export default class CreateEvent extends Component {
                                 </Item>
 
                                 <Item>
-                                    <StyledLabel htmlFor="eventAddress">Location</StyledLabel>
-                                    <Input type="text" label="Location" id="eventAddress" name="eventAddress" placeholder="Address" />
+                                    <StyledLabel htmlFor="eventAddress">Location Address</StyledLabel>
+                                    <Input type="text" label="Address" id="eventAddress" name="eventAddress" placeholder="Address" />
                                 </Item>
 
                                 <Item>
