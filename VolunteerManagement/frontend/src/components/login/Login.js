@@ -78,6 +78,11 @@ export default function Login(){
         // Validate the username and password, if they are correct,
         // redirect the user to the login page
 
+        // Validate the username and password:
+        // Curently valid credentials
+        // username: axel@email.com
+        // password: 123456789
+
         // Assuming they are correct.
         // Redirecting the user to the landing page.
         //const navigate = useNavigate();

@@ -77,15 +77,23 @@ WSGI_APPLICATION = 'VolunteerManagement.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+#'default': {
+#    'ENGINE': 'django.db.backends.postgresql',
+#    'NAME': 'enterprise',
+#    'USER': 'database_admin',
+#    'PASSWORD': 'admincomputer',
+#    'HOST': 'postgres.ctht9myazhhg.us-east-2.rds.amazonaws.com',
+#    'PORT': '5432',
+#}
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'enterprise',
-        'USER': 'database_admin',
-        'PASSWORD': 'admincomputer',
-        'HOST': 'postgres.ctht9myazhhg.us-east-2.rds.amazonaws.com',
-        'PORT': '5432',
-    }
+ 'default': {
+     'ENGINE': 'django.db.backends.postgresql',
+     'NAME': 'enterprise',
+     'USER': 'database_admin',
+     'PASSWORD': 'admincomputer',
+     'HOST': 'postgres.ctht9myazhhg.us-east-2.rds.amazonaws.com',
+     'PORT': '5432',
+ }
 }
 
 
