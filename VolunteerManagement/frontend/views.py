@@ -5,5 +5,5 @@ def index(request, *args, **kwargs):
     return render(request, 'frontend/index.html')
 
 
-def django_admin(request, *args, **kwargs):
-    return render(request, )
+#def django_admin(request, *args, **kwargs):
+#    return render(request, )

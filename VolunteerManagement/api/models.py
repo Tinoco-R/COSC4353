@@ -3,6 +3,7 @@ import string, random
 
 
 from django.core.validators import MinLengthValidator # https://stackoverflow.com/questions/15845116/how-to-set-min-length-for-models-textfield
+from django.contrib.auth.models import User as UserDefault
 
 # Generates unique ID code and ensures it doesn't yet exist in the database
 def generate_unique_code():
@@ -31,14 +32,29 @@ class Event(models.Model):
 
 
 # Axel's code
-class User(models.Model):
-    user_id = models.IntegerField(unique=True)
-    email = models.CharField(max_length=100)
-
+class User(UserDefault):
+    #user_id = models.IntegerField(unique=True)
+    #username = models.CharField(max_length=100) # email
+    #password = models.CharField()
     # Min length requirement code, credit: Felipe Gabriel Souze Martins at https://stackoverflow.com/questions/15845116/how-to-set-min-length-for-models-textfield
-    password = models.CharField(validators=[
-        MinLengthValidator(8, 'The password must contain at least 8 characters')
-    ])
+    #password = models.CharField(validators=[
+    #    MinLengthValidator(8, 'The password must contain at least 8 characters')
+    #])
 
-    verified = models.BooleanField() # True means verified, False means not verified
-    type = models.BooleanField() # True for Admin, False for Volunteer
+
+    #verified = models.BooleanField() # True means verified, False means not verified
+    pass
+    # is_staff attribute from django will replace type attribute
+    #type = models.BooleanField() # True for Admin, False for Volunteer
+
+
+
+# Profile class "extends" the default auth User model
+# the class below is the class that should contain
+# data like the availability of the user, their skills,
+# preferences, etc.
+class Profile(models.Model): 
+    user = models.OneToOneField(UserDefault, on_delete=models.CASCADE)
+    is_verified = models.BooleanField(default=False)
+
+    # Continue here on July 5 (after pushing to github)

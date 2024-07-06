@@ -21,17 +21,65 @@ export default function Signup(){
     //console.log(errors);
     console.log(watch());
 
-    const onSubmit = (data) => {
+    const onSubmit = async (data) => { // Making it async so I can call await in fetch
 
         console.log('Login form submitted!');
         console.log(data); // just put them in the console for now
+        
+        data.email
+        data.password
+
+        let url = 'http://127.0.0.1:8000/api/Register';
+        console.log('Making fetch call to register user');
+        const response = await fetch(url,
+            {
+                //mode: "cors",
+                headers: {
+                    "Content-Type": "application/json", // credit: https://rapidapi.com/guides/request-headers-fetch
+                    "Host": "http://127.0.0.1:8000",
+                    //"Content-Length": "",
+                    "Origin": "http://127.0.0.1:8000",
+                    "User-Agent": "",
+                    "Accept": "*/*",
+                    "Accept-Encoding": "gzip,deflate,br",
+                    "Connection": "keep-alive",
+                    //"X-CSRF-Token": "",
+                    "mode": "cors",
+                },
+                method: "POST",
+                body: JSON.stringify({
+                    password: data.Password,
+                    last_login: null,
+                    is_superuser: false,
+                    username: data.email,
+                    first_name: "",
+                    last_name: "",
+                    email: "",
+                    is_staff: false,
+                    is_active: false,
+                    date_joined: null,
+                    groups: [],
+                    user_permissions: []
+                }),
+                credentials: "same-origin"
+            }
+        )
+
+        if (!response.ok){
+            console.log('Error creating user');
+            console.log(response);
+        }
+        else {
+            console.log('User registered successfully');
+        }
+    
     }
     
     return (
         <>
         <h1>Sign Up</h1>
 
-        <form className="loginForm" >
+        <form className="loginForm" onSubmit={handleSubmit(onSubmit)} >
 
 
             <div className="signupFIELD">
@@ -51,9 +99,9 @@ export default function Signup(){
             </div>
 
 
-            <Link to='/verification' >
+            {/*<Link to='/verification' >*/}
             <input type={"submit"} name={"SignupButton"} value={"Signup"}></input> {/* https://developer.mozilla.org/en-US/docs/Web/HTML/Element/form */}
-            </Link>
+            {/*</Link></>*/}
 
         </form>
         </>

@@ -70,7 +70,7 @@ export default function Login(){
 
     const navigate = useNavigate();
 
-    const onSubmit = (data) => {
+    const onSubmit = async (data) => { // async added to call await in fetch
 
         console.log('Login form submitted!');
         console.log(data); // just put them in the console for now
@@ -83,6 +83,110 @@ export default function Login(){
         // username: axel@email.com
         // password: 123456789
 
+        // Search in the database for the credentials
+        data.email;
+        data.Password;
+
+
+        // Make API call to authenticate the username (email) and password
+        // On July 3, Continue here
+        // Credentials/session not needed because we are
+        // trying to log in
+        let url = 'http://127.0.0.1:8000/api/Login';
+        console.log('Making fetch call');
+        const response = await fetch(url,
+            {
+                //mode: "cors",
+                headers: {
+                    "Content-Type": "application/json", // credit: https://rapidapi.com/guides/request-headers-fetch
+                    "Host": "http://127.0.0.1:8000",
+                    //"Content-Length": "",
+                    "Origin": "http://127.0.0.1:8000",
+                    "User-Agent": "",
+                    "Accept": "*/*",
+                    "Accept-Encoding": "gzip,deflate,br",
+                    "Connection": "keep-alive",
+                    //"X-CSRF-Token": "",
+                    "mode": "cors",
+                },
+                method: "POST",
+                body: JSON.stringify({
+                    password: data.Password,
+                    last_login: null,
+                    is_superuser: false,
+                    username: data.email,
+                    first_name: "",
+                    last_name: "",
+                    email: "",
+                    is_staff: false,
+                    is_active: false,
+                    date_joined: null,
+                    groups: [],
+                    user_permissions: []
+                }),
+                credentials: "same-origin"
+            }
+        )
+
+        if (!response.ok) {
+            console.log('ERROR: response error');
+            console.log(response);
+        }
+        else {
+            console.log('OK response');
+            console.log('Data received:')
+
+            let newAbsoluteURL = ''
+
+            let url = await response.text();
+            console.log('url:');
+            console.log(url);
+            newAbsoluteURL = (JSON.parse(url)).url;
+            console.log(newAbsoluteURL);
+            if (newAbsoluteURL === "/login"){
+                // The server is redirecting to the login page
+                // because the user has not verified their account
+                // through the email link
+                ShowNotification(
+                    'Pending Account Verification',
+                    'Click on the link sent to the email address \
+                    associated with this account to complete \
+                    the verification process. You will not \
+                    be able to log in until you have completed \
+                    this requirement.'
+                )
+                
+            }
+            else {
+                // User has completed verification process,
+                // redirect 
+                navigate(newAbsoluteURL);
+            }
+
+
+            /*
+            response.text().then( text => { // credit: https://stackoverflow.com/questions/62109232/getting-httpresponse-in-django-from-javascript-fetch
+                console.log(text);
+                console.log(typeof(text));
+                newAbsoluteURL = JSON.parse(text).url;
+                console.log(newAbsoluteURL);
+                
+                // Redirect the user to the right url (correct url
+                // determined in the server (here, we are only parsing
+                // the response to read that url)
+                navigate(newAbsoluteURL);
+                
+            });
+            */
+            
+            // Check if the user already verified their account
+
+        }
+
+
+
+        
+
         // Assuming they are correct.
         // Redirecting the user to the landing page.
         //const navigate = useNavigate();
@@ -90,6 +194,9 @@ export default function Login(){
 
         //const object = useRef();
 
+        /////// Block below commented-out becausen it is
+        /////// now handled in the back-end
+        /*
         if (validCredentials == false) {
             Swal.fire({
                 title: "<h5>Failed Login</h5>",
@@ -105,6 +212,7 @@ export default function Login(){
             navigate("/admin");
             window.location.reload();
         }
+        */
     }
 
     /*

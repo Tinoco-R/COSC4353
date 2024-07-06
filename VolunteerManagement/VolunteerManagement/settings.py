@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'api.apps.ApiConfig',
     'rest_framework',
-    'frontend.apps.FrontendConfig'
+    'frontend.apps.FrontendConfig',
+    #'api.apps.RegisterConfig'
 ]
 
 MIDDLEWARE = [
@@ -53,12 +54,15 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8000']
+
 ROOT_URLCONF = 'VolunteerManagement.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'Templates')],
+        'DIRS': [os.path.join(BASE_DIR, 'Templates'), 
+                 os.path.join(BASE_DIR, 'api','templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -96,6 +100,23 @@ DATABASES = {
  }
 }
 
+# Email configurations
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_FROM = 'ax.alvarenga19@gmail.com'
+EMAIL_HOST_USER = 'ax.alvarenga19@gmail.com'
+EMAIL_HOST_PASSWORD = 'xtgdybwvlrhdhhbb'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+PASSWORD_RESET_TIMEOUT = 86400
+
+#LOGIN_URL = '/'
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+#    'django.contrib.auth.backends.AllowAllUsersModelBackend'
+]
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
