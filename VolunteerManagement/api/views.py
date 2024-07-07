@@ -29,6 +29,8 @@ from .tokens import account_activation_token
 from django.contrib.auth import get_user_model
 # Axel's forms
 from .forms import RegisterForm
+# Axel's import of hard-coded data for Assignment 3
+from . import hard_coded_data
 
 #############################################################
 
@@ -303,4 +305,244 @@ def LoginView(request):
     else: # add check to verify if username or password are incorrect
         print('Username or password are incorrent')
         response = '''{"url": "/login"}'''
+        return HttpResponse(response)
+    
+
+
+@csrf_exempt
+def CreateProfile(request): # POST REQUEST ONLY
+    print(request)
+    decoded_request_body = json.loads(request.body.decode("utf-8")) # https://www.freecodecamp.org/news/python-json-how-to-convert-a-string-to-json/
+    
+    print(decoded_request_body)
+    
+    user = request.user
+    full_name = decoded_request_body["full_name"]
+    address1 = decoded_request_body["address1"]
+    
+    address2 = None
+    if decoded_request_body["address2"]:
+        address2 = decoded_request_body["address2"]
+    
+    city = decoded_request_body["city"]
+    state = decoded_request_body["state"]
+    zip_code = decoded_request_body["zip_code"]
+    skills = decoded_request_body["skills"]    
+    preferences = decoded_request_body["preferences"]
+    availability = decoded_request_body["availability"]
+
+
+    #######################################################
+    ### Add: check if the user already filled-in their
+    ### profile information, and, if so, pre-fill
+    ### the data fields
+
+
+    #######################################################
+
+
+    new_profile_created = hard_coded_data.Profile(user=user,
+                                                  full_name=full_name,
+                                                  address1=address1,
+                                                  address2=address2,
+                                                  city=city,
+                                                  state=state,
+                                                  zip_code=zip_code,
+                                                  skills=skills,
+                                                  preferences=preferences,
+                                                  availability=availability)
+
+    if new_profile_created is not None:
+        print('User profile created:')
+        print(new_profile_created)
+        response_tmp = {"status" : "OK"}
+        response = json.dumps(response_tmp)
+        return HttpResponse(response)
+    else:
+        response_tmp = {"status" : "ERROR"}
+        response = json.dumps(response_tmp)
+        return HttpResponse(response)
+
+
+
+@csrf_exempt
+def UpdateProfile(request): # POST REQUEST ONLY
+    decoded_request_body = json.loads(request.body.decode("utf-8")) # https://www.freecodecamp.org/news/python-json-how-to-convert-a-string-to-json/
+    
+    
+    ## This is some hard-coded data to show the functionality when the user
+    ## has previously given the information for their profile, but now they want
+    ## to update it
+
+    
+    profile_tmp = hard_coded_data.get_profile(request.user) # get the profile for the user that is making the request
+    
+    
+    ######################################################################
+    # Strategy: take all the fields as input, and overwrite all the data in the database for this profile
+    # (Update by overwriting the whole profile tuple -or almost all the tuple but the primary key
+    # or other field that *cannot* or *should not* be updated due to constraints in the db or programming
+    # logic, for example)
+    #
+    # This is not the most efficient approach for updating the profile data, but it is simple
+
+    print(request)
+    decoded_request_body = json.loads(request.body.decode("utf-8")) # https://www.freecodecamp.org/news/python-json-how-to-convert-a-string-to-json/
+    
+    print(decoded_request_body)
+    
+    user = request.user # get the user object for the user making the request
+
+    # Reading the input from the request (all fields required to perform the update):
+    
+
+    full_name = decoded_request_body["full_name"]
+    address1 = decoded_request_body["address1"]
+    
+    address2 = None
+    if decoded_request_body["address2"]:
+        address2 = decoded_request_body["address2"]
+    
+    city = decoded_request_body["city"]
+    state = decoded_request_body["state"]
+    zip_code = decoded_request_body["zip_code"]
+    skills = decoded_request_body["skills"]    
+    preferences = decoded_request_body["preferences"]
+    availability = decoded_request_body["availability"]
+
+    new_profile_created = hard_coded_data.Profile(user=user,
+                                                  full_name=full_name,
+                                                  address1=address1,
+                                                  address2=address2,
+                                                  city=city,
+                                                  state=state,
+                                                  zip_code=zip_code,
+                                                  skills=skills,
+                                                  preferences=preferences,
+                                                  availability=availability)
+
+    if new_profile_created is not None:
+        print('User profile created:')
+        print(new_profile_created)
+        response_tmp = {"status" : "OK"}
+        response = json.dumps(response_tmp)
+        return HttpResponse(response)
+    else:
+        response_tmp = {"status" : "ERROR"}
+        response = json.dumps(response_tmp)
+        return HttpResponse(response)
+
+
+
+
+
+
+
+
+@csrf_exempt
+def GetProfile(request): # GET REQUEST ONLY
+
+    #############################################################
+    ######                                                   ####
+    # This block of code is a tempoary block of code with hardcoded
+    # data for 1 user. The purpose of doing this is to test
+    # the functionality that when the user already created a profile,
+    # it will tell them the current values stored in the system for 
+    # their profile. To accomplish that, I have hardcoded data for 1
+    # value, simulating the data stored in the database for that user
+
+    print(request.user)
+
+    if (str(request.user) == "ax.alvarenga19@gmail.com"):
+        user = hard_coded_data.Profile(user="sample@sample.com",
+                                        full_name="Mark White",
+                                        address1="12345 Houston Rd.",
+                                        address2="7219 Nebraska Ave.",
+                                        city="Huntsville",
+                                        state="AL",
+                                        zip_code="78239", 
+                                        skills=["Plumbing,", "Construction,", "German - Language,", 
+                                                "Cooking,", "Cleaning,", "Mathematics Skills,"],
+                                        preferences="Events near downtown are preferred. \
+                                                    No events after 6 pm.",
+                                        availability=["07/25/2024,", "07/26/2024,", "07/27/2024,",
+                                                    "08/03/2024,", "08/09/2024,", "09/15/2024,"])
+
+        profile_dictionary = {
+            "user": user.user,
+            "full_name": user.full_name,
+            "address1": user.address1,
+            "address2": user.address2,
+            "city": user.city,
+            "state": user.state,
+            "zip_code": user.zip_code,
+            "skills": user.skills,
+            "preferences": user.preferences,
+            "availability": user.availability
+        }
+
+        response = json.dumps(profile_dictionary)
+        return HttpResponse(response)
+    
+
+    ## End of temporary block of code                                                       
+    ##############################################################
+
+
+    # API endpoint Implementation    
+    
+    user = hard_coded_data.get_profile(username=request.user)
+
+    if user is not None: # the user already created a profile
+        print('Profile found')
+
+        profile_dictionary = {
+            "user": user.user,
+            "full_name": user.full_name,
+            "address1": user.address1,
+            "address2": user.address2,
+            "city": user.city,
+            "state": user.state,
+            "zip_code": user.zip_code,
+            "skills": user.skills,
+            "preferences": user.preferences,
+            "availability": user.availability
+        }
+
+        response = json.dumps(profile_dictionary)
+        return HttpResponse(response)
+    
+    else:
+        print('Profile not found')
+        # the user has not created a profile yet, return "Noprofile"    
+        profile_dictionary = {"user" : "None"}
+        response = json.dumps(profile_dictionary)
+        return HttpResponse(response)
+    
+
+
+
+@csrf_exempt
+def GetSkills(request):
+    skills_dictionary = hard_coded_data.skills
+    try:
+        response = json.dumps(skills_dictionary)
+        return HttpResponse(response)
+    except:
+        response = "ERROR"
+        return HttpResponse(response)
+
+
+
+@csrf_exempt
+def GetStates(request):
+    print(request.user)
+    states_dictionary = hard_coded_data.states
+    print(states_dictionary)
+    try:
+        response = json.dumps(states_dictionary)
+        print(response)
+        return HttpResponse(response)
+    except:
+        response = "ERROR"
         return HttpResponse(response)

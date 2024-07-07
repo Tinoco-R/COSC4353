@@ -16,7 +16,7 @@ export default function SavedChangesConfirmation(){
                 />  
         </div>
 
-        <Link to='volunteer/landing'>
+        <Link to='/volunteer/landing'>
             <button className="greenButtonStyle">Go to home page</button>
         </Link>
 

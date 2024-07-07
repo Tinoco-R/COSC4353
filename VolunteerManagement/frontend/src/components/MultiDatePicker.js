@@ -1,3 +1,6 @@
+// This file is not being used anymore
+
+/*
 import React, { useState } from 'react';
 import DatePicker from 'react-multi-date-picker';
 
@@ -33,3 +36,5 @@ export default function MultiDatePicker() {
         />
     )
 }
+
+*/

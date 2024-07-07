@@ -5,6 +5,9 @@ import string, random
 from django.core.validators import MinLengthValidator # https://stackoverflow.com/questions/15845116/how-to-set-min-length-for-models-textfield
 from django.contrib.auth.models import User as UserDefault
 
+from django.contrib.postgres.fields import ArrayField
+from datetime import date
+
 # Generates unique ID code and ensures it doesn't yet exist in the database
 def generate_unique_code():
     length = 10
@@ -49,12 +52,33 @@ class User(UserDefault):
 
 
 
+#def get_today_date():
+#    l = []
+#    l.append(date.today)
+#    return l
+
+class Date(models.Model):
+    date = models.DateField()
+
 # Profile class "extends" the default auth User model
 # the class below is the class that should contain
 # data like the availability of the user, their skills,
 # preferences, etc.
 class Profile(models.Model): 
     user = models.OneToOneField(UserDefault, on_delete=models.CASCADE)
-    is_verified = models.BooleanField(default=False)
 
-    # Continue here on July 5 (after pushing to github)
+    full_name = models.CharField(null=False, blank=False, max_length=50, default='') # "blank=False" (required)
+    # must ensure, in the view, at the programming level that the value is not null
+    address1 = models.CharField(null=False, blank=False, max_length=100, default='') 
+    address2 = models.CharField(null=True, blank=True, max_length=100)
+    city = models.CharField(null=False, blank=False, max_length=100, default='Houston')
+    state = models.CharField(null=False, blank=False, max_length=2, default='TX')
+    zip_code = models.CharField(null=False, blank=False, max_length=9, validators=[MinLengthValidator(5)], default='12345')
+    skills = models.CharField(null=False, blank=False)
+    #skills = models.ManyToManyField(to=Skill, related_name='user_skills_relation')
+    preferences = models.TextField(null=True, blank=True, max_length=1000)
+    availability = models.ManyToManyField(to=Date, related_name='dates_availability')
+
+
+
+
