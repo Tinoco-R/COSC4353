@@ -178,3 +178,78 @@ event8 = None
 event9 = None
 event10 = None
 
+
+#####################################################################
+#### Notifications class
+
+# One user can be mapped to multiple notifications
+# Every notification is associated with an event (we are notifying about,
+# event matched, changes in an event, and reminders)
+
+# There are 3 generic, customizable notifications that
+# the system will use to create the notifications for the
+# user
+
+event_id = None
+class EventMatchedNotification():
+    title = "New Event"
+    text = "You have been matched to the following event:"
+    description = ""
+
+    #def __init__(self, event_id):
+    def __init__(self):
+        self.description = "Cleaning Event on July 25, 2025"
+
+class EventReminderNotification():
+    title = "Event Reminder"
+    text = "You have the following event coming up in 3 days"
+    description = ""
+
+    #def __init__(self, event_id):
+    def __init__(self):
+        self.description = "Cleaning Event on July 25, 2025" 
+
+
+class EventChangeNotification():
+    title = "Event Change"
+    text = "There have been changes to the following event"
+    description = ""
+    prev_data = ""
+    new_data = ""
+    change = ""
+    change_type = ""
+
+    #def __init__(self, event_id):
+    def __init__(self):
+        self.description = "Cleaning Event on July 25, 2025"
+        self.change_type = "Location change"
+        self.old_data = "Humble"
+        self.new_data = "Sugar Land"
+        self.change = "Previously: " + self.old_data + " , Now: " + self.new_data
+
+
+# Sample hard-coded notification
+eventMatched1 = EventMatchedNotification()
+eventUpdated1 = EventChangeNotification()
+eventReminder1 = EventReminderNotification()
+
+
+
+# notifications dictionary to map users to one or many
+# notifications 
+# Used to get all the notifications for a user using the username
+# as the key
+notifications = {
+    "ax.alvarenga19@gmail.com": [eventMatched1, 
+                                 eventUpdated1, 
+                                 eventReminder1],
+
+    # these users don't have notifications mapped to them
+    
+    "user2@user2.com": [eventUpdated1], 
+    "user3@user3.com": [eventMatched1, eventReminder1]   
+}
+
+#####################################################################
+
+

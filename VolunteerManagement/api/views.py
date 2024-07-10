@@ -521,6 +521,108 @@ def GetProfile(request): # GET REQUEST ONLY
     
 
 
+###################################
+### Notifications Module endpoints
+
+@csrf_exempt
+def GetMatchNotifications(request): # Called by the front-end the moment the user visits the alerts page
+
+    user = request.user
+    print(user)
+
+    #notifications_for_user = hard_coded_data.notifications[user]
+
+    eventMatched1 = hard_coded_data.EventMatchedNotification()
+    eventUpdated1 = hard_coded_data.EventChangeNotification()
+    eventReminder1 = hard_coded_data.EventReminderNotification()
+
+    notifications_for_user = [eventMatched1, eventUpdated1, eventReminder1]
+
+    if len(notifications_for_user) > 0:
+        response_tmp = {
+            "matchNotification1": "You have been matched to the event Sugar Land Park Cleaning \
+                                on 07/26/2024."
+        }
+        response = json.dumps(response_tmp)
+        return HttpResponse(response)
+    
+    else:
+        response_tmp = {"message": "None"} # No notifications
+        response = json.dumps(response_tmp)
+        return HttpResponse(response)
+    
+
+
+@csrf_exempt
+def GetUpdateNotifications(request): # Called by the front-end the moment the user visits the alerts page
+
+    user = request.user
+    print(user)
+
+    #notifications_for_user = hard_coded_data.notifications[user]
+
+    if (user == "ax.alvareng19@gmail.com"): # Hard-coded data for 1 volunteer now
+        eventMatched1 = hard_coded_data.EventMatchedNotification()
+        eventUpdated1 = hard_coded_data.EventChangeNotification()
+        eventReminder1 = hard_coded_data.EventReminderNotification()
+
+    notifications_for_user = [eventMatched1, eventUpdated1, eventReminder1]
+
+    if len(notifications_for_user) > 0:
+        response_tmp = {
+            "changeNotification1": "There was a change in the location of the event Kids STEM camp \
+                with Houston Children Foundation on 07/30/2024. New location: Houston Zoo"
+        }
+        response = json.dumps(response_tmp)
+        return HttpResponse(response)
+    
+    else:
+        response_tmp = {"message": "None"} # No notifications
+        response = json.dumps(response_tmp)
+        return HttpResponse(response)
+    
+
+    
+@csrf_exempt
+def GetReminderNotifications(request): # Called by the front-end the moment the user visits the alerts page
+
+    user = request.user
+    print(user)
+
+    #notifications_for_user = hard_coded_data.notifications[user]
+
+    eventMatched1 = hard_coded_data.EventMatchedNotification()
+    eventUpdated1 = hard_coded_data.EventChangeNotification()
+    eventReminder1 = hard_coded_data.EventReminderNotification()
+
+    notifications_for_user = [eventMatched1, eventUpdated1, eventReminder1]
+
+    if len(notifications_for_user) > 0:
+        response_tmp = {                         
+            "reminderNotification1": "Event Reminder: House Building event is coming up in 3 days. \
+                Details of the event: Location: Humble, TX, Date: 08/12/2024"
+        }
+        response = json.dumps(response_tmp)
+        return HttpResponse(response)
+    
+    else:
+        response_tmp = {"message": "None"} # No notifications
+        response = json.dumps(response_tmp)
+        return HttpResponse(response)
+
+# CreateNotification function is not needed as an API endpoint because the notifications
+# are not created by any external system, rather, they are created programatically
+# by our app whenever the events that trigger an action happen (event created, event information
+# changed, and event reminders). There is no need to provide an interface for external systems
+# to create notifications.
+#   This applies to UpdateNotification API endpoint
+
+
+
+###################################
+
+
+
 
 @csrf_exempt
 def GetSkills(request):

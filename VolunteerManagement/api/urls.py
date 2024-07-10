@@ -8,6 +8,7 @@ from .views import LoginView
 from .views import activate
 from .views import CreateProfile, GetProfile, UpdateProfile
 from .views import GetStates, GetSkills
+from .views import GetMatchNotifications, GetUpdateNotifications, GetReminderNotifications
 from . import views # Import everything
 
 urlpatterns = [
@@ -21,5 +22,8 @@ urlpatterns = [
     path('CreateProfile', CreateProfile, name='CreateProfile'),
     path('GetProfile', GetProfile, name='GetProfile'),
     path('UpdateProfile', UpdateProfile, name='UpdateProfile'),
+    path('GetMatchNotifications', GetMatchNotifications, name='GetMatchNotifications'),
+    path('GetUpdateNotifications', GetUpdateNotifications, name='GetUpdateNotifications'),
+    path('GetReminderNotifications', GetReminderNotifications, name='GetReminderNotifications'),
     path('', include('frontend.urls'))
 ]
