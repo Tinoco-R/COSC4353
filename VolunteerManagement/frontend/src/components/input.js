@@ -108,7 +108,6 @@ export default class Input extends React.Component {
 
         // Zip-code must be a numeric-value
         else if (id === "eventZip") {
-          console.log(this.hasOnlyNumbers(value));
           if (!this.hasOnlyNumbers(value) || value.length > 5) {
             this.setState({ value, error: "Zip Code must be a 5 length string of numbers." });
           }
@@ -122,10 +121,9 @@ export default class Input extends React.Component {
         else if (id === "eventDate") {
           const currentDate = new Date();
           const formattedDate = currentDate.toISOString().split('T')[0];
-          console.log(value, formattedDate);
+          
           if (value <= formattedDate) {
               this.setState({ value, error: "Must be a future date." });
-              console.log("New events should occur in the future")
           }
           else {
             this.setState({ value, error: "" });
@@ -134,8 +132,15 @@ export default class Input extends React.Component {
         }
 
         else if (id === "eventStart") {
-            console.log(id, value);
-            this.setState({ value, error: "" });
+            let regex = new RegExp(/((1[0-2]|0?[1-9]):([0-5][0-9]) ?([AP][M]))/);
+
+            if (!regex.test(value) && value !== "") {
+              this.setState({ value, error: "Time format: HH:MM AM/PM" });
+            }
+            else {
+              this.setState({ value, error: "" });
+              this.setState({ value: value }, () => {});
+            }
         }
     }
 

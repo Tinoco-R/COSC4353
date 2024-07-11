@@ -14,7 +14,7 @@ import { Item, StyledLabel } from "./item";
 export default class CreateEvent extends Component {
     constructor(props) {
         super(props);
-        this.state = {
+        const initialState = {
             eventName: '',
             eventDescription: '',
             eventAddress: '',
@@ -23,13 +23,25 @@ export default class CreateEvent extends Component {
             eventZip: '',
             eventDate: '',
             eventStart: '',
-            eventEnd: '',
+            eventDuration: '',
             eventSkills: [],
             eventUrgency: '',
-            isValid: false,
-        }
+        };
+    
+        // Use prefilledData if available, otherwise use initialState (prefilled when modifying an event)
+        this.state = props.prefilledData || initialState;
+
+        this.prefilled = props.prefilledData !== null;
+
         this.eventSkillsRef = React.createRef();
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleInputChange = this.handleInputChange.bind(this);
+    }
+
+    handleInputChange(event) {
+        this.setState({
+            [event.target.name]: event.target.value,
+        });
     }
 
     handleSubmit(event) {
@@ -57,9 +69,11 @@ export default class CreateEvent extends Component {
                 minutes = 0;
                 hours += 1;
             }
-            const formattedTime = `${hours}h ${minutes}m`;
-            return { formattedTime };
+            return { formattedTime: `${hours}h ${minutes}m` };
         }).map(obj => obj.formattedTime);
+        
+        // Prepend an empty string to the durationOptions array
+        durationOptions.unshift('');
 
         return (
             <ThemeProvider theme={theme}>
@@ -69,64 +83,64 @@ export default class CreateEvent extends Component {
                             <Stack spacing={{ xs: 1, sm: 2 }} direction="row" useFlexGap flexWrap="wrap">
                                 <Item>
                                     <StyledLabel htmlFor="eventName">Event Name</StyledLabel>
-                                    <Input type="text" label="Event Name" id="eventName" name="eventName" placeholder="Name" />
+                                    <Input type="text" label="Event Name" id="eventName" name="eventName" placeholder="Name" value={this.state.eventName || ''} />
                                 </Item>
 
                                 <Item>
                                     <StyledLabel htmlFor="eventDescription">Event Description</StyledLabel>
-                                    <Input type="text" label="Event Description" id="eventDescription" name="eventDescription" placeholder="Description" />
+                                    <Input type="text" label="Event Description" id="eventDescription" name="eventDescription" placeholder="Description" value={this.state.eventDescription || ''} />
                                 </Item>
 
                                 <Item>
                                     <StyledLabel htmlFor="eventAddress">Location Address</StyledLabel>
-                                    <Input type="text" label="Address" id="eventAddress" name="eventAddress" placeholder="Address" />
+                                    <Input type="text" label="Address" id="eventAddress" name="eventAddress" placeholder="Address" value={this.state.eventAddress || ''} />
                                 </Item>
 
                                 <Item>
                                     <StyledLabel htmlFor="eventCity">City</StyledLabel>
-                                    <Input type="text" label="City" id="eventCity" name="eventCity" placeholder="City" />
+                                    <Input type="text" label="City" id="eventCity" name="eventCity" placeholder="City" value={this.state.eventCity || ''} />
                                 </Item>
                                 
                                 <Item>
                                     <StyledLabel htmlFor="eventState">State</StyledLabel>
                                     <Item type="inputItem" fontFamily="'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif">
-                                        <MultipleSelect id="eventState" name="eventState" dataValues={stateData} isMulti={false} helpfulLabel={"State"}/>
+                                        <MultipleSelect id="eventState" name="eventState" dataValues={stateData} isMulti={false} helpfulLabel={"State"} value={this.state.eventState ? [this.state.eventState] : []} />
                                     </Item>
                                 </Item>
                                 
                                 <Item>
                                     <StyledLabel htmlFor="eventZip">Zip Code</StyledLabel>
-                                    <Input type="text" label="Zip Code" id="eventZip" name="eventZip" placeholder="Zip" />
+                                    <Input type="text" label="Zip Code" id="eventZip" name="eventZip" placeholder="Zip" value={this.state.eventZip || ''} />
                                 </Item>
 
                                 <Item>
                                     <StyledLabel htmlFor="eventDate">Event Date</StyledLabel>
-                                    <Input type="date" id="eventDate" name="eventDate" placeholder="Date" label="Date" />
+                                    <Input type="date" id="eventDate" name="eventDate" placeholder="Date" label="Date" value={this.state.eventDate || ''} />
                                 </Item>
 
                                 <Item>
                                     <StyledLabel htmlFor="eventStart">Start Time</StyledLabel>
-                                    <Input label="Start" type="time" step="00:15" id="eventStart" name="eventStart" />
+                                    <Input label="Start" type="text" id="eventStart" name="eventStart" value={this.state.eventStart || ''} />
                                 </Item>
 
                                 <Item>
                                     <StyledLabel htmlFor="eventDuration">Duration</StyledLabel>
                                     <Item type="inputItem">
-                                        <MultipleSelect id="eventDuration" name="eventDuration" dataValues={durationOptions} isMulti={false} helpfulLabel={"Duration"} />
+                                        <MultipleSelect id="eventDuration" name="eventDuration" dataValues={durationOptions} isMulti={false} helpfulLabel={"Duration"} value={this.state.eventDuration ? [this.state.eventDuration] : []} />
                                     </Item>
                                 </Item>
 
                                 <Item>
                                     <StyledLabel htmlFor="eventSkills">Required Skills</StyledLabel>
                                     <Item type="inputItem" fontFamily="'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif">
-                                        <MultipleSelect ref={this.eventSkillsRef} id="eventSkills" name="eventSkills" dataValues={skillsData} isMulti={true} helpfulLabel={"Skills"}/>
+                                        <MultipleSelect ref={this.eventSkillsRef} id="eventSkills" name="eventSkills" dataValues={skillsData} isMulti={true} helpfulLabel={"Skills"} value={this.state.eventSkills || []}  />
                                     </Item>
                                 </Item>
                                 
                                 <Item>
                                     <StyledLabel htmlFor="eventUrgency">Urgency</StyledLabel>
                                     <Item type="inputItem" fontFamily="'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif">
-                                        <MultipleSelect id="eventUrgency" name="eventUrgency" dataValues={urgencyData} isMulti={false} helpfulLabel={"Urgency"}/>
+                                        <MultipleSelect id="eventUrgency" name="eventUrgency" dataValues={urgencyData} isMulti={false} helpfulLabel={"Urgency"} value={this.state.eventUrgency ? [this.state.eventUrgency] : []} />
                                     </Item>
                                 </Item>
                             </Stack>
@@ -139,14 +153,26 @@ export default class CreateEvent extends Component {
 
     // Skills here are hardcoded, but should reference the database for all skills admins have created
     render() {
+        let pageTitle;
+        let eventButton;
+
+        if (!this.prefilled) {
+            pageTitle = "Create A New Event";
+            eventButton = "Create Event";
+        }
+        else {
+            pageTitle = "Modify Existing Event";
+            eventButton = "Update Event";
+        }
+
         return (
             <div className="createEvent" style={{ textAlign: 'center' }}>
                 <form id="eventForm" onSubmit={this.handleSubmit}>
                     <StyledLabel >
-                        <h1>Create A New Event</h1>
+                        <h1>{pageTitle}</h1>
                     </StyledLabel>
                     {this.FlexboxGapStack()}
-                        <Button style={{backgroundColor: "#61892F" /* #86C232 #61892F */}}  variant="contained" type="submit" fontFamily="'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif">Create Event</Button>                
+                        <Button style={{backgroundColor: "#61892F" /* #86C232 #61892F */}}  variant="contained" type="submit" fontFamily="'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif">{eventButton}</Button>                
                 </form>
             </div>
         );

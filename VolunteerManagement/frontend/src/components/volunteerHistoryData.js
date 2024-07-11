@@ -283,7 +283,7 @@ function generateEvents(eventNames, administrators, descriptions, streetAddresse
             description: descriptions[i],
             address: streetAddresses[i],
             city: cities[i],
-            state: stateData[i],
+            state: stateData[i + 1],
             zip: zipCodes[i],
             date: dates[i],
             time: times[Math.floor(Math.random() * times.length)],

@@ -21,14 +21,31 @@ const theme = createTheme({
   },
 });
 
+function getEventNames() {
+    let eventNames = []
+    for (let index = 0; index < eventData.length; index++) {
+        const eventName = eventData[index].name;
+        eventNames.push(eventName);        
+    }
+
+    return eventNames;
+}
+
 // From https://mui.com/material-ui/react-autocomplete/ to allow for easy search of events
-function ComboBox() {
+function ComboBox({ onChange }) {
+  let events = getEventNames();
+
+  const handleChange = (event, value) => {
+    onChange(value);
+  };
+
   return (
     <ThemeProvider theme={theme}>
         <Autocomplete
+        onChange={handleChange}
         disablePortal
         id="combo-box-demo"
-        options={top100Films}
+        options={events}
         sx={{ width: 300 }}
         renderInput={(params) => (
             <TextField
@@ -52,8 +69,6 @@ function ComboBox() {
   );
 }
 
-const top100Films = ['1', '2', '3']
-
 const StyledButton = ({ children,...props}) => {
     return (
         <Button
@@ -75,35 +90,86 @@ export default class EventAdministration extends Component {
         super(props);
         this.state = {
             create: false,
-            modify: false
+            modify: false,
+            confirm: false,
+            search: "",
+            selectedRowData: null,
         }
     }
     
-    handleClickEvent = ( type ) => {
+    handleClickEvent = ( type, eventData = null ) => {
         // Remove the create / modify buttons
         // Get type (create or modify) and render correct page
         if (type === "create") {
             console.log("Creating");
-            this.setState({ create: true, modify: false });
+            this.setState({ create: true, modify: false, confirm: false, selectedRowData: null });
         }
-        else if (type === "modify" ) {
+        else if (type === "modify") {
             console.log("Modifying");
-            this.setState({ create: false, modify: true });
+            this.setState({ create: false, modify: true, confirm: false, selectedRowData: eventData });
+        }
+        else if (type === "back") {
+            console.log("Back");
+            this.setState({ create: false, modify: false, confirm: false, selectedRowData: null });            
+        }
+        else if (type === "confirm") {
+            if (type === "confirm") {
+                console.log("Confirm");
+                
+                // Transform eventData to match the expected shape in CreateEvent
+                const transformedEventData = {
+                    eventName: eventData.name,
+                    eventDescription: eventData.description,
+                    eventAddress: eventData.address,
+                    eventCity: eventData.city,
+                    eventState: eventData.state,
+                    eventZip: eventData.zip,
+                    eventDate: new Date(eventData.date).toISOString().split('T')[0],
+                    eventStart: eventData.time,
+                    eventDuration: eventData.duration,
+                    eventSkills: eventData.skills.split(", "),
+                    eventUrgency: eventData.urgency,
+                };
+                this.setState({ create: false, modify: false, confirm: true, selectedRowData: transformedEventData });
+            }     
         }
         else {
-            console.log("Back");
-            this.setState({ create: false, modify: false });            
+            console.log("Other");
         }
     }
 
+    handleSearchInputChange = (newValue) => {
+        this.setState({ search: newValue });
+    };
+
+    filterEventsBySearch = ( searchBar ) => {
+        let events = [];
+        // No Search
+        if (searchBar === "") {
+            return eventData;
+        }
+
+        for (let index = 0; index < eventData.length; index++) {
+            const eventName = eventData[index].name;
+            // If eventName not like searchBar, continue; else add it to events and once loop is done return events
+            if (eventName.toLowerCase().includes(searchBar.toLowerCase())) {
+                events.push(eventData[index]);
+            }
+        }
+
+        return events;
+    };
+
     render() {
+        const filteredRows = this.filterEventsBySearch( this.state.search );
+
         return (
             <>
             {/* Three Buttons: Create, Modify and Back. Selecting Create or Modify hides those and renders their corresponding page. Back resets to the default page [rendered only when one of the other buttons have been clicked].  */}
             {!this.state.create && !this.state.modify && (
                 <>
                 <StyledButton type="submit" onClick={() => {this.handleClickEvent("create")}} >Create A New Event</StyledButton>
-                <StyledButton type="submit" onClick={() => {this.handleClickEvent("modify")} } >Modify An Existing Event</StyledButton>
+                <StyledButton type="submit" onClick={() => {this.handleClickEvent("modify", this.state.selectedRowData)} } >Modify An Existing Event</StyledButton>
                 </>
             )}
             
@@ -118,15 +184,21 @@ export default class EventAdministration extends Component {
                             
                             <div style={{ marginTop: '-8px'}}>
                                 <Item type="lime">
-                                    <ComboBox />
+                                    <ComboBox onChange={this.handleSearchInputChange} />
                                 </Item>
+                            </div>
+                        
+                            <div>
+                            {this.state.selectedRowData !== null && (
+                                <StyledButton type="submit" onClick={() => {this.handleClickEvent("confirm", this.state.selectedRowData)} } >Confirm</StyledButton>
+                            )}
                             </div>
                         </div>
                     </Grid>
                     
                     <div style={{ marginTop: '20px', height: 400, width: "95%", height: "90%" }}>
                         <DataGrid
-                            rows={eventData}
+                            rows={filteredRows}
                             columns={eventModificationColumns}
                             initialState={{
                                 pagination: { paginationModel: { page: 0, pageSize: 20 } },
@@ -137,13 +209,10 @@ export default class EventAdministration extends Component {
                             disableMultipleSelection
                             disableMultipleRowSelection
                             selectionType="single"
-                            // Get the list of skills for the selected row on the data table
-                            onRowSelectionModelChange={(selectionModel) => {
-                                let selectedRowId = selectionModel[0];
-                                if (selectedRowId!== undefined) {
-                                    const rowSkills = eventData[selectedRowId - 1].skills;
-                                    this.setState({ selectedSkills: rowSkills });
-                                }
+                            onRowSelectionModelChange={(newSelection) => {
+                                const selectedId = newSelection[0];
+                                const selectedEvent = eventData.find(event => event.id === selectedId);
+                                this.setState({ selectedRowData: selectedEvent });
                             }}
                             sx={{
                                 ".MuiDataGrid-row.Mui-selected:hover": { backgroundColor: "rgb(97 137 47 / 15%)", },
@@ -161,6 +230,24 @@ export default class EventAdministration extends Component {
                             }}
                         />
                     </div>
+
+                    {this.state.selectedRowData && (
+                        <div style={{ marginTop: '20px', padding: '20px', border: '1px solid #ccc', borderRadius: '5px' }}>
+                            <h3>Selected Event Details:</h3>
+                            <ul>
+                                {Object.keys(this.state.selectedRowData).map((key, index) => (
+                                    <li key={index}>{`${key}: ${this.state.selectedRowData[key]}`}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+                </>
+            )}
+            {/* Confirm Selected: Render the modify event page (create event with parameters passed) */}
+            {this.state.confirm  && (
+                <>
+                    <StyledButton type="submit" onClick={() => {this.handleClickEvent("back")}}>Back</StyledButton>
+                    <CreateEvent prefilledData={this.state.selectedRowData} />
                 </>
             )}
 
