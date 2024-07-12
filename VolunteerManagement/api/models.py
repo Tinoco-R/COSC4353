@@ -22,14 +22,18 @@ class Skill(models.Model):
 
 class Event(models.Model):
     Event_ID = models.CharField(max_length = 10, default = "", unique = True, primary_key = True)
+    Name = models.CharField(max_length = 100, default = "")
     Administrator = models.CharField(max_length = 50)
-    Urgency = models.CharField(max_length= 10, default = "") # Immediate, High, Moderate, Low
+    Description = models.CharField(max_length=256, default="")
     Address = models.CharField(max_length = 75)
-    State = models.CharField(max_length = 2)
-    City = models.CharField(max_length = 45)
-    Zip_Code = models.CharField(max_length = 10)
-    Volunteer_Count = models.IntegerField()
+    City = models.CharField(max_length = 28)
+    State = models.CharField(max_length = 13)
+    Zip_Code = models.CharField(max_length = 5)
+    Date = models.CharField(max_length = 10)
+    Start_Time = models.CharField(max_length = 8, default = "12:00 PM")
     Skills = models.ManyToManyField(Skill, related_name='events')
+    Urgency = models.CharField(max_length= 10, default = "") # Low, Medium, High, Critical
+    Volunteer_Count = models.IntegerField(default = 0)
     Created_By = models.ForeignKey('auth.User', on_delete=models.CASCADE)
     Created_At = models.DateTimeField(auto_now_add = True)
 

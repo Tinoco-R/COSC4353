@@ -31,7 +31,7 @@ export default class AdminHomePage extends Component {
                     // Events
                     <Route path='admin/events' element = {<p>Events</p>} />
                     <Route path='admin/events/my' element = {<PersonalAdminEvents />} />
-                    <Route path='admin/events/my/create-event' element={<CreateEvent />} />
+                    <Route path='admin/events/my/create-event' element={<CreateEvent prefilledData={null}/>} />
                     <Route path='admin/events/my/:eventId' element={<EventDetails />} />
                     <Route path='admin/events/all' element = {<AllAdminEvents/>} />
                     <Route path='admin/events/administration' element = {<EventAdministration />} />

@@ -9,7 +9,8 @@ import { Item, StyledLabel } from "./item";
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { DataGrid } from '@mui/x-data-grid';
 import { eventModificationColumns } from "./columns";
-import { eventData } from "./volunteerHistoryData";
+//import { eventData } from "./volunteerHistoryData";
+import { eventData } from "./eventData";
 
 const theme = createTheme({
   components: {
@@ -101,24 +102,21 @@ export default class EventAdministration extends Component {
         // Remove the create / modify buttons
         // Get type (create or modify) and render correct page
         if (type === "create") {
-            console.log("Creating");
             this.setState({ create: true, modify: false, confirm: false, selectedRowData: null });
         }
         else if (type === "modify") {
-            console.log("Modifying");
             this.setState({ create: false, modify: true, confirm: false, selectedRowData: eventData });
         }
         else if (type === "back") {
-            console.log("Back");
             this.setState({ create: false, modify: false, confirm: false, selectedRowData: null });            
         }
         else if (type === "confirm") {
-            if (type === "confirm") {
-                console.log("Confirm");
-                
+            if (type === "confirm") {                
                 // Transform eventData to match the expected shape in CreateEvent
                 const transformedEventData = {
+                    eventId: eventData.id,
                     eventName: eventData.name,
+                    eventAdministrator: eventData.administrator,
                     eventDescription: eventData.description,
                     eventAddress: eventData.address,
                     eventCity: eventData.city,
@@ -255,7 +253,7 @@ export default class EventAdministration extends Component {
             {(this.state.create && !this.state.modify) && (
                 <>
                     <StyledButton type="submit" onClick={() => {this.handleClickEvent("back")}}>Back</StyledButton>
-                    <CreateEvent />
+                    <CreateEvent prefilledData={null} />
                 </>
             )}
             </>

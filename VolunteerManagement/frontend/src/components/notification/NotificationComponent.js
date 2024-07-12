@@ -43,3 +43,30 @@ export function ShowNotification(title, message){
     //});
 
 }
+
+export function ShowDetails(title, form, onConfirm){
+    const formHtml = Object.entries(form).map(([key, value]) => {
+        return `<p><strong>${key}:</strong> ${value}</p>`;
+    }).join('');
+
+    Swal.fire({
+        title: '<h5>' + title +  '</h5>',
+        html: formHtml,
+        showCancelButton: true,
+        showConfirmButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        cancelButtonText: "Close",
+        confirmButtonText: "Acknowledge",
+        allowOutsideClick: false
+    }).then((result) => { // Check if user confirms or denies form finalization
+        if (result.isConfirmed) {
+            console.log('User confirmed');
+            onConfirm(true);
+        } else {
+            console.log('User cancelled');
+            onConfirm(false);
+        }
+    });
+
+}

@@ -1,7 +1,6 @@
 import React from 'react'
 
 export const stateData = [
-    "",
     "Alabama",
     "Alaska",
     "Arizona",

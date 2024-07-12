@@ -50,6 +50,7 @@ export default function MultipleSelect( { dataValues, isMulti = true, helpfulLab
       target: { value },
     } = event;
     setData(value);
+    //console.log("Selected values in MultipleSelect:", value);
     if (onChange) {
       onChange(value);
     }
