@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTheme } from '@mui/material/styles';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputLabel from '@mui/material/InputLabel';
@@ -37,17 +37,23 @@ function getStyles(data, choice, theme) {
 }
 
 // Pass a list of data to populate the select
-export default function MultipleSelect( { dataValues, isMulti = true, helpfulLabel } ) {
+export default function MultipleSelect( { dataValues, isMulti = true, helpfulLabel, value = [], onChange } ) {
   const theme = useTheme();
   const [choice, setData] = React.useState([]);
+
+  useEffect(() => {
+    setData(value || []);
+  }, [value]);
 
   const handleChange = (event) => {
     const {
       target: { value },
     } = event;
-    setData(
-      typeof value === 'string' ? value.split(',') : value,
-    );
+    setData(value);
+    //console.log("Selected values in MultipleSelect:", value);
+    if (onChange) {
+      onChange(value);
+    }
   };
 
   return (

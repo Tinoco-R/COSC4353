@@ -136,6 +136,7 @@ export default class VolunteerDetailsAdmin extends Component {
     valuetext(value) {
         return value === 1? `${value} Matching Skill` : `${value} Matching Skills`;
     }
+    
     render() {
         const matchingSkills = this.state.matchingSkills;
         const filteredVolunteers = this.filterVolunteersBySkills( matchingSkills );
