@@ -56,14 +56,16 @@ class User(UserDefault):
 #    l = []
 #    l.append(date.today)
 #    return l
-
+'''
 class Date(models.Model):
     date = models.DateField()
+'''
 
 # Profile class "extends" the default auth User model
 # the class below is the class that should contain
 # data like the availability of the user, their skills,
 # preferences, etc.
+'''
 class Profile(models.Model): 
     user = models.OneToOneField(UserDefault, on_delete=models.CASCADE)
 
@@ -78,7 +80,7 @@ class Profile(models.Model):
     #skills = models.ManyToManyField(to=Skill, related_name='user_skills_relation')
     preferences = models.TextField(null=True, blank=True, max_length=1000)
     availability = models.ManyToManyField(to=Date, related_name='dates_availability')
-
+'''
 
 
 

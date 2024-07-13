@@ -112,7 +112,16 @@ class Profile():
 #####################################################################
 ###### Hard-coded profile instances (to be initialized in the backend)
 
-user1 = None
+user1 = Profile(user='testuser2@mail.com',
+                full_name='Cloe Thompson',
+                address1='19210 Magnolia St.',
+                address2='72190 Seven Rd.',
+                city='Boulder',
+                state='CO',
+                zip_code=21002,
+                skills='Drawing, Singing, Math Skills',
+                preferences='Events near dowtown are preferred',
+                availability='08/12/2024,09/27/2024,10/15/2024')
 user2 = None
 user3 = None
 user4 = None
