@@ -137,6 +137,9 @@ class UserView(generics.CreateAPIView):
         print('Session:')
         print(request.session)
         print(request.session.get("session_id"))
+        # Since the username comes from the Python request object (it is
+        # not really a user-given input in this part of the code) there is
+        # no validation coded for it
         username = request.session.get("session_id") # Getting the value of session_id
         response = {'username' : username}
         print('Sending User data to the front-end')
@@ -190,45 +193,76 @@ def RegisterView(request):
     print(request)
     decoded_request_body = json.loads(request.body.decode("utf-8")) # https://www.freecodecamp.org/news/python-json-how-to-convert-a-string-to-json/
     print(decoded_request_body)
-    username = decoded_request_body["username"] #request.data.get('username') # username from front-end
-    password = decoded_request_body["password"] #request.data.get('password') # password from front-end
-    # Validate the user input (missing)
-    #form = RegisterForm(request.data)
-    form = RegisterForm({"username": username,
-                            "password": password,
-                            "password1": password,
-                            "password2": password,
-                            "is_active": False})
-    #print(form)
-    print('Request.POST:')
-    print(request.POST)
 
-    for field in form:
-        print("Field Error:", field.name, field.errors)
 
-    # If validation successfull, create the user
-    # Database relation needed for line below (Django complains)
-    newUser = None
-    if (form.is_valid()):
-        newUser = form.save(commit=True)
-        
-        #newUser.is_active = False # Set is_active to false by default
-        #newUser() # Save change onde to is_active attribute
-        #newUser.is_active = False
-        #newUser.save()
+    #### Input validation for username and password ####
 
-        activateEmail(request, newUser, form.cleaned_data.get('username') )
-        #newUser = User.objects.create_user(username=username, 
-        #                                email=None, 
-        #                                password=password)
+    validated_username = ''
+    validated_password = ''
+
+    # Username (email) validation
+
+    try:
+        validated_username = validators.email(decoded_request_body["username"], allow_empty=False) #request.data.get('username') # username from front-end
+    except errors.EmptyValueError:
+        print("ERROR: username (email) received from the front-end is empty.")
+    except errors.InvalidEmailError:
+        print("ERROR: username (email) received from the front-end is invalid.")
+
+    # Password validation
+    
+    if checkers.is_string(decoded_request_body["password"], allow_empty=False): #request.data.get('password') # password from front-end
+        validated_password = decoded_request_body["password"]
     else:
-        print('ERROR: Form not valid')
-    #if (request.POST) and (newUser is not None):
-    if (newUser is not None):
-        response = "{'message': 'OK'}" # User registered in the system
-        print('User created successfully')
-        return HttpResponse(response)
-        #return redirect('') # Redirect the user to the email verification page    
+        if (len(decoded_request_body["password"]) == 0):
+            print("ERROR: password received from the front-end is empty")
+        else:
+            print("ERROR: password received from the front-end is not valid")
+    
+    #### Input validation end ####
+
+    if (validated_username != '') and (validated_password != ''):
+        username = validated_username
+        password = validated_password
+
+
+        # Validate the user input (missing)
+        #form = RegisterForm(request.data)
+        form = RegisterForm({"username": username,
+                                "password": password,
+                                "password1": password,
+                                "password2": password,
+                                "is_active": False})
+        #print(form)
+        print('Request.POST:')
+        print(request.POST)
+
+        for field in form:
+            print("Field Error:", field.name, field.errors)
+
+        # If validation successfull, create the user
+        # Database relation needed for line below (Django complains)
+        newUser = None
+        if (form.is_valid()):
+            newUser = form.save(commit=True)
+            
+            #newUser.is_active = False # Set is_active to false by default
+            #newUser() # Save change onde to is_active attribute
+            #newUser.is_active = False
+            #newUser.save()
+
+            activateEmail(request, newUser, form.cleaned_data.get('username') )
+            #newUser = User.objects.create_user(username=username, 
+            #                                email=None, 
+            #                                password=password)
+        else:
+            print('ERROR: Form not valid')
+        #if (request.POST) and (newUser is not None):
+        if (newUser is not None):
+            response = "{'message': 'OK'}" # User registered in the system
+            print('User created successfully')
+            return HttpResponse(response)
+            #return redirect('') # Redirect the user to the email verification page    
     
     response = "{'message': 'Something went wrong'}"
     print('ERROR: Failed to create user')
@@ -247,63 +281,91 @@ def LoginView(request):
 
     decoded_request_body = json.loads(request.body.decode("utf-8")) # https://www.freecodecamp.org/news/python-json-how-to-convert-a-string-to-json/
 
-    # Login the user
-    username = decoded_request_body["username"]
-    password = decoded_request_body["password"]
-    print(username, password)
-    User = get_user_model()
-    userAttemptingLogin = User.objects.get(username=username)
-    user = authenticate(request, username=username, password=password)
-    #user = True # not implementing the authentication quite yet (closely toupled with DB & Django)
-    print(user)
-    # Get the user_id for the user
-    #user_id = 1
+    #### Input validation for username and password ####
+
+    # Username (email) validation
+
+    validated_username = ''
+    validated_password = ''
+
+
+    try:
+        validated_username = validators.email(decoded_request_body["username"], allow_empty=False) #request.data.get('username') # username from front-end
+    except errors.EmptyValueError:
+        print("ERROR: username (email) received from the front-end is empty.")
+    except errors.InvalidEmailError:
+        print("ERROR: username (email) received from the front-end is invalid.")
+
+    # Password validation
     
-    if user is not None:
+    if checkers.is_string(decoded_request_body["password"], allow_empty=False): #request.data.get('password') # password from front-end
+        validated_password = decoded_request_body["password"]
+    else:
+        if (len(decoded_request_body["password"]) == 0):
+            print("ERROR: password received from the front-end is empty")
+        else:
+            print("ERROR: password received from the front-end is not valid")
+    
+    #### Input validation end ####
 
-        # User authenticated successfully
-        print('User authenticated successfully')
-
-        ################## Session Creation
-
-        # Per Django's documentation, login() saves the userID's
-        # in the session, using Django's session framework
-        login(request, user)
-        print('Session started successfully')
-        print('Session:')
-        print(request.session)
+    # Login the user
+    if (validated_username != '') and (validated_password != ''):
+        username = validated_username
+        password = validated_password
+        print(username, password)
+        User = get_user_model()
+        userAttemptingLogin = User.objects.get(username=username)
+        user = authenticate(request, username=username, password=password)
+        #user = True # not implementing the authentication quite yet (closely toupled with DB & Django)
+        print(user)
+        # Get the user_id for the user
+        #user_id = 1
         
-        print(user.get_username())
-        request.session["session_id"] = user.get_username() # For this assignment, using username as session_id
+        if user is not None:
 
-        ########################################
+            # User authenticated successfully
+            print('User authenticated successfully')
 
-        ### Check if the user has verified their account
-        ### through the email link
+            ################## Session Creation
 
-        if (user.is_active):
-            ################### User Redirection per user role
-            if (user.is_staff == True):
-                #res = redirect('/admin/home') # Redirect to Admin Home page
-                response = '''{"url": "/admin/home"}'''
-                #return HttpResponseRedirect('/admin/home')
-                return HttpResponse(response)
-                #return redirect('/admin/home')
-            else:
-                #res = redirect('/volunteer/landing') # Redirect to Volunteer Home page
-                response = '''{"url": "/volunteer/landing"}'''
-                return HttpResponse(response)
-                #return HttpResponseRedirect('/volunteer/landing')
-                #return redirect('/volunteer/landing')
-        #else:
-            # Account verification process
-            # has not been completed.
-            # Inform the user
-    elif (userAttemptingLogin.is_active):
-        print('User account has not been verified')
-        # Return an 'invalid login' error message
-        response = '''{"url": "/login"}'''
-        return HttpResponse(response)
+            # Per Django's documentation, login() saves the userID's
+            # in the session, using Django's session framework
+            login(request, user)
+            print('Session started successfully')
+            print('Session:')
+            print(request.session)
+            
+            print(user.get_username())
+            request.session["session_id"] = user.get_username() # For this assignment, using username as session_id
+
+            ########################################
+
+            ### Check if the user has verified their account
+            ### through the email link
+
+            if (user.is_active):
+                ################### User Redirection per user role
+                if (user.is_staff == True):
+                    #res = redirect('/admin/home') # Redirect to Admin Home page
+                    response = '''{"url": "/admin/home"}'''
+                    #return HttpResponseRedirect('/admin/home')
+                    return HttpResponse(response)
+                    #return redirect('/admin/home')
+                else:
+                    #res = redirect('/volunteer/landing') # Redirect to Volunteer Home page
+                    response = '''{"url": "/volunteer/landing"}'''
+                    return HttpResponse(response)
+                    #return HttpResponseRedirect('/volunteer/landing')
+                    #return redirect('/volunteer/landing')
+            #else:
+                # Account verification process
+                # has not been completed.
+                # Inform the user
+        elif (userAttemptingLogin.is_active):
+            print('User account has not been verified')
+            # Return an 'invalid login' error message
+            response = '''{"url": "/login"}'''
+            return HttpResponse(response)
     else: # add check to verify if username or password are incorrect
         print('Username or password are incorrent')
         response = '''{"url": "/login"}'''
@@ -317,50 +379,196 @@ def CreateProfile(request): # POST REQUEST ONLY
     decoded_request_body = json.loads(request.body.decode("utf-8")) # https://www.freecodecamp.org/news/python-json-how-to-convert-a-string-to-json/
     
     print(decoded_request_body)
-    
-    user = request.user
-    full_name = decoded_request_body["full_name"]
-    address1 = decoded_request_body["address1"]
-    
-    address2 = None
-    if decoded_request_body["address2"]:
-        address2 = decoded_request_body["address2"]
-    
-    city = decoded_request_body["city"]
-    state = decoded_request_body["state"]
-    zip_code = decoded_request_body["zip_code"]
-    skills = decoded_request_body["skills"]    
-    preferences = decoded_request_body["preferences"]
-    availability = decoded_request_body["availability"]
 
+    #####################################
+    #### Input validation for profile ###
+    #####################################
 
-    #######################################################
-    ### Add: check if the user already filled-in their
-    ### profile information, and, if so, pre-fill
-    ### the data fields
+    # Declarations
 
+    validated_full_name = ''
+    validated_address1 = ''
+    validated_address2 = ''
+    validated_city = ''
+    validated_state = ''
+    validated_zip_code = ''
+    validated_skills = ''   
+    validated_preferences = ''
+    validated_availability = ''
 
-    #######################################################
+    # Full Name validation
 
-
-    new_profile_created = hard_coded_data.Profile(user=user,
-                                                  full_name=full_name,
-                                                  address1=address1,
-                                                  address2=address2,
-                                                  city=city,
-                                                  state=state,
-                                                  zip_code=zip_code,
-                                                  skills=skills,
-                                                  preferences=preferences,
-                                                  availability=availability)
-
-    if new_profile_created is not None:
-        print('User profile created:')
-        print(new_profile_created)
-        response_tmp = {"status" : "OK"}
-        response = json.dumps(response_tmp)
-        return HttpResponse(response)
+    full_name_is_valid = checkers.is_string(decoded_request_body["full_name"], allow_empty=False, 
+                                            maximum_length=50) #request.data.get('username') # username from front-end
+    if full_name_is_valid:
+        validated_full_name = decoded_request_body["full_name"]
     else:
+        if (len(decoded_request_body["full_name"]) == 0):
+            print("ERROR: Full name is empty.")
+        elif (len(decoded_request_body["full_name"]) > 50):
+            print("ERROR: Full name has more than 50 characters.")
+        else:
+            print("ERROR: Some error. Full name could not be validated.")
+
+    # Address 1 validation
+
+    address1_is_valid = checkers.is_string(decoded_request_body["address1"], allow_empty=False, 
+                                           maximum_length=100)
+    if address1_is_valid:
+        validated_address1 = decoded_request_body["address1"]
+    else:
+        if (len(decoded_request_body["address1"]) == 0):
+            print("ERROR: Address 1 is empty.")
+        elif (len(decoded_request_body["address1"]) > 100):
+            print("ERROR: Address 1 has more than 100 characters.")
+        else:
+            print("ERROR: Some error. Address 1 could not be validated.")
+
+    # Address 2 validation (Address 2 can be emty because it is optional)
+
+    address2_is_valid = checkers.is_string(decoded_request_body["address2"], allow_empty=True, 
+                                           maximum_length=100)
+    if address2_is_valid: # Address 2 is valid and not empty
+        print("OK: Address 2 is valid.")
+        validated_address2 = decoded_request_body["address2"]
+    else:
+        if (len(decoded_request_body["address2"]) > 100):
+            print("ERROR: Address 2 has more than 100 characters.")
+        else:
+            print("ERROR: Some error. Address 2 could not be validated.")
+
+    # City validation
+
+    city_is_valid = checkers.is_string(decoded_request_body["city"], allow_empty=False, 
+                                           maximum_length=100)
+    if city_is_valid: # Address 2 is valid and not empty
+        print("OK: City is valid.")
+        validated_city = decoded_request_body["city"]
+    else:
+        if (len(decoded_request_body["city"]) == 0):
+            print("ERROR: Field <city> is empty.")
+        elif (len(decoded_request_body["city"]) > 100):
+            print("ERROR: Field <City> has more than 100 characters.")
+        else:
+            print("ERROR: Some error. City could not be validated.")
+
+    # State validation
+
+    state_is_valid = checkers.is_string(decoded_request_body["state"], allow_empty=False, 
+                                           maximum_length=2)
+    if state_is_valid: # State is valid and not empty
+        print("OK: State is valid.")
+        validated_state = decoded_request_body["state"]
+    else:
+        if (len(decoded_request_body["state"]) == 0):
+            print("ERROR: Field <State> is empty.")
+        elif (len(decoded_request_body["state"]) > 2):
+            print("ERROR: Field <State> has more than 2 characters.")
+        else:
+            print("ERROR: Some error. State could not be validated.")
+    
+    # Zip Code validation
+
+    zip_code_is_valid = checkers.is_string(decoded_request_body["zip_code"], allow_empty=False,
+                                           minimum_length=5, 
+                                           maximum_length=9)
+    if zip_code_is_valid: # Zip code is valid and not empty
+        print("OK: Zip code is valid.")
+        validated_zip_code = decoded_request_body["zip_code"]
+    else:
+        if (len(decoded_request_body["zip_code"]) == 0):
+            print("ERROR: Field <Zip code> is empty.")
+        elif (len(decoded_request_body["zip_code"]) > 9):
+            print("ERROR: Field <Zip code> has more than 9 characters.")
+        elif (len(decoded_request_body["zip_code"]) < 5):
+            print("ERROR: Field <Zip code> has less than 5 characters.")
+        else:
+            print("ERROR: Some error. Zip code could not be validated.")
+
+    # Skills validation (string)
+
+    skills_is_valid = checkers.is_string(decoded_request_body["skills"], allow_empty=False)
+    if skills_is_valid: # Skills is valid and not empty
+        print("OK: Skills is valid.")
+        validated_skills = decoded_request_body["skills"]
+    else:
+        if (len(decoded_request_body["skills"]) == 0):
+            print("ERROR: Field <Skills> is empty.")
+        else:
+            print("ERROR: Some error. Skills could not be validated.")
+
+    # Preferences validation (Preferences can be emty because it is optional)
+
+    preferences_is_valid = checkers.is_string(decoded_request_body["preferences"], allow_empty=True)
+    if preferences_is_valid: # Address 2 is valid and not empty
+        print("OK: Preferences is valid.")
+        validated_preferences = decoded_request_body["preferences"]
+    else:
+        print("ERROR: Some error. Preferences could not be validated.")
+    
+    # Availability validation (string)
+
+    availability_is_valid = checkers.is_string(decoded_request_body["availability"], allow_empty=False)
+    if availability_is_valid: # Skills is valid and not empty
+        print("OK: Availability is valid.")
+        validated_availability = decoded_request_body["availability"]
+    else:
+        print("ERROR: Some error. Availability could not be validated.")
+
+    ##############################
+    #### Input validation end ####
+    ##############################
+    
+    # If input validation succeeded, proceed:
+    if (validated_full_name != '') and (validated_address1 != '') \
+        and (validated_city != '') and (validated_state != '') \
+        and (validated_zip_code != '') and (validated_skills != '') \
+        and (validated_availability != ''):   
+    
+        # Validation was successfull, proceeding   
+        user = request.user
+        full_name = decoded_request_body["full_name"]
+        address1 = decoded_request_body["address1"]
+        
+        address2 = None
+        if decoded_request_body["address2"]:
+            address2 = validated_address2# decoded_request_body["address2"]
+        
+        city = decoded_request_body["city"]
+        state = decoded_request_body["state"]
+        zip_code = decoded_request_body["zip_code"]
+        skills = decoded_request_body["skills"]    
+        preferences = validated_preferences#decoded_request_body["preferences"]
+        availability = decoded_request_body["availability"]
+
+
+        #######################################################
+        ### Add: check if the user already filled-in their
+        ### profile information, and, if so, pre-fill
+        ### the data fields
+
+
+        #######################################################
+
+
+        new_profile_created = hard_coded_data.Profile(user=user,
+                                                    full_name=full_name,
+                                                    address1=address1,
+                                                    address2=address2,
+                                                    city=city,
+                                                    state=state,
+                                                    zip_code=zip_code,
+                                                    skills=skills,
+                                                    preferences=preferences,
+                                                    availability=availability)
+
+        if new_profile_created is not None:
+            print('User profile created:')
+            print(new_profile_created)
+            response_tmp = {"status" : "OK"}
+            response = json.dumps(response_tmp)
+            return HttpResponse(response)
+    else: # Validation failed
         response_tmp = {"status" : "ERROR"}
         response = json.dumps(response_tmp)
         return HttpResponse(response)
@@ -392,43 +600,189 @@ def UpdateProfile(request): # POST REQUEST ONLY
     decoded_request_body = json.loads(request.body.decode("utf-8")) # https://www.freecodecamp.org/news/python-json-how-to-convert-a-string-to-json/
     
     print(decoded_request_body)
-    
-    user = request.user # get the user object for the user making the request
 
-    # Reading the input from the request (all fields required to perform the update):
-    
+    #####################################
+    #### Input validation for profile ###
+    #####################################
 
-    full_name = decoded_request_body["full_name"]
-    address1 = decoded_request_body["address1"]
-    
-    address2 = None
-    if decoded_request_body["address2"]:
-        address2 = decoded_request_body["address2"]
-    
-    city = decoded_request_body["city"]
-    state = decoded_request_body["state"]
-    zip_code = decoded_request_body["zip_code"]
-    skills = decoded_request_body["skills"]    
-    preferences = decoded_request_body["preferences"]
-    availability = decoded_request_body["availability"]
+    # Declarations
 
-    new_profile_created = hard_coded_data.Profile(user=user,
-                                                  full_name=full_name,
-                                                  address1=address1,
-                                                  address2=address2,
-                                                  city=city,
-                                                  state=state,
-                                                  zip_code=zip_code,
-                                                  skills=skills,
-                                                  preferences=preferences,
-                                                  availability=availability)
+    validated_full_name = ''
+    validated_address1 = ''
+    validated_address2 = ''
+    validated_city = ''
+    validated_state = ''
+    validated_zip_code = ''
+    validated_skills = ''   
+    validated_preferences = ''
+    validated_availability = ''
 
-    if new_profile_created is not None:
-        print('User profile created:')
-        print(new_profile_created)
-        response_tmp = {"status" : "OK"}
-        response = json.dumps(response_tmp)
-        return HttpResponse(response)
+    # Full Name validation
+
+    full_name_is_valid = checkers.is_string(decoded_request_body["full_name"], allow_empty=False, 
+                                            maximum_length=50) #request.data.get('username') # username from front-end
+    if full_name_is_valid:
+        validated_full_name = decoded_request_body["full_name"]
+    else:
+        if (len(decoded_request_body["full_name"]) == 0):
+            print("ERROR: Full name is empty.")
+        elif (len(decoded_request_body["full_name"]) > 50):
+            print("ERROR: Full name has more than 50 characters.")
+        else:
+            print("ERROR: Some error. Full name could not be validated.")
+
+    # Address 1 validation
+
+    address1_is_valid = checkers.is_string(decoded_request_body["address1"], allow_empty=False, 
+                                           maximum_length=100)
+    if address1_is_valid:
+        validated_address1 = decoded_request_body["address1"]
+    else:
+        if (len(decoded_request_body["address1"]) == 0):
+            print("ERROR: Address 1 is empty.")
+        elif (len(decoded_request_body["address1"]) > 100):
+            print("ERROR: Address 1 has more than 100 characters.")
+        else:
+            print("ERROR: Some error. Address 1 could not be validated.")
+
+    # Address 2 validation (Address 2 can be emty because it is optional)
+
+    address2_is_valid = checkers.is_string(decoded_request_body["address2"], allow_empty=True, 
+                                           maximum_length=100)
+    if address2_is_valid: # Address 2 is valid and not empty
+        print("OK: Address 2 is valid.")
+        validated_address2 = decoded_request_body["address2"]
+    else:
+        if (len(decoded_request_body["address2"]) > 100):
+            print("ERROR: Address 2 has more than 100 characters.")
+        else:
+            print("ERROR: Some error. Address 2 could not be validated.")
+
+    # City validation
+
+    city_is_valid = checkers.is_string(decoded_request_body["city"], allow_empty=False, 
+                                           maximum_length=100)
+    if city_is_valid: # Address 2 is valid and not empty
+        print("OK: City is valid.")
+        validated_city = decoded_request_body["city"]
+    else:
+        if (len(decoded_request_body["city"]) == 0):
+            print("ERROR: Field <city> is empty.")
+        elif (len(decoded_request_body["city"]) > 100):
+            print("ERROR: Field <City> has more than 100 characters.")
+        else:
+            print("ERROR: Some error. City could not be validated.")
+
+    # State validation
+
+    state_is_valid = checkers.is_string(decoded_request_body["state"], allow_empty=False, 
+                                           maximum_length=2)
+    if state_is_valid: # State is valid and not empty
+        print("OK: State is valid.")
+        validated_state = decoded_request_body["state"]
+    else:
+        if (len(decoded_request_body["state"]) == 0):
+            print("ERROR: Field <State> is empty.")
+        elif (len(decoded_request_body["state"]) > 2):
+            print("ERROR: Field <State> has more than 2 characters.")
+        else:
+            print("ERROR: Some error. State could not be validated.")
+    
+    # Zip Code validation
+
+    zip_code_is_valid = checkers.is_string(decoded_request_body["zip_code"], allow_empty=False,
+                                           minimum_length=5, 
+                                           maximum_length=9)
+    if zip_code_is_valid: # Zip code is valid and not empty
+        print("OK: Zip code is valid.")
+        validated_zip_code = decoded_request_body["zip_code"]
+    else:
+        if (len(decoded_request_body["zip_code"]) == 0):
+            print("ERROR: Field <Zip code> is empty.")
+        elif (len(decoded_request_body["zip_code"]) > 9):
+            print("ERROR: Field <Zip code> has more than 9 characters.")
+        elif (len(decoded_request_body["zip_code"]) < 5):
+            print("ERROR: Field <Zip code> has less than 5 characters.")
+        else:
+            print("ERROR: Some error. Zip code could not be validated.")
+
+    # Skills validation (string)
+
+    skills_is_valid = checkers.is_string(decoded_request_body["skills"], allow_empty=False)
+    if skills_is_valid: # Skills is valid and not empty
+        print("OK: Skills is valid.")
+        validated_skills = decoded_request_body["skills"]
+    else:
+        if (len(decoded_request_body["skills"]) == 0):
+            print("ERROR: Field <Skills> is empty.")
+        else:
+            print("ERROR: Some error. Skills could not be validated.")
+
+    # Preferences validation (Preferences can be emty because it is optional)
+
+    preferences_is_valid = checkers.is_string(decoded_request_body["preferences"], allow_empty=True)
+    if preferences_is_valid: # Address 2 is valid and not empty
+        print("OK: Preferences is valid.")
+        validated_preferences = decoded_request_body["preferences"]
+    else:
+        print("ERROR: Some error. Preferences could not be validated.")
+    
+    # Availability validation (string)
+
+    availability_is_valid = checkers.is_string(decoded_request_body["availability"], allow_empty=False)
+    if availability_is_valid: # Skills is valid and not empty
+        print("OK: Availability is valid.")
+        validated_availability = decoded_request_body["availability"]
+    else:
+        print("ERROR: Some error. Availability could not be validated.")
+
+    ##############################
+    #### Input validation end ####
+    ##############################
+
+    # If input validation succeeded, proceed:
+    if (validated_full_name != '') and (validated_address1 != '') \
+        and (validated_city != '') and (validated_state != '') \
+        and (validated_zip_code != '') and (validated_skills != '') \
+        and (validated_availability != ''):   
+    
+        # Validation was successfull, proceeding      
+        user = request.user # get the user object for the user making the request
+
+        # Reading the input from the request (all fields required to perform the update):
+        
+
+        full_name = decoded_request_body["full_name"]
+        address1 = decoded_request_body["address1"]
+        
+        address2 = None
+        if decoded_request_body["address2"]:
+            address2 = decoded_request_body["address2"]
+        
+        city = decoded_request_body["city"]
+        state = decoded_request_body["state"]
+        zip_code = decoded_request_body["zip_code"]
+        skills = decoded_request_body["skills"]    
+        preferences = decoded_request_body["preferences"]
+        availability = decoded_request_body["availability"]
+
+        new_profile_created = hard_coded_data.Profile(user=user,
+                                                    full_name=full_name,
+                                                    address1=address1,
+                                                    address2=address2,
+                                                    city=city,
+                                                    state=state,
+                                                    zip_code=zip_code,
+                                                    skills=skills,
+                                                    preferences=preferences,
+                                                    availability=availability)
+
+        if new_profile_created is not None:
+            print('User profile created:')
+            print(new_profile_created)
+            response_tmp = {"status" : "OK"}
+            response = json.dumps(response_tmp)
+            return HttpResponse(response)
     else:
         response_tmp = {"status" : "ERROR"}
         response = json.dumps(response_tmp)
