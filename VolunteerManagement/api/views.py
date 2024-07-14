@@ -12,7 +12,7 @@ from .serializers import UserSerializer
 from rest_framework.response import Response
 from django.shortcuts import redirect
 from django.contrib.auth import authenticate, login
-from api.session import current_session # session hard-coded file (credit: msc at https://stackoverflow.com/questions/12169133/how-to-import-python-code-into-views-py-file-in-django)
+#from api.session import current_session # session hard-coded file (credit: msc at https://stackoverflow.com/questions/12169133/how-to-import-python-code-into-views-py-file-in-django)
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
@@ -31,7 +31,7 @@ from django.contrib.auth import get_user_model
 from .forms import RegisterForm
 # Axel's import of hard-coded data for Assignment 3
 from . import hard_coded_data
-
+from validator_collection import validators, checkers, errors
 #############################################################
 
 
@@ -145,6 +145,7 @@ class UserView(generics.CreateAPIView):
 
 
 #@login_required
+''''
 class UserDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = UserSerializer
     queryset = User.objects.all()
@@ -172,7 +173,7 @@ class UserDetail(generics.RetrieveUpdateDestroyAPIView):
         response = {'message': message}
 
         return Response(response)
-
+'''
 
 
 #@method_decorator(csrf_exempt, name="dispatch")
@@ -231,7 +232,8 @@ def RegisterView(request):
     
     response = "{'message': 'Something went wrong'}"
     print('ERROR: Failed to create user')
-    return HttpResponse(response)
+    
+    return HttpResponse(response).status_code(200)
 
 
 
@@ -497,16 +499,16 @@ def GetProfile(request): # GET REQUEST ONLY
         print('Profile found')
 
         profile_dictionary = {
-            "user": user.user,
-            "full_name": user.full_name,
-            "address1": user.address1,
-            "address2": user.address2,
-            "city": user.city,
-            "state": user.state,
-            "zip_code": user.zip_code,
-            "skills": user.skills,
-            "preferences": user.preferences,
-            "availability": user.availability
+            "user": user.get_user(),
+            "full_name": user.get_full_name(),
+            "address1": user.get_address1(),
+            "address2": user.get_address2(),
+            "city": user.get_city(),
+            "state": user.get_state(),
+            "zip_code": user.get_zip_code(),
+            "skills": user.get_skills(),
+            "preferences": user.get_preferences(),
+            "availability": user.get_availability()
         }
 
         response = json.dumps(profile_dictionary)
@@ -561,10 +563,10 @@ def GetUpdateNotifications(request): # Called by the front-end the moment the us
 
     #notifications_for_user = hard_coded_data.notifications[user]
 
-    if (user == "ax.alvareng19@gmail.com"): # Hard-coded data for 1 volunteer now
-        eventMatched1 = hard_coded_data.EventMatchedNotification()
-        eventUpdated1 = hard_coded_data.EventChangeNotification()
-        eventReminder1 = hard_coded_data.EventReminderNotification()
+    #if (user == "ax.alvareng19@gmail.com"): # Hard-coded data for 1 volunteer now
+    eventMatched1 = hard_coded_data.EventMatchedNotification()
+    eventUpdated1 = hard_coded_data.EventChangeNotification()
+    eventReminder1 = hard_coded_data.EventReminderNotification()
 
     notifications_for_user = [eventMatched1, eventUpdated1, eventReminder1]
 
