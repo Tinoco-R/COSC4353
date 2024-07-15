@@ -188,6 +188,33 @@ event9 = None
 event10 = None
 
 
+# Initialization of event hard-coded data
+
+class Event():
+    #id = None
+    #calendarId = None
+    #title = None
+    #category = None
+    #start = None
+    #end = None
+    #month = None
+
+    def __init__(self, id, calendarId, title, category, start, end, month):
+        self.id = id
+        self.calendarId = calendarId
+        self.title = title
+        self.category = category
+        self.start = start
+        self.end = end
+        self.month = month
+
+
+event1 = Event('1', 'cal1', 'Community Cleaning', 'time', 
+               '2024-07-28T12:00:00', '2024-07-28T13:30:00', 7)
+event2 = Event('2', 'cal1', 'Senior Living Maintenance', 'time', 
+               '2024-07-28T15:00:00', '2024-07-28T15:30:00', 7)
+
+
 #####################################################################
 #### Notifications class
 

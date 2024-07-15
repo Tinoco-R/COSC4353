@@ -1004,3 +1004,42 @@ def GetStates(request):
     except:
         response = "ERROR"
         return HttpResponse(response)
+    
+
+@csrf_exempt
+def GetMonthlyEvents(request):
+    event1 = hard_coded_data.event1
+    event2 = hard_coded_data.event2
+    print(event1.calendarId)
+
+    print(event1)
+    print(event2)
+
+    if (event1 is not None) and (event2 is not None):
+        events = {
+            "event1": {
+                "id": event1.id,
+                "calendarId": event1.calendarId,
+                "category": event1.category,
+                "end": event1.end,
+                "start": event1.start,
+                "title": event1.title,
+                #"month": event1.month
+            },
+            "event2": {
+                "id": event2.id,
+                "calendarId": event2.calendarId,
+                "category": event2.category,
+                "end": event2.end,
+                "start": event2.start,
+                "title": event2.title,
+                #"month": event2.month
+            }
+        }
+
+        response = json.dumps(events)
+        return HttpResponse(response)
+    
+    else:
+        response = "ERROR"
+        return HttpResponse(response)
