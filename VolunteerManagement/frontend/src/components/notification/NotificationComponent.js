@@ -56,8 +56,8 @@ export function ShowDetails(title, form, onConfirm){
         showConfirmButton: true,
         confirmButtonColor: "#3085d6",
         cancelButtonColor: "#d33",
-        cancelButtonText: "Close",
-        confirmButtonText: "Acknowledge",
+        cancelButtonText: "Edit Event Form",
+        confirmButtonText: "Send To Database",
         allowOutsideClick: false
     }).then((result) => { // Check if user confirms or denies form finalization
         if (result.isConfirmed) {

@@ -1,7 +1,95 @@
 from django.shortcuts import render
-from rest_framework import generics
-from .serializers import EventSerializer
+from rest_framework import generics, status
+from .serializers import EventSerializer, CreateEventSerializer
 from .models import Event, Skill
+from rest_framework.views import APIView;
+from rest_framework.response import Response;
+from django.contrib.auth.models import User
+
+# Allows us to view all event details
+class EventView(generics.CreateAPIView):
+    eventQuerySet = Event.objects.all() # Returns all event objects
+    serializer_class = EventSerializer # Converts to json format
+
+""" class CreateEventView(APIView):
+    serializer_class = CreateEventSerializer
+
+    def post(self, request, format=None):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            # This will create a new event or update an existing one based on the provided data
+            event = serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) """
+ 
+class CreateEventView(APIView):
+    serializer_class = CreateEventSerializer
+
+    def post(self, request, format=None):
+
+        # Reimplement foreign keY? Or just stick with created by being the administrator
+        # Test user ID; pass in request if good
+        #eventCreatedBy = 2
+        #created_by_user = User.objects.get(id=eventCreatedBy)
+        
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            print("Test: pass" ,request.data)
+            eventId = serializer.data.get('Event_ID')
+            eventName = serializer.data.get('Name')
+            eventAdministrator = serializer.data.get('Administrator')
+            eventDescription = serializer.data.get('Description')
+            eventAddress = serializer.data.get('Address')
+            eventCity = serializer.data.get('City')
+            eventState = serializer.data.get('State')
+            eventZip = serializer.data.get('Zip_Code')
+            eventDate = serializer.data.get('Date')
+            eventStart = serializer.data.get('Start_Time')
+            eventDuration = serializer.data.get('Duration')
+            eventSkills = serializer.data.get('Skills')
+            eventUrgency = serializer.data.get('Urgency')
+            queryset = Event.objects.filter(Event_ID = eventId)
+
+            if eventUrgency == "L":
+                eventUrgency = "Low"
+            elif eventUrgency == "M":
+                eventUrgency = "Medium"
+            elif eventUrgency == "H":
+                eventUrgency = "High"
+            elif eventUrgency == "C":
+                eventUrgency = "Critical"
+
+            # When updating an event
+            if queryset.exists():
+                event = queryset[0]
+                event.Event_ID = eventId
+                event.Name = eventName
+                event.Administrator = eventAdministrator
+                event.Description = eventDescription
+                event.Address = eventAddress
+                event.City = eventCity
+                event.State = eventState
+                event.Zip_Code = eventZip
+                event.Date = eventDate
+                event.Start_Time = eventStart
+                event.Duration = eventDuration
+                event.Skills = eventSkills
+                event.Urgency = eventUrgency
+                #event.Created_By = eventCreatedBy
+                #event.save(update_fields=['Event_ID', 'Name', 'Administrator', 'Description', 'Address', 'City', 'State', 'Zip_Code', 'Date', 'Start_Time', 'Urgency', 'Skills', 'Duration'])
+                event.save(update_fields=['Event_ID', 'Name', 'Administrator', 'Description', 'Address', 'City', 'State', 'Zip_Code', 'Date', 'Start_Time', 'Urgency', 'Created_By', 'Skills', 'Duration'])
+            # volunteerCount, createdAt, createdBy if default values work; not needed
+            else:
+                print("Test: fail" ,request.data)
+                #event = Event(Event_ID = eventId, Name =  eventName, Administrator = eventAdministrator, Description = eventDescription, Address = eventAddress, City = eventCity, State = eventState, Zip_Code = eventZip, Date = eventDate, Start_Time = eventStart, Duration = eventDuration, Created_By = eventCreatedBy, Skills = eventSkills, Urgency = eventUrgency)
+                event = Event(Event_ID = eventId, Name =  eventName, Administrator = eventAdministrator, Description = eventDescription, Address = eventAddress, City = eventCity, State = eventState, Zip_Code = eventZip, Date = eventDate, Start_Time = eventStart, Duration = eventDuration, Skills = eventSkills, Urgency = eventUrgency)
+                event.save()
+
+            return Response(EventSerializer(event).data, status=status.HTTP_201_CREATED)
+        
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 ##########################################################
 # Axel's models:
@@ -9,7 +97,6 @@ from .models import User
 from .serializers import UserSerializer
 
 # Axel's utilities:
-from rest_framework.response import Response
 from django.shortcuts import redirect
 from django.contrib.auth import authenticate, login
 from api.session import current_session # session hard-coded file (credit: msc at https://stackoverflow.com/questions/12169133/how-to-import-python-code-into-views-py-file-in-django)
@@ -36,11 +123,7 @@ from . import hard_coded_data
 
 
 
-# Allows us to view all events/skills
-class EventView(generics.CreateAPIView):
-    eventQuerySet = Event.objects.all() # Returns all event objects
-    serializer_class = EventSerializer # Converts to json format
-
+# Allows us to view all skills
 class SkillView(generics.CreateAPIView):
     skillQuerySet = Skill.objects.all()
     serializer_class = EventSerializer

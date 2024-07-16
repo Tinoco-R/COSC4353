@@ -13,7 +13,9 @@ export const eventData =
         "time": "4:00 PM",
         "duration": "3h 30m",
         "skills": "Mobility Assistance, Initiative, Ability to Work in Various Weather Conditions",
-        "urgency": "Low"
+        "urgency": "Low",
+        "volunteers": 0,
+        "creator": 2,
     },
     {
         "id": 2,
@@ -28,7 +30,9 @@ export const eventData =
         "time": "9:45 AM",
         "duration": "3h 30m",
         "skills": "Good Vision, Physical Therapy Skills, Critical Thinking",
-        "urgency": "Low"
+        "urgency": "Low",
+        "volunteers": 0,
+        "creator": 2,
     },
     {
         "id": 3,
@@ -43,7 +47,9 @@ export const eventData =
         "time": "12:45 PM",
         "duration": "3h 45m",
         "skills": "Patience, Resilience, Flexibility",
-        "urgency": "Medium"
+        "urgency": "Medium",
+        "volunteers": 0,
+        "creator": 2,
     },
     {
         "id": 4,
@@ -58,7 +64,9 @@ export const eventData =
         "time": "3:45 PM",
         "duration": "3h 0m",
         "skills": "Basic First Aid, Empathy, First Aid/CPR Certification",
-        "urgency": "Medium"
+        "urgency": "Medium",
+        "volunteers": 0,
+        "creator": 2,
     },
     {
         "id": 5,
@@ -73,7 +81,9 @@ export const eventData =
         "time": "2:00 PM",
         "duration": "2h 45m",
         "skills": "Physical Stamina, Able to Lift 50 lbs, Teamwork",
-        "urgency": "Medium"
+        "urgency": "Medium",
+        "volunteers": 0,
+        "creator": 2,
     },
     {
         "id": 6,
@@ -88,7 +98,9 @@ export const eventData =
         "time": "9:00 AM",
         "duration": "4h 0m",
         "skills": "Empathy, Sign Language Interpretation, Coordination",
-        "urgency": "Low"
+        "urgency": "Low",
+        "volunteers": 0,
+        "creator": 2,
     },
     {
         "id": 7,
@@ -103,7 +115,9 @@ export const eventData =
         "time": "7:00 PM",
         "duration": "2h 45m",
         "skills": "Good Vision, Adaptability, Flexibility",
-        "urgency": "Medium"
+        "urgency": "Medium",
+        "volunteers": 0,
+        "creator": 2,
     },
     {
         "id": 8,
@@ -118,7 +132,9 @@ export const eventData =
         "time": "4:30 PM",
         "duration": "2h 30m",
         "skills": "Technical Proficiency, Able to Lift 50 lbs, Creativity",
-        "urgency": "Critical"
+        "urgency": "Critical",
+        "volunteers": 0,
+        "creator": 2,
     },
     {
         "id": 9,
@@ -133,7 +149,9 @@ export const eventData =
         "time": "11:00 AM",
         "duration": "4h 45m",
         "skills": "Ability to Work Standing/Walking for Long Periods, Wheelchair Assistance, Empathy",
-        "urgency": "Low"
+        "urgency": "Low",
+        "volunteers": 0,
+        "creator": 2,
     },
     {
         "id": 10,
@@ -148,7 +166,9 @@ export const eventData =
         "time": "6:30 PM",
         "duration": "2h 15m",
         "skills": "Flexibility, Time Management, Coordination",
-        "urgency": "Medium"
+        "urgency": "Medium",
+        "volunteers": 0,
+        "creator": 2,
     },
     {
         "id": 11,
@@ -163,7 +183,9 @@ export const eventData =
         "time": "11:00 AM",
         "duration": "1h 45m",
         "skills": "Patience, Flexibility, Good Vision",
-        "urgency": "Critical"
+        "urgency": "Critical",
+        "volunteers": 0,
+        "creator": 2,
     },
     {
         "id": 12,
@@ -178,7 +200,9 @@ export const eventData =
         "time": "7:00 PM",
         "duration": "5h 15m",
         "skills": "Creativity, Listening, Problem-Solving",
-        "urgency": "Critical"
+        "urgency": "Critical",
+        "volunteers": 0,
+        "creator": 2,
     },
     {
         "id": 13,
@@ -193,7 +217,9 @@ export const eventData =
         "time": "3:15 PM",
         "duration": "1h 15m",
         "skills": "Endurance, Computer Literacy, Ability to Work in Various Weather Conditions",
-        "urgency": "Low"
+        "urgency": "Low",
+        "volunteers": 0,
+        "creator": 2,
     },
     {
         "id": 14,
@@ -208,7 +234,9 @@ export const eventData =
         "time": "2:15 PM",
         "duration": "0h 45m",
         "skills": "First Aid/CPR Certification, Basic First Aid, Coordination",
-        "urgency": "Low"
+        "urgency": "Low",
+        "volunteers": 0,
+        "creator": 2,
     },
     {
         "id": 15,
@@ -223,7 +251,9 @@ export const eventData =
         "time": "1:30 PM",
         "duration": "2h 0m",
         "skills": "Coordination, First Aid/CPR Certification, Resilience",
-        "urgency": "High"
+        "urgency": "High",
+        "volunteers": 0,
+        "creator": 2,
     },
     {
         "id": 16,
@@ -238,7 +268,9 @@ export const eventData =
         "time": "6:15 PM",
         "duration": "1h 15m",
         "skills": "Flexibility, Physical Therapy Skills, Wheelchair Assistance",
-        "urgency": "Medium"
+        "urgency": "Medium",
+        "volunteers": 0,
+        "creator": 2,
     },
     {
         "id": 17,
@@ -253,7 +285,9 @@ export const eventData =
         "time": "9:15 AM",
         "duration": "6h 0m",
         "skills": "Physical Therapy Skills, Ability to Work Standing/Walking for Long Periods, First Aid/CPR Certification",
-        "urgency": "Medium"
+        "urgency": "Medium",
+        "volunteers": 0,
+        "creator": 2,
     },
     {
         "id": 18,
@@ -268,7 +302,9 @@ export const eventData =
         "time": "1:15 PM",
         "duration": "2h 0m",
         "skills": "Time Management, Able to Lift 50 lbs, Flexibility",
-        "urgency": "Medium"
+        "urgency": "Medium",
+        "volunteers": 0,
+        "creator": 2,
     },
     {
         "id": 19,
@@ -283,7 +319,9 @@ export const eventData =
         "time": "5:00 PM",
         "duration": "3h 15m",
         "skills": "Sign Language Interpretation, Good Vision",
-        "urgency": "Low"
+        "urgency": "Low",
+        "volunteers": 0,
+        "creator": 2,
     },
     {
         "id": 20,
@@ -298,7 +336,9 @@ export const eventData =
         "time": "1:00 PM",
         "duration": "3h 15m",
         "skills": "Listening, Physical Therapy Skills, Good Hearing",
-        "urgency": "Critical"
+        "urgency": "Critical",
+        "volunteers": 0,
+        "creator": 2,
     },
     {
         "id": 21,
@@ -313,6 +353,8 @@ export const eventData =
         "time": "2:15 PM",
         "duration": "5h 0m",
         "skills": "Coordination, Technical Proficiency, Adaptability",
-        "urgency": "Medium"
+        "urgency": "Medium",
+        "volunteers": 0,
+        "creator": 2,
     }
 ]

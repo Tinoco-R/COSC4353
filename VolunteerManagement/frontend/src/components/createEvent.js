@@ -168,13 +168,16 @@ export default class CreateEvent extends Component {
 
         // Description is a text area allowing only alphanumeric characters
         else if (id === "eventDescription") {
-            const regex = /^[A-Za-z0-9'\/]+$/;
+            const regex = /^[A-Za-z0-9'\/ ]+$/;
 
             if (!regex.test(value) && value !== "") {
-                error = "Invalid characters in description. Only 'A-Z', 'a-z', '0-9'.";
+                error = "Invalid characters in description. Only 'A-Z', 'a-z', '0-9', ' '.";
             }
             else if (value.length === 0) {
                 error = "This field cannot be empty.";
+            }
+            else if (value[0] === " ") {
+                error = "Cannot start with a space";
             }
             else {
                 error = "";
@@ -259,10 +262,13 @@ export default class CreateEvent extends Component {
         else if (dateInput.length === 10) {
             date = "";
             for (let index = 5; index < dateInput.length; index++) {
-                const digit = dateInput[index];
+                let digit = dateInput[index];
+                if (digit === "-") {
+                    digit = "/"
+                }
                 date += digit;                
             }
-            date += "-"
+            date += "/"
             for (let index = 0; index < 4; index++) {
                 const digit = dateInput[index];
                 date += digit;          
@@ -278,7 +284,7 @@ export default class CreateEvent extends Component {
         const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
         const day = String(date.getDate()).padStart(2, '0');
         const year = date.getFullYear();
-        return `${month}/${day}/${year}`;
+        return `${year}/${month}/${day}`;
     }    
 
     handleSubmit(event) {
@@ -320,8 +326,8 @@ export default class CreateEvent extends Component {
             let nextSunday = new Date();
             nextSunday.setDate(nextSunday.getDate() + ((7 - nextSunday.getDay()) % 7));
 
-            // Format the date as MM/DD/YYYY
-            const options = { month: '2-digit', day: '2-digit', year: 'numeric'};
+            // Format the date as YYYY/MM/DD/
+            const options = { year: 'numeric', month: '2-digit', day: '2-digit'};
             let defaultDate = nextSunday.toLocaleDateString('en-US', options);
 
             // Default start time is noon with a default duration of 3 hours
@@ -330,31 +336,64 @@ export default class CreateEvent extends Component {
             const formData = {};
 
             // Collect basic input fields
-            formData.eventId = this.state.eventId || lastEventId;
-            formData.eventName = this.state.eventName;
-            formData.eventAdministrator = this.state.eventAdministrator || defaultAdministrator;
-            formData.eventDescription = this.state.eventDescription;
-            formData.eventAddress = this.state.eventAddress;
-            formData.eventCity = this.state.eventCity;
-            formData.eventState = this.state.eventState[0];
-            formData.eventZip = this.state.eventZip;
-            formData.eventDate = this.formatDate(this.state.eventDate) || defaultDate;
-            formData.eventStart = this.state.eventStart || defaultStart;
-            formData.eventDuration = this.state.eventDuration[0] || defaultDuration;
+            formData.Event_ID = this.state.eventId || lastEventId;
+            formData.Name = this.state.eventName;
+            formData.Administrator = this.state.eventAdministrator || defaultAdministrator;
+            formData.Description = this.state.eventDescription;
+            formData.Address = this.state.eventAddress;
+            formData.City = this.state.eventCity;
+            formData.State = this.state.eventState[0];
+            formData.Zip_Code = this.state.eventZip;
+            formData.Date = this.formatDate(this.state.eventDate) || defaultDate;
+            formData.Start_Time = this.state.eventStart || defaultStart;
+            formData.Duration = this.state.eventDuration[0] || defaultDuration;
 
-            formData.eventSkills = this.state.eventSkills;
-            formData.eventUrgency = this.state.eventUrgency[0];
+            // Get string form of all skills
+            let skillsString = "";
+            for (let index = 0; index < this.state.eventSkills.length; index++) {
+                const skill = this.state.eventSkills[index];
+                if (skillsString.length === 0) {
+                    skillsString += skill;
+                }
+                else {
+                    skillsString += (", " + skill)
+                }                
+            }
+            
+            formData.Skills = skillsString;
+            formData.Urgency = this.state.eventUrgency[0];
 
             const jsonData = JSON.stringify(formData);
 
             // Now we have form data and can send it to the database after the user finalizes their changes
             console.log(jsonData);
-            ShowDetails('Event Created!', formData, (isConfirmed) => {
+            ShowDetails('Event Ready:', formData, (isConfirmed) => {
                 // Send data to database
                 if (isConfirmed) {
                     console.log('Event creation confirmed, sending to the database...');
-
-                    window.location.reload();                    
+                    
+                    fetch('http://localhost:8000/api/events/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: jsonData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Response data:', data); // This will print the response data to the console
+                        if (data.message) {
+                            console.log('Server message:', data.message); // Print the server's message
+                        }
+                        if (data.non_field_errors) {
+                            console.log('Validation errors:', data.non_field_errors); // Print non-field errors
+                        }
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                    });
+                    
+                    //window.location.reload();                    
                 }
 
                 // Close notification and allow user to edit chanegs until they are satisfied

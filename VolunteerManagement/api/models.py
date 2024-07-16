@@ -18,10 +18,11 @@ def generate_unique_code():
             break
 
 class Skill(models.Model):
+    ID = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
     Name = models.CharField(max_length = 20, unique = True)
 
 class Event(models.Model):
-    Event_ID = models.CharField(max_length = 10, default = "", unique = True, primary_key = True)
+    Event_ID = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
     Name = models.CharField(max_length = 100, default = "")
     Administrator = models.CharField(max_length = 50)
     Description = models.CharField(max_length=256, default="")
@@ -29,14 +30,13 @@ class Event(models.Model):
     City = models.CharField(max_length = 28)
     State = models.CharField(max_length = 13)
     Zip_Code = models.CharField(max_length = 5)
-    Date = models.CharField(max_length = 10)
+    Date = models.CharField(max_length = 10, default=date.today().strftime('%Y/%d/%m'))
     Start_Time = models.CharField(max_length = 8, default = "12:00 PM")
-    Skills = models.ManyToManyField(Skill, related_name='events')
-    Urgency = models.CharField(max_length= 10, default = "") # Low, Medium, High, Critical
-    Volunteer_Count = models.IntegerField(default = 0)
-    Created_By = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    Duration = models.CharField(max_length = 6, default = "3h 0m")
+    Skills = models.CharField(max_length = 200)
+    Urgency = models.CharField(max_length= 10, default = "")
+    #Created_By = models.ForeignKey('auth.User', on_delete=models.CASCADE)
     Created_At = models.DateTimeField(auto_now_add = True)
-
 
 # Axel's code
 class User(UserDefault):
@@ -82,7 +82,3 @@ class Profile(models.Model):
     #skills = models.ManyToManyField(to=Skill, related_name='user_skills_relation')
     preferences = models.TextField(null=True, blank=True, max_length=1000)
     availability = models.ManyToManyField(to=Date, related_name='dates_availability')
-
-
-
-

@@ -24,6 +24,7 @@ const theme = createTheme({
 
 function getEventNames() {
     let eventNames = []
+    eventNames.push("All");
     for (let index = 0; index < eventData.length; index++) {
         const eventName = eventData[index].name;
         eventNames.push(eventName);        
@@ -143,14 +144,14 @@ export default class EventAdministration extends Component {
     filterEventsBySearch = ( searchBar ) => {
         let events = [];
         // No Search
-        if (searchBar === "") {
+        if (searchBar === "" || searchBar === "All" || searchBar === null) {
             return eventData;
         }
 
         for (let index = 0; index < eventData.length; index++) {
             const eventName = eventData[index].name;
             // If eventName not like searchBar, continue; else add it to events and once loop is done return events
-            if (eventName.toLowerCase().includes(searchBar.toLowerCase())) {
+            if (eventName !== null && eventName.toLowerCase().includes(searchBar.toLowerCase())) {
                 events.push(eventData[index]);
             }
         }

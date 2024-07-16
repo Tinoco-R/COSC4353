@@ -58,12 +58,16 @@ export default class Input extends React.Component {
         
         // Description is a text area allowing only alphanumeric characters
         if (id === "eventDescription") {
-          const regex = /^[A-Za-z0-9'\/]+$/;
+          const regex = /^[A-Za-z0-9'\/ ]+$/;
+
           if (!regex.test(value) && value !== "") {
-            this.setState({ value, error: "Invalid characters in description. Only 'A-Z', 'a-z', '0-9'." });
+            this.setState({ value, error: "Invalid characters in description. Only 'A-Z', 'a-z', '0-9', ' '." });
           }
           else if (value.length === 0) {
             this.setState({ value, error: "This field cannot be empty." });
+          }
+          else if (value[0] === ' ') {
+            this.setState({ value, error: "Cannot start with a space." });
           }
           else {
             this.setState({ value, error: "" });
