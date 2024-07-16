@@ -112,7 +112,16 @@ class Profile():
 #####################################################################
 ###### Hard-coded profile instances (to be initialized in the backend)
 
-user1 = None
+user1 = Profile(user='testuser2@mail.com',
+                full_name='Cloe Thompson',
+                address1='19210 Magnolia St.',
+                address2='72190 Seven Rd.',
+                city='Boulder',
+                state='CO',
+                zip_code=21002,
+                skills='Drawing, Singing, Math Skills',
+                preferences='Events near dowtown are preferred',
+                availability='08/12/2024,09/27/2024,10/15/2024')
 user2 = None
 user3 = None
 user4 = None
@@ -177,6 +186,33 @@ event7 = None
 event8 = None
 event9 = None
 event10 = None
+
+
+# Initialization of event hard-coded data
+
+class Event():
+    #id = None
+    #calendarId = None
+    #title = None
+    #category = None
+    #start = None
+    #end = None
+    #month = None
+
+    def __init__(self, id, calendarId, title, category, start, end, month):
+        self.id = id
+        self.calendarId = calendarId
+        self.title = title
+        self.category = category
+        self.start = start
+        self.end = end
+        self.month = month
+
+
+event1 = Event('1', 'cal1', 'Community Cleaning', 'time', 
+               '2024-07-28T12:00:00', '2024-07-28T13:30:00', 7)
+event2 = Event('2', 'cal1', 'Senior Living Maintenance', 'time', 
+               '2024-07-28T15:00:00', '2024-07-28T15:30:00', 7)
 
 
 #####################################################################

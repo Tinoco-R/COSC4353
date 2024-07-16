@@ -55,7 +55,52 @@ const rows = [
   ];
  */ 
 
-
+async function get_match_notifications () {
+    var get_match_notifications_url = '/api/GetMatchNotifications'
+    var match_notifications;
+    fetch(get_match_notifications_url, {
+        //mode: "cors",
+        headers: {
+            "Content-Type": "application/json", // credit: https://rapidapi.com/guides/request-headers-fetch
+            "Host": "http://127.0.0.1:8000",
+            //"Content-Length": "",
+            "Origin": "http://127.0.0.1:8000",
+            "User-Agent": "",
+            "Accept": "*/*",
+            "Accept-Encoding": "gzip,deflate,br",
+            "Connection": "keep-alive",
+            //"X-CSRF-Token": "",
+            "mode": "cors",
+        },
+        method: "GET",
+        credentials: "same-origin"
+    })
+    .then((res) => {
+        //console.log("States from backend:");
+        //console.log(res);
+        //var res_json;
+        //var tmp_ignore = res.text().then((tmp) => {
+        //    res_json = JSON.parse(tmp);
+        //});
+        console.log('res');
+        console.log(res);
+        return res.json(); //res_json;/*response in json format*/
+    })
+    .then((profile) => {
+        var arr = [];
+        console.log('not looped profile:');
+        match_notifications = profile;
+        console.log(profile);
+        for (const data in profile) {
+            arr.push({ value: data, label: profile[data]});
+        }
+        console.log("Profile from backend:")
+        console.log(Object.keys(profile).length)
+        console.log(profile);
+        console.log(arr);
+        return profile
+    });
+}
 
 
 // Handles routing for all pages found within the administrator site
@@ -159,7 +204,7 @@ export default function Alerts () {
     // Getting the Reminder Event Notifications 
     var get_reminder_notifications_url = '/api/GetReminderNotifications'
     //var reminder_notifications;
-    var reminder_notifications = fetch(get_reminder_notifications_url, {
+    fetch(get_reminder_notifications_url, {
         //mode: "cors",
         headers: {
             "Content-Type": "application/json", // credit: https://rapidapi.com/guides/request-headers-fetch
@@ -199,7 +244,7 @@ export default function Alerts () {
         console.log(Object.keys(profile).length)
         console.log(profile);
         console.log(arr);
-        return profile;
+
     });
 
     console.log('Notifications:');

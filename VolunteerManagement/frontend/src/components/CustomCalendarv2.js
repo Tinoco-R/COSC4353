@@ -56,7 +56,7 @@ var current_date = new Date();
 var current_year = current_date.getFullYear();
 
 
-var month_index = 5;
+var month_index = current_date.getMonth();
 var month_displayed = months_array[month_index];
 
 
@@ -69,24 +69,25 @@ const calendars = [{
   dragBackgroundColor: '#9e5fff', 
 }];
 
+/*
 const initialEvents = [
   {
     id: '1',
     calendarId: 'cal1',
     title: 'Lunch',
     category: 'time',
-    start: '2024-06-28T12:00:00',
-    end: '2024-06-28T13:30:00',
+    start: '2024-07-28T12:00:00',
+    end: '2024-07-28T13:30:00',
   },
   {
     id: '2',
     calendarId: 'cal1',
     title: 'Coffee Break',
     category: 'time',
-    start: '2024-06-28T15:00:00',
-    end: '2024-06-28T15:30:00',
+    start: '2024-07-28T15:00:00',
+    end: '2024-07-28T15:30:00',
   },
-];
+];*/
 
 const onAfterRenderEvent = (event) => {
   console.log(event.title);
@@ -218,6 +219,8 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import { useState } from "react";
+import { json } from 'react-router-dom';
 
 
 const DialogComponentLocal = () => {
@@ -265,6 +268,64 @@ export class CustomCalendar extends React.Component{
 
 
   /***************************************** */
+  // Getting the events data from the backend
+  // source: https://dev.to/sergioholgado/how-to-fetch-data-before-rendering-in-react-js-3750
+
+  //initialEvents = null;
+
+  state = {
+    initialEvents: [],
+  };
+
+  //constructor(props) {
+  //  super(props);
+  //  this.state = {
+  //    initialEvents: []
+  //  }
+    //this.state = null;
+    //fetchData().then(data =>
+    //  this.setState({data: data})
+    //)
+  //}
+
+
+  //async componentDidMount() {
+    //this.fetchData();
+  //}
+
+  fetchData = async () => { 
+    try {
+      const res = await fetch('http://127.0.0.1:8000/api/GetMonthlyEvents');
+      console.log('res:');
+      console.log(res);
+      const jsonData = await res.json();
+      //console.log('events:')
+      //console.log(initialEvents)
+      console.log('jsonData:');
+      console.log(jsonData);
+      const jsonArr = []
+      
+      let e = null;
+      for (e in jsonData){
+        jsonArr.push(e);
+      }
+
+      this.setState({initialEvents: jsonArr});
+      //this.setState(jsonData["event1"]);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  //async componentDidMount(){
+  //  this.fetchData();
+  //}
+
+  componentDidMount(){
+    this.fetchData();
+  }
+
+  
 
 
   /***************************************** */
@@ -356,6 +417,8 @@ export class CustomCalendar extends React.Component{
   
 
   render(){
+    //const { initialEvents } = this.state;
+    
     return(
           <>        
           {/*<h2>{month_displayed}</h2>*/}
@@ -375,7 +438,7 @@ export class CustomCalendar extends React.Component{
               visibleWeeksCount: 4,
               }}
               calendars={calendars}
-              events={initialEvents}
+              events={this.state.initialEvents}
               onAfterRenderEvent={onAfterRenderEvent}
               useFormPopup={false}
               useDetailPopup={false}
