@@ -14,7 +14,6 @@ import Grid from '@mui/material/Grid';
 import Slider from '@mui/material/Slider';
 
 // Slider code adapted from: https://mui.com/material-ui/react-slider/
-
 export default class VolunteerDetailsAdmin extends Component {
     constructor(props) {
         super(props);
@@ -26,6 +25,7 @@ export default class VolunteerDetailsAdmin extends Component {
             matchingSkills: 0, 
         };
     }
+
     // Initial filter (of 0)
     componentDidMount() {
         this.setState({
@@ -59,11 +59,14 @@ export default class VolunteerDetailsAdmin extends Component {
                     }
                 }
             }
+
             // Volunteer matched or exceeded specified number of required skills
             if (skillsLeft <= 0) {
                 filteredVolunteers.push(volunteer);
             }
         }
+
+        this.state.filteredVolunteers = filteredVolunteers;
       
         return filteredVolunteers;
     };
@@ -110,8 +113,9 @@ export default class VolunteerDetailsAdmin extends Component {
 
     // Actual volunteer cards with information over a volunteer: Name, Rating, Attendance, and all their Skills
     basicCard(data, isActive, className, cardsToShow) {
-        const row = (data.row - 1) % cardsToShow;
         const { selectedSkills } = this.props;
+        let row = (data.row - 1);
+
         return(
             <Card id="volunteerCard" event={data.event} onClick={() => this.cardClick(row)} className={`volunteer-card ${isActive? className : ''}`} sx={{ bgcolor: theme.palette.primary.main, mb: 2, cursor: 'pointer', ...(!isActive? {} : { backgroundColor: '#86C232' }) }}>
                 <CardContent>
@@ -143,7 +147,6 @@ export default class VolunteerDetailsAdmin extends Component {
         const maxCardsToShow = 10;
         const startIndex = this.state.currentIndex * maxCardsToShow;
         const lastPossibleIndex = Math.floor((filteredVolunteers.length - 1) / maxCardsToShow);
-        const hasActiveSelections = this.state.activeCards.length > 0;
 
         return (
             <ThemeProvider theme={theme}>
@@ -167,8 +170,8 @@ export default class VolunteerDetailsAdmin extends Component {
 
                         />
                     </Box>
-                        <Button onClick={() => this.setState({ currentIndex: Math.max(this.state.currentIndex - 1, 0) })} disabled={hasActiveSelections || this.state.currentIndex === 0} style={{backgroundColor: "#86C232"}}  variant="contained" type="submit" fontFamily="'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif" sx={{ mx: 1 }}>Previous</Button>
-                        <Button onClick={() => this.setState({ currentIndex: this.state.currentIndex + 1, })} disabled={hasActiveSelections || this.state.currentIndex >= lastPossibleIndex} style={{backgroundColor: "#86C232"}}  variant="contained" type="submit" fontFamily="'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif" sx={{ mx: 1 }}>Next</Button>
+                        <Button onClick={() => this.setState({ currentIndex: Math.max(this.state.currentIndex - 1, 0) })} disabled={this.state.currentIndex === 0} style={{backgroundColor: "#86C232"}}  variant="contained" type="submit" fontFamily="'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif" sx={{ mx: 1 }}>Previous</Button>
+                        <Button onClick={() => this.setState({ currentIndex: this.state.currentIndex + 1, })}  disabled={this.state.currentIndex >= lastPossibleIndex} style={{backgroundColor: "#86C232"}}  variant="contained" type="submit" fontFamily="'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif" sx={{ mx: 1 }}>Next</Button>
                         <Button onClick={(this.toggleSkills)} style={{backgroundColor: "#86C232"}}  variant="contained" type="submit" fontFamily="'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif" sx={{ mx: 1 }}>Toggle Skills</Button>
                     </Grid>
                     <br></br>
@@ -178,6 +181,8 @@ export default class VolunteerDetailsAdmin extends Component {
                             {this.defaultCard()}
                         </Grid>
                         {filteredVolunteers.slice(startIndex, startIndex + maxCardsToShow).map((val, index) => {
+                        index += startIndex;
+
                         const isActive = this.state.activeCards.includes(index)
                             return (
                                 <Grid item xs={6} key={index}>

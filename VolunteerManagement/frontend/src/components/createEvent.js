@@ -11,11 +11,8 @@ import { stateData } from "./stateData";
 import { urgencyData } from "./urgencyData";
 import { Item, StyledLabel } from "./item";
 import { ShowNotification, ShowDetails } from "./notification/NotificationComponent";
+import { fetchEvents } from "./eventData";
 
-// Import hard coded data for events [to know what will be the next id to use and then push to] (will pull from database in next implementation)
-import { eventData, fetchEvents } from "./eventData";
-
-const lastEventId = eventData[eventData.length - 1].id;
 const defaultAdministrator = "ADMIN";
 
 export default class CreateEvent extends Component {
