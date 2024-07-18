@@ -13,7 +13,7 @@ import { Item, StyledLabel } from "./item";
 import { ShowNotification, ShowDetails } from "./notification/NotificationComponent";
 
 // Import hard coded data for events [to know what will be the next id to use and then push to] (will pull from database in next implementation)
-import { eventData } from "./eventData";
+import { eventData, fetchEvents } from "./eventData";
 
 const lastEventId = eventData[eventData.length - 1].id;
 const defaultAdministrator = "ADMIN";
@@ -46,6 +46,9 @@ export default class CreateEvent extends Component {
             eventDateError: '',
             eventStartError: '',
             eventDurationError: '',
+            updating: false,
+            events: [],
+            lastEventId: '',
         };
     
         // Use prefilledData if available, otherwise use initialState (prefilled when modifying an event)
@@ -58,6 +61,15 @@ export default class CreateEvent extends Component {
         this.handleEventDurationChange = this.handleEventDurationChange.bind(this);
         this.handleEventStateChange = this.handleEventStateChange.bind(this);
         this.handleEventUrgencyChange = this.handleEventUrgencyChange.bind(this);
+    }
+
+    componentDidMount() {
+        fetchEvents().then(events => {
+            this.setState({
+                events: events,
+                lastEventId: events.length > 0 ? events[events.length - 1].Event_ID + 1 : 1,
+            });
+        });
     }
 
     // For the multiple select changes: skills  
@@ -80,8 +92,82 @@ export default class CreateEvent extends Component {
         this.setState({ eventUrgency: [newValue] });
     };
 
+    // Deletes an event from the database
+    deleteEvent = () => {
+        //ShowNotification("Delete Event", "This will delete this event from the database, are you sure?");
+        const formData = {};
+        formData.Event_ID = this.state.eventId;
+        // When deleting, we just need the Event_ID, the rest of the data will be shown to the user to confirm their choice however
+        const jsonData = JSON.stringify(formData);
+        
+        formData.Name = this.state.eventName;
+        formData.Administrator = this.state.eventAdministrator;
+        formData.Description = this.state.eventDescription;
+        formData.Address = this.state.eventAddress;
+        formData.City = this.state.eventCity;
+        if (this.state.updating) {
+            formData.State = this.state.eventState;
+            formData.Urgency = this.state.eventUrgency;
+        }
+        else {
+            formData.State = this.state.eventState[0];
+            formData.Urgency = this.state.eventUrgency[0];                
+        }
+        formData.Zip_Code = this.state.eventZip;
+        formData.Date = this.formatDate(this.state.eventDate);
+        formData.Start_Time = this.state.eventStart;
+        formData.Duration = this.state.eventDuration[0];
+
+        // Get string form of all skills
+        let skillsString = "";
+        for (let index = 0; index < this.state.eventSkills.length; index++) {
+            const skill = this.state.eventSkills[index];
+            if (skillsString.length === 0) {
+                skillsString += skill;
+            }
+            else {
+                skillsString += (", " + skill)
+            }                
+        }
+        
+        formData.Skills = skillsString;
+        const deleting = true;
+
+        ShowDetails(`Delete Event ${formData.Name} (ID: ${formData.Event_ID})`, formData, (isConfirmed) => {
+            if (isConfirmed) {
+                console.log('Event deletion confirmed...');
+                
+                // Check if creating a new row or updating an existing row
+                let eventUrl = "http://localhost:8000/api/eventDelete/";
+
+                fetch(eventUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: jsonData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Response data:', data);
+                    if (data.message) {
+                        console.log('Server message:', data.message);
+                    }
+                    if (data.non_field_errors) {
+                        console.log('Validation errors:', data.non_field_errors);
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+                
+                //window.location.reload();                    
+            }
+        }, deleting)
+    }
+
     componentDidUpdate(prevProps, prevState) {
-        console.log(this.state);
+        //console.log(this.state);
     }
 
     handleInputChange = (id, value, error = "") => {
@@ -231,17 +317,32 @@ export default class CreateEvent extends Component {
     checkForErrors() {
         let badFields = [];
 
-        for (let index = 13; index < Object.keys(this.state).length; index++) {
+        console.log("State:", this.state);
+
+        Object.keys(this.state).forEach(key => {
+            if (/Error$/.test(key) && this.state[key]) {
+                let fieldName = key.replace(/Error$/, '');
+                let friendlyName = this.extractFieldName(fieldName);
+                if (this.isRequired(friendlyName)) {
+                    friendlyName += " *";
+                }
+                badFields.push(friendlyName);
+            }
+        });
+/* 
+        for (let index = 13; index < 21; index++) {
             const key = Object.keys(this.state)[index];
+            console.log("key", key)
             
             if (this.state[key] && this.state[key].length > 0) {
                 let name = this.extractFieldName(key);
                 if (this.isRequired(name)) {
                     name += " *"
                 }
+                console.log("Pushing", name)
                 badFields.push(name);
             }
-        }
+        } */
 
         return badFields;
     }
@@ -279,15 +380,15 @@ export default class CreateEvent extends Component {
         else {
             date = dateInput;
         }
-    
 
-        const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+        const month = String(date.getMonth() + 1).padStart(2, '0');
         const day = String(date.getDate()).padStart(2, '0');
         const year = date.getFullYear();
         return `${year}/${month}/${day}`;
     }    
 
     handleSubmit(event) {
+        console.log("Last Event:", this.state.lastEventId)
         event.preventDefault();
         let badFields = this.checkForErrors();
 
@@ -305,8 +406,10 @@ export default class CreateEvent extends Component {
             let fieldWord      = count === 1 ? "Field" : "Fields";
             let requiredPhrase = count === 1 ? "(Required Field)" : "(* = Required)";
 
+            console.log("BAD FIELDS:", badFields);
             for (let index = 0; index < badFields.length; index++) {
                 const field = badFields[index];
+                console.log("BF:", field);
                 
                 if (this.isRequired(field)) {
                     noRequiredFields = false;
@@ -314,9 +417,11 @@ export default class CreateEvent extends Component {
                 }
             }
             if (noRequiredFields) {
+                console.log("No required")
                 ShowNotification(`${errorWord} in ${fieldWord}`, badFields);
             }
             else {
+                console.log("Has Required")
                 ShowNotification(`${errorWord} in ${fieldWord} ${requiredPhrase}`, badFields);
             }
         }
@@ -336,13 +441,20 @@ export default class CreateEvent extends Component {
             const formData = {};
 
             // Collect basic input fields
-            formData.Event_ID = this.state.eventId || lastEventId;
+            formData.Event_ID = this.state.eventId || this.state.lastEventId;
             formData.Name = this.state.eventName;
             formData.Administrator = this.state.eventAdministrator || defaultAdministrator;
             formData.Description = this.state.eventDescription;
             formData.Address = this.state.eventAddress;
             formData.City = this.state.eventCity;
-            formData.State = this.state.eventState[0];
+            if (this.state.updating) {
+                formData.State = this.state.eventState;
+                formData.Urgency = this.state.eventUrgency;
+            }
+            else {
+                formData.State = this.state.eventState[0];
+                formData.Urgency = this.state.eventUrgency[0];                
+            }
             formData.Zip_Code = this.state.eventZip;
             formData.Date = this.formatDate(this.state.eventDate) || defaultDate;
             formData.Start_Time = this.state.eventStart || defaultStart;
@@ -361,7 +473,6 @@ export default class CreateEvent extends Component {
             }
             
             formData.Skills = skillsString;
-            formData.Urgency = this.state.eventUrgency[0];
 
             const jsonData = JSON.stringify(formData);
 
@@ -372,7 +483,15 @@ export default class CreateEvent extends Component {
                 if (isConfirmed) {
                     console.log('Event creation confirmed, sending to the database...');
                     
-                    fetch('http://localhost:8000/api/events/', {
+                    // Check if creating a new row or updating an existing row
+                    let eventUrl = "";
+                    if (!this.state.updating) {
+                        eventUrl = 'http://localhost:8000/api/eventCreate/';
+                    }
+                    else {
+                        eventUrl = 'http://localhost:8000/api/eventUpdate/'
+                    }
+                    fetch(eventUrl, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -381,12 +500,12 @@ export default class CreateEvent extends Component {
                     })
                     .then(response => response.json())
                     .then(data => {
-                        console.log('Response data:', data); // This will print the response data to the console
+                        console.log('Response data:', data);
                         if (data.message) {
-                            console.log('Server message:', data.message); // Print the server's message
+                            console.log('Server message:', data.message);
                         }
                         if (data.non_field_errors) {
-                            console.log('Validation errors:', data.non_field_errors); // Print non-field errors
+                            console.log('Validation errors:', data.non_field_errors);
                         }
                     })
                     .catch((error) => {
@@ -428,7 +547,7 @@ export default class CreateEvent extends Component {
                         <Item type="background">
                             <Stack spacing={{ xs: 1, sm: 2 }} direction="row" useFlexGap flexWrap="wrap">
                                 <Item style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }} >
-                                    <StyledLabel htmlFor="eventId">Event ID: {this.state.eventId || lastEventId}</StyledLabel>
+                                    <StyledLabel htmlFor="eventId">Event ID: {this.state.eventId || this.state.lastEventId}</StyledLabel>
                                     <br />
                                     <StyledLabel htmlFor="eventAdministrator">Administrator: {this.state.eventAdministrator || defaultAdministrator}</StyledLabel>
                                 </Item>
@@ -507,15 +626,21 @@ export default class CreateEvent extends Component {
     render() {
         let pageTitle;
         let eventButton;
+        let deleteButton;
 
         if (!this.prefilled) {
             pageTitle = "Create A New Event";
             eventButton = "Create Event";
+            this.state.updating = false;
         }
         else {
             pageTitle = "Modify Existing Event";
             eventButton = "Update Event";
+            deleteButton = "Delete Event";
+            this.state.updating = true;
         }
+
+        console.log("Updating: ", this.state.updating)
 
         return (
             <div className="createEvent" style={{ textAlign: 'center' }}>
@@ -524,7 +649,10 @@ export default class CreateEvent extends Component {
                         <h1>{pageTitle}</h1>
                     </StyledLabel>
                     {this.FlexboxGapStack()}
-                        <Button style={{backgroundColor: "#61892F" /* #86C232 #61892F */}}  variant="contained" type="submit" fontFamily="'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif">{eventButton}</Button>                
+                        <Button style={{backgroundColor: "#61892F", margin: '0 16px' /* #86C232 #61892F */}}  variant="contained" type="submit" fontFamily="'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif">{eventButton}</Button>
+                    {(this.state.updating && (
+                        <Button style={{backgroundColor: "#DD3333", margin: '0 16px' }} onClick={() => {this.deleteEvent()}} variant="contained" fontFamily="'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif">{deleteButton}</Button>
+                    ))}
                 </form>
             </div>
         );

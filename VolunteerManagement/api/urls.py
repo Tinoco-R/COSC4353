@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import EventView, CreateEventView
+from .views import EventView, CreateEventView, UpdateEventView, EventsListView, DeleteEventView
 
 # Axel's imports
 from .views import UserView#, UserDetail
@@ -27,7 +27,9 @@ urlpatterns = [
     path('GetMatchNotifications', GetMatchNotifications, name='GetMatchNotifications'),
     path('GetUpdateNotifications', GetUpdateNotifications, name='GetUpdateNotifications'),
     path('GetReminderNotifications', GetReminderNotifications, name='GetReminderNotifications'),
-    path('events/', CreateEventView.as_view(), name='create_event'),
-    #path('events/', UpdateEventView.as_view(), name='update_event'),
+    path('eventCreate/', CreateEventView.as_view(), name='create_event'),
+    path('eventUpdate/', UpdateEventView.as_view(), name='update_event'),
+    path('eventDelete/', DeleteEventView.as_view(), name='delete_event'),
+    path('eventsView/', EventsListView.as_view(), name='view_events'),
     path('', include('frontend.urls'))
 ]

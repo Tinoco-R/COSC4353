@@ -1,4 +1,4 @@
-import React, { Children, Component } from "react";
+import React, { Children, Component, useState, useEffect } from "react";
 import Button from '@mui/material/Button';
 import CreateEvent from "./createEvent";
 import ModifyEvent from "./modifyEvent";
@@ -9,8 +9,7 @@ import { Item, StyledLabel } from "./item";
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { DataGrid } from '@mui/x-data-grid';
 import { eventModificationColumns } from "./columns";
-//import { eventData } from "./volunteerHistoryData";
-import { eventData } from "./eventData";
+import { eventData, fetchEvents } from "./eventData";
 
 const theme = createTheme({
   components: {
@@ -22,20 +21,34 @@ const theme = createTheme({
   },
 });
 
-function getEventNames() {
-    let eventNames = []
-    eventNames.push("All");
-    for (let index = 0; index < eventData.length; index++) {
-        const eventName = eventData[index].name;
-        eventNames.push(eventName);        
+// Extracts event names from the database
+async function getEventData(type) {
+    
+    const events = await fetchEvents();
+        
+    let eventData = [];
+    eventData.push("All");
+    for (let index = 0; index < events.length; index++) {
+        const eventName = events[index].Name;
+        if(type === "Names") {
+            eventData.push(eventName);
+        }
+        else {
+            eventData.push(events[index]);
+        }
     }
-
-    return eventNames;
+    
+    return eventData;
 }
 
 // From https://mui.com/material-ui/react-autocomplete/ to allow for easy search of events
 function ComboBox({ onChange }) {
-  let events = getEventNames();
+  const [events, setEvents] = useState([]);
+
+  useEffect(() => {
+    getEventData("Names").then(setEvents);
+  }, []);
+
 
   const handleChange = (event, value) => {
     onChange(value);
@@ -96,17 +109,32 @@ export default class EventAdministration extends Component {
             confirm: false,
             search: "",
             selectedRowData: null,
+            events: []
         }
     }
+
+    // Maye want to look into calling after user clicks modify button as not all rows will be current
+    componentDidMount() {
+        this.fetchEventsAndUpdateState();
+    }
+
+    async fetchEventsAndUpdateState() {
+        const events = await fetchEvents();
+        this.setState({
+            events: events,
+            lastEventId: events.length > 0 ? events[events.length - 1].Event_ID + 1 : 1,
+        });
+    };
     
-    handleClickEvent = ( type, eventData = null ) => {
+    handleClickEvent = ( type, selectedEvent = null ) => {
         // Remove the create / modify buttons
         // Get type (create or modify) and render correct page
         if (type === "create") {
             this.setState({ create: true, modify: false, confirm: false, selectedRowData: null });
         }
         else if (type === "modify") {
-            this.setState({ create: false, modify: true, confirm: false, selectedRowData: eventData });
+            this.setState({ create: false, modify: true, confirm: false, selectedRowData: selectedEvent });
+            this.fetchEventsAndUpdateState(); 
         }
         else if (type === "back") {
             this.setState({ create: false, modify: false, confirm: false, selectedRowData: null });            
@@ -115,25 +143,22 @@ export default class EventAdministration extends Component {
             if (type === "confirm") {                
                 // Transform eventData to match the expected shape in CreateEvent
                 const transformedEventData = {
-                    eventId: eventData.id,
-                    eventName: eventData.name,
-                    eventAdministrator: eventData.administrator,
-                    eventDescription: eventData.description,
-                    eventAddress: eventData.address,
-                    eventCity: eventData.city,
-                    eventState: eventData.state,
-                    eventZip: eventData.zip,
-                    eventDate: new Date(eventData.date).toISOString().split('T')[0],
-                    eventStart: eventData.time,
-                    eventDuration: eventData.duration,
-                    eventSkills: eventData.skills.split(", "),
-                    eventUrgency: eventData.urgency,
+                    eventId: selectedEvent.Event_ID,
+                    eventName: selectedEvent.Name,
+                    eventAdministrator: selectedEvent.Administrator,
+                    eventDescription: selectedEvent.Description,
+                    eventAddress: selectedEvent.Address,
+                    eventCity: selectedEvent.City,
+                    eventState: selectedEvent.State,
+                    eventZip: selectedEvent.Zip_Code,
+                    eventDate: new Date(selectedEvent.Date).toISOString().split('T')[0],
+                    eventStart: selectedEvent.Start_Time,
+                    eventDuration: selectedEvent.Duration,
+                    eventSkills: selectedEvent.Skills.split(", "),
+                    eventUrgency: selectedEvent.Urgency,
                 };
                 this.setState({ create: false, modify: false, confirm: true, selectedRowData: transformedEventData });
             }     
-        }
-        else {
-            console.log("Other");
         }
     }
 
@@ -142,21 +167,22 @@ export default class EventAdministration extends Component {
     };
 
     filterEventsBySearch = ( searchBar ) => {
-        let events = [];
+        let filteredEvents = [];
+        
         // No Search
         if (searchBar === "" || searchBar === "All" || searchBar === null) {
-            return eventData;
+            return this.state.events;
         }
 
-        for (let index = 0; index < eventData.length; index++) {
-            const eventName = eventData[index].name;
-            // If eventName not like searchBar, continue; else add it to events and once loop is done return events
+        for (let index = 0; index < this.state.events.length; index++) {
+            const eventName = this.state.events[index].Name;
+            // If eventName not like searchBar, continue; else add it to filteredEvents and once loop is done return filteredEvents
             if (eventName !== null && eventName.toLowerCase().includes(searchBar.toLowerCase())) {
-                events.push(eventData[index]);
+                filteredEvents.push(this.state.events[index]);
             }
         }
 
-        return events;
+        return filteredEvents;
     };
 
     render() {
@@ -199,9 +225,7 @@ export default class EventAdministration extends Component {
                         <DataGrid
                             rows={filteredRows}
                             columns={eventModificationColumns}
-                            initialState={{
-                                pagination: { paginationModel: { page: 0, pageSize: 20 } },
-                            }}
+                            initialState={{ pagination: { paginationModel: { page: 0, pageSize: 20 } }, }}
                             pageSizeOptions={[5, 10, 20]}
                             disableSelectionOnClick
                             checkboxSelection
@@ -210,7 +234,7 @@ export default class EventAdministration extends Component {
                             selectionType="single"
                             onRowSelectionModelChange={(newSelection) => {
                                 const selectedId = newSelection[0];
-                                const selectedEvent = eventData.find(event => event.id === selectedId);
+                                const selectedEvent = this.state.events.find(event => event.Event_ID === selectedId);
                                 this.setState({ selectedRowData: selectedEvent });
                             }}
                             sx={{
@@ -227,6 +251,7 @@ export default class EventAdministration extends Component {
                                 ".MuiDataGrid-cell": { color: "white", },
                                 ".MuiDataGrid-row": { "&.MuiDataGrid-cell": { color: "white", }, },
                             }}
+                            getRowId={(row) => row.Event_ID}
                         />
                     </div>
 

@@ -44,7 +44,18 @@ export function ShowNotification(title, message){
 
 }
 
-export function ShowDetails(title, form, onConfirm){
+export function ShowDetails(title, form, onConfirm, deleting = false){
+    let cancelText;
+    let confirmText;
+    // Either deleting an event or adding / updating
+    if (deleting) {
+        cancelText = "Cancel";
+        confirmText = "Delete Event";
+    }
+    else {
+        cancelText = "Edit Event Form";
+        confirmText = "Send To Database";
+    }
     const formHtml = Object.entries(form).map(([key, value]) => {
         return `<p><strong>${key}:</strong> ${value}</p>`;
     }).join('');
@@ -56,8 +67,8 @@ export function ShowDetails(title, form, onConfirm){
         showConfirmButton: true,
         confirmButtonColor: "#3085d6",
         cancelButtonColor: "#d33",
-        cancelButtonText: "Edit Event Form",
-        confirmButtonText: "Send To Database",
+        cancelButtonText: cancelText,
+        confirmButtonText: confirmText,
         allowOutsideClick: false
     }).then((result) => { // Check if user confirms or denies form finalization
         if (result.isConfirmed) {

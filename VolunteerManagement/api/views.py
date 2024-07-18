@@ -1,28 +1,103 @@
 from django.shortcuts import render
 from rest_framework import generics, status
-from .serializers import EventSerializer, CreateEventSerializer
+from .serializers import EventSerializer, CreateEventSerializer, UpdateEventSerializer, DeleteEventSerializer
 from .models import Event, Skill
 from rest_framework.views import APIView;
 from rest_framework.response import Response;
 from django.contrib.auth.models import User
 
-# Allows us to view all event details
+# Allows us to view all event details (not being used? maybe use to only output one event)
 class EventView(generics.CreateAPIView):
     eventQuerySet = Event.objects.all() # Returns all event objects
     serializer_class = EventSerializer # Converts to json format
 
-""" class CreateEventView(APIView):
-    serializer_class = CreateEventSerializer
+# Allows us to view all event details
+class EventsListView(generics.ListAPIView):
+    queryset  = Event.objects.all().order_by('Event_ID') # Returns all event objects
+    serializer_class = EventSerializer # Converts to json format
 
-    def post(self, request, format=None):
+    #events = Event.objects.all()
+    #for event in events:
+    #    print(event.__dict__)
+    #    print()
+
+# Updates pre-existing Event
+class UpdateEventView(APIView):
+    serializer_class = UpdateEventSerializer
+
+    def post(self, request, format=None, **kwargs):
+        
         serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            # This will create a new event or update an existing one based on the provided data
-            event = serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        if serializer.is_valid():                
+            eventId = request.data.get('Event_ID')
+            eventName = serializer.data.get('Name')
+            eventAdministrator = serializer.data.get('Administrator')
+            eventDescription = serializer.data.get('Description')
+            eventAddress = serializer.data.get('Address')
+            eventCity = serializer.data.get('City')
+            eventState = serializer.data.get('State')
+            eventZip = serializer.data.get('Zip_Code')
+            eventDate = serializer.data.get('Date')
+            eventStart = serializer.data.get('Start_Time')
+            eventDuration = serializer.data.get('Duration')
+            eventSkills = serializer.data.get('Skills')
+            eventUrgency = serializer.data.get('Urgency')
+
+            # Get existing row
+            try:
+                event = Event.objects.get(Event_ID=eventId)
+            except Event.DoesNotExist:
+                return Response({"error": "Event not found"}, status=status.HTTP_404_NOT_FOUND)
+            
+            # Update data for row
+            event.Name = eventName
+            event.Administrator = eventAdministrator
+            event.Description = eventDescription
+            event.Address = eventAddress
+            event.City = eventCity
+            event.State = eventState
+            event.Zip_Code = eventZip
+            event.Date = eventDate
+            event.Start_Time = eventStart
+            event.Duration = eventDuration
+            event.Skills = eventSkills
+            event.Urgency = eventUrgency
+            event.save()
+
+            return Response(EventSerializer(event).data, status=status.HTTP_201_CREATED)
+        
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) """
- 
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# Deletes an event fromt the DB
+class DeleteEventView(APIView):
+    serializer_class = DeleteEventSerializer
+
+    def post(self, request, format=None, **kwargs):
+        
+        serializer = self.serializer_class(data=request.data)
+        print(serializer)
+        print()
+
+
+        if serializer.is_valid():
+            print(serializer.validated_data)
+            print()         
+            eventId = request.data.get('Event_ID')
+
+            # Get existing row
+            try:
+                event = Event.objects.get(Event_ID=eventId)
+            except Event.DoesNotExist:
+                return Response({"error": "Event not found"}, status=status.HTTP_404_NOT_FOUND)
+
+            event.delete()
+            return Response({"message": "Event deleted successfully"}, status=status.HTTP_200_OK)
+        
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# Creates a new Event
 class CreateEventView(APIView):
     serializer_class = CreateEventSerializer
 
@@ -34,8 +109,8 @@ class CreateEventView(APIView):
         #created_by_user = User.objects.get(id=eventCreatedBy)
         
         serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            print("Test: pass" ,request.data)
+        if serializer.is_valid():                
+            
             eventId = serializer.data.get('Event_ID')
             eventName = serializer.data.get('Name')
             eventAdministrator = serializer.data.get('Administrator')
@@ -49,42 +124,9 @@ class CreateEventView(APIView):
             eventDuration = serializer.data.get('Duration')
             eventSkills = serializer.data.get('Skills')
             eventUrgency = serializer.data.get('Urgency')
-            queryset = Event.objects.filter(Event_ID = eventId)
 
-            if eventUrgency == "L":
-                eventUrgency = "Low"
-            elif eventUrgency == "M":
-                eventUrgency = "Medium"
-            elif eventUrgency == "H":
-                eventUrgency = "High"
-            elif eventUrgency == "C":
-                eventUrgency = "Critical"
-
-            # When updating an event
-            if queryset.exists():
-                event = queryset[0]
-                event.Event_ID = eventId
-                event.Name = eventName
-                event.Administrator = eventAdministrator
-                event.Description = eventDescription
-                event.Address = eventAddress
-                event.City = eventCity
-                event.State = eventState
-                event.Zip_Code = eventZip
-                event.Date = eventDate
-                event.Start_Time = eventStart
-                event.Duration = eventDuration
-                event.Skills = eventSkills
-                event.Urgency = eventUrgency
-                #event.Created_By = eventCreatedBy
-                #event.save(update_fields=['Event_ID', 'Name', 'Administrator', 'Description', 'Address', 'City', 'State', 'Zip_Code', 'Date', 'Start_Time', 'Urgency', 'Skills', 'Duration'])
-                event.save(update_fields=['Event_ID', 'Name', 'Administrator', 'Description', 'Address', 'City', 'State', 'Zip_Code', 'Date', 'Start_Time', 'Urgency', 'Created_By', 'Skills', 'Duration'])
-            # volunteerCount, createdAt, createdBy if default values work; not needed
-            else:
-                print("Test: fail" ,request.data)
-                #event = Event(Event_ID = eventId, Name =  eventName, Administrator = eventAdministrator, Description = eventDescription, Address = eventAddress, City = eventCity, State = eventState, Zip_Code = eventZip, Date = eventDate, Start_Time = eventStart, Duration = eventDuration, Created_By = eventCreatedBy, Skills = eventSkills, Urgency = eventUrgency)
-                event = Event(Event_ID = eventId, Name =  eventName, Administrator = eventAdministrator, Description = eventDescription, Address = eventAddress, City = eventCity, State = eventState, Zip_Code = eventZip, Date = eventDate, Start_Time = eventStart, Duration = eventDuration, Skills = eventSkills, Urgency = eventUrgency)
-                event.save()
+            event = Event(Event_ID = eventId, Name =  eventName, Administrator = eventAdministrator, Description = eventDescription, Address = eventAddress, City = eventCity, State = eventState, Zip_Code = eventZip, Date = eventDate, Start_Time = eventStart, Duration = eventDuration, Skills = eventSkills, Urgency = eventUrgency)
+            event.save()
 
             return Response(EventSerializer(event).data, status=status.HTTP_201_CREATED)
         
