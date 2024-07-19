@@ -377,13 +377,12 @@ def RegisterView(request):
 
     # Password validation
     
-    if checkers.is_string(decoded_request_body["password"], allow_empty=False): #request.data.get('password') # password from front-end
+    if checkers.is_string(decoded_request_body["password"]) and (len(decoded_request_body["password"]) > 0): #request.data.get('password') # password from front-end
         validated_password = decoded_request_body["password"]
     else:
+        print("ERROR: password received from the front-end is not valid")
         if (len(decoded_request_body["password"]) == 0):
-            print("ERROR: password received from the front-end is empty")
-        else:
-            print("ERROR: password received from the front-end is not valid")
+            print("ERROR INFO: password received from the front-end is empty")
     
     #### Input validation end ####
 
@@ -421,8 +420,7 @@ def RegisterView(request):
             #newUser = User.objects.create_user(username=username, 
             #                                email=None, 
             #                                password=password)
-        else:
-            print('ERROR: Form not valid')
+
         #if (request.POST) and (newUser is not None):
         if (newUser is not None):
             response = "{'message': 'OK'}" # User registered in the system
@@ -457,20 +455,18 @@ def LoginView(request):
 
     try:
         validated_username = validators.email(decoded_request_body["username"], allow_empty=False) #request.data.get('username') # username from front-end
-    except errors.EmptyValueError:
-        print("ERROR: username (email) received from the front-end is empty.")
-    except errors.InvalidEmailError:
+    except:
         print("ERROR: username (email) received from the front-end is invalid.")
 
     # Password validation
     
-    if checkers.is_string(decoded_request_body["password"], allow_empty=False): #request.data.get('password') # password from front-end
+    if checkers.is_string(decoded_request_body["password"], minimum_length=1): #request.data.get('password') # password from front-end
         validated_password = decoded_request_body["password"]
     else:
+        print("ERROR: password received from the front-end is not valid")
         if (len(decoded_request_body["password"]) == 0):
-            print("ERROR: password received from the front-end is empty")
-        else:
-            print("ERROR: password received from the front-end is not valid")
+            print("ERROR INFO: password received from the front-end is empty")
+            
     
     #### Input validation end ####
 
@@ -564,9 +560,9 @@ def CreateProfile(request): # POST REQUEST ONLY
 
     # Full Name validation
 
-    full_name_is_valid = checkers.is_string(decoded_request_body["full_name"], allow_empty=False, 
+    full_name_is_valid = checkers.is_string(decoded_request_body["full_name"], minimum_length=1,  # Since the field cannot be empty, check that the lenght of the string is at least 1
                                             maximum_length=50) #request.data.get('username') # username from front-end
-    if full_name_is_valid:
+    if full_name_is_valid and (len(decoded_request_body["full_name"]) > 0):
         validated_full_name = decoded_request_body["full_name"]
     else:
         if (len(decoded_request_body["full_name"]) == 0):
@@ -578,9 +574,9 @@ def CreateProfile(request): # POST REQUEST ONLY
 
     # Address 1 validation
 
-    address1_is_valid = checkers.is_string(decoded_request_body["address1"], allow_empty=False, 
+    address1_is_valid = checkers.is_string(decoded_request_body["address1"], minimum_length=1, 
                                            maximum_length=100)
-    if address1_is_valid:
+    if address1_is_valid and (len(decoded_request_body["address1"]) > 0):
         validated_address1 = decoded_request_body["address1"]
     else:
         if (len(decoded_request_body["address1"]) == 0):
@@ -592,7 +588,7 @@ def CreateProfile(request): # POST REQUEST ONLY
 
     # Address 2 validation (Address 2 can be emty because it is optional)
 
-    address2_is_valid = checkers.is_string(decoded_request_body["address2"], allow_empty=True, 
+    address2_is_valid = checkers.is_string(decoded_request_body["address2"], minimum_length=None, 
                                            maximum_length=100)
     if address2_is_valid: # Address 2 is valid and not empty
         print("OK: Address 2 is valid.")
@@ -605,7 +601,7 @@ def CreateProfile(request): # POST REQUEST ONLY
 
     # City validation
 
-    city_is_valid = checkers.is_string(decoded_request_body["city"], allow_empty=False, 
+    city_is_valid = checkers.is_string(decoded_request_body["city"], minimum_length=1, 
                                            maximum_length=100)
     if city_is_valid: # Address 2 is valid and not empty
         print("OK: City is valid.")
@@ -620,7 +616,7 @@ def CreateProfile(request): # POST REQUEST ONLY
 
     # State validation
 
-    state_is_valid = checkers.is_string(decoded_request_body["state"], allow_empty=False, 
+    state_is_valid = checkers.is_string(decoded_request_body["state"], minimum_length=1, 
                                            maximum_length=2)
     if state_is_valid: # State is valid and not empty
         print("OK: State is valid.")
@@ -635,7 +631,7 @@ def CreateProfile(request): # POST REQUEST ONLY
     
     # Zip Code validation
 
-    zip_code_is_valid = checkers.is_string(decoded_request_body["zip_code"], allow_empty=False,
+    zip_code_is_valid = checkers.is_string(decoded_request_body["zip_code"],
                                            minimum_length=5, 
                                            maximum_length=9)
     if zip_code_is_valid: # Zip code is valid and not empty
@@ -653,7 +649,7 @@ def CreateProfile(request): # POST REQUEST ONLY
 
     # Skills validation (string)
 
-    skills_is_valid = checkers.is_string(decoded_request_body["skills"], allow_empty=False)
+    skills_is_valid = checkers.is_string(decoded_request_body["skills"], minimum_length=1)
     if skills_is_valid: # Skills is valid and not empty
         print("OK: Skills is valid.")
         validated_skills = decoded_request_body["skills"]
@@ -665,7 +661,7 @@ def CreateProfile(request): # POST REQUEST ONLY
 
     # Preferences validation (Preferences can be emty because it is optional)
 
-    preferences_is_valid = checkers.is_string(decoded_request_body["preferences"], allow_empty=True)
+    preferences_is_valid = checkers.is_string(decoded_request_body["preferences"], minimum_length=None)
     if preferences_is_valid: # Address 2 is valid and not empty
         print("OK: Preferences is valid.")
         validated_preferences = decoded_request_body["preferences"]
@@ -674,7 +670,7 @@ def CreateProfile(request): # POST REQUEST ONLY
     
     # Availability validation (string)
 
-    availability_is_valid = checkers.is_string(decoded_request_body["availability"], allow_empty=False)
+    availability_is_valid = checkers.is_string(decoded_request_body["availability"], minimum_length=1)
     if availability_is_valid: # Skills is valid and not empty
         print("OK: Availability is valid.")
         validated_availability = decoded_request_body["availability"]
@@ -785,7 +781,7 @@ def UpdateProfile(request): # POST REQUEST ONLY
 
     # Full Name validation
 
-    full_name_is_valid = checkers.is_string(decoded_request_body["full_name"], allow_empty=False, 
+    full_name_is_valid = checkers.is_string(decoded_request_body["full_name"], minimum_length=1, 
                                             maximum_length=50) #request.data.get('username') # username from front-end
     if full_name_is_valid:
         validated_full_name = decoded_request_body["full_name"]
@@ -799,7 +795,7 @@ def UpdateProfile(request): # POST REQUEST ONLY
 
     # Address 1 validation
 
-    address1_is_valid = checkers.is_string(decoded_request_body["address1"], allow_empty=False, 
+    address1_is_valid = checkers.is_string(decoded_request_body["address1"], minimum_length=1, 
                                            maximum_length=100)
     if address1_is_valid:
         validated_address1 = decoded_request_body["address1"]
@@ -813,7 +809,7 @@ def UpdateProfile(request): # POST REQUEST ONLY
 
     # Address 2 validation (Address 2 can be emty because it is optional)
 
-    address2_is_valid = checkers.is_string(decoded_request_body["address2"], allow_empty=True, 
+    address2_is_valid = checkers.is_string(decoded_request_body["address2"], minimum_length=None, 
                                            maximum_length=100)
     if address2_is_valid: # Address 2 is valid and not empty
         print("OK: Address 2 is valid.")
@@ -826,7 +822,7 @@ def UpdateProfile(request): # POST REQUEST ONLY
 
     # City validation
 
-    city_is_valid = checkers.is_string(decoded_request_body["city"], allow_empty=False, 
+    city_is_valid = checkers.is_string(decoded_request_body["city"], minimum_length=1, 
                                            maximum_length=100)
     if city_is_valid: # Address 2 is valid and not empty
         print("OK: City is valid.")
@@ -841,7 +837,7 @@ def UpdateProfile(request): # POST REQUEST ONLY
 
     # State validation
 
-    state_is_valid = checkers.is_string(decoded_request_body["state"], allow_empty=False, 
+    state_is_valid = checkers.is_string(decoded_request_body["state"], minimum_length=1, 
                                            maximum_length=2)
     if state_is_valid: # State is valid and not empty
         print("OK: State is valid.")
@@ -856,7 +852,7 @@ def UpdateProfile(request): # POST REQUEST ONLY
     
     # Zip Code validation
 
-    zip_code_is_valid = checkers.is_string(decoded_request_body["zip_code"], allow_empty=False,
+    zip_code_is_valid = checkers.is_string(decoded_request_body["zip_code"],
                                            minimum_length=5, 
                                            maximum_length=9)
     if zip_code_is_valid: # Zip code is valid and not empty
@@ -874,7 +870,7 @@ def UpdateProfile(request): # POST REQUEST ONLY
 
     # Skills validation (string)
 
-    skills_is_valid = checkers.is_string(decoded_request_body["skills"], allow_empty=False)
+    skills_is_valid = checkers.is_string(decoded_request_body["skills"],minimum_length=1)
     if skills_is_valid: # Skills is valid and not empty
         print("OK: Skills is valid.")
         validated_skills = decoded_request_body["skills"]
@@ -886,7 +882,7 @@ def UpdateProfile(request): # POST REQUEST ONLY
 
     # Preferences validation (Preferences can be emty because it is optional)
 
-    preferences_is_valid = checkers.is_string(decoded_request_body["preferences"], allow_empty=True)
+    preferences_is_valid = checkers.is_string(decoded_request_body["preferences"], minimum_length=None)
     if preferences_is_valid: # Address 2 is valid and not empty
         print("OK: Preferences is valid.")
         validated_preferences = decoded_request_body["preferences"]
@@ -895,7 +891,7 @@ def UpdateProfile(request): # POST REQUEST ONLY
     
     # Availability validation (string)
 
-    availability_is_valid = checkers.is_string(decoded_request_body["availability"], allow_empty=False)
+    availability_is_valid = checkers.is_string(decoded_request_body["availability"], minimum_length=1)
     if availability_is_valid: # Skills is valid and not empty
         print("OK: Availability is valid.")
         validated_availability = decoded_request_body["availability"]

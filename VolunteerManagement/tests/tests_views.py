@@ -107,18 +107,118 @@ class testViews(TestCase):
         #self.assertEquals(response, '''"{'message': 'OK'}"''')
 
 
+        body_data2 = {
+            'password': '',
+            #'last_login': 0,
+            'is_superuser': False,
+            'username': 'myemail@example.com',
+            'first_name': '',
+            'last_name': '',
+            'email': '',
+            'is_staff': False,
+            'is_active': False,
+            #'date_joined': 0,
+            'groups': [],
+            'user_permissions': []
+        }
+        try:
+            response2 = client.post(reverse('Register'),
+                                data=json.dumps(body_data2),
+                                content_type='application/json'
+                                )
+        except:
+            print("ERROR")
+
+        body_data3 = {
+            'password': '',
+            #'last_login': 0,
+            'is_superuser': False,
+            'username': '',
+            'first_name': '',
+            'last_name': '',
+            'email': '',
+            'is_staff': False,
+            'is_active': False,
+            #'date_joined': 0,
+            'groups': [],
+            'user_permissions': []
+        }
+        try:
+            response3 = client.post(reverse('Register'),
+                                data=json.dumps(body_data3),
+                                content_type='application/json'
+                                )
+        except:
+            print("ERROR")
+
+        body_data3["username"] = "bademail#mymail.com"
+        try:
+            response4 = client.post(reverse('Register'),
+                                data=json.dumps(body_data3),
+                                content_type='application/json'
+                                )
+        except:
+            print("ERROR")
+
+        
+
+        body_data3["username"] = "myemail@example.com"
+        body_data3["password"] = ""
+        try:
+            response4 = client.post(reverse('Register'),
+                                data=json.dumps(body_data3),
+                                content_type='application/json'
+                                )
+        except:
+            print("ERROR")
+
+        body_data3["username"] = "myemail@example.com"
+        body_data3["password"] = "myValidPassword"
+        try:
+            response4 = client.post(reverse('Register'),
+                                data=json.dumps(body_data3),
+                                content_type='application/json'
+                                )
+        except:
+            print("ERROR")
+
+
         
     
-    '''
+    
     def test_LoginView(self):
         client = Client()
-        response = client.post(reverse('Login'),headers={'Content-Type: application/json'},
-                               data=bytes(json.dumps({"username": "ax.alvarenga19@gmail.com","password": "houston123"}).encode("utf-8")))
-            #"username": "ax.alvarenga19@gmail.com",
-            #"password": "houston123"
-        #}))
-        self.assertEquals(response.status_code, 200)
-    '''
+        try:
+            response = client.post(reverse('Login'), content_type='application/json',
+                                data=json.dumps({"username": "","password": "houston123"}))
+                #"username": "ax.alvarenga19@gmail.com",
+                #"password": "houston123"
+            #}))
+        except:
+            print("MESSAGE: FAILED LOGIN TEST AS EXPECTED")
+ 
+        try:
+            response = client.post(reverse('Login'), content_type='application/json',
+                                data=json.dumps({"username": "myemail@example.com","password": ""}))
+                #"username": "ax.alvarenga19@gmail.com",
+                #"password": "houston123"
+            #}))
+        except:
+            print("MESSAGE: FAILED LOGIN TEST AS EXPECTED")
+
+        
+        try:
+            response = client.post(reverse('Login'), content_type='application/json',
+                                data=json.dumps({"username": "myemail@example.com","password": "myValidPassword"}))
+                #"username": "ax.alvarenga19@gmail.com",
+                #"password": "houston123"
+            #}))
+        except:
+            print("MESSAGE: LOGIN TEST SUCCESSFUL AS EXPECTED")
+        
+ 
+        #self.assertEquals(response.status_code, 200)
+    
 
     def test_GetStates(self):
         client = Client()
@@ -185,8 +285,46 @@ class testViews(TestCase):
                                  to_email=)
     '''
 
-    
-    
+    def test_CreateProfile(self):
+        client = Client()
+        body_data = {
+            "user": "sample@sample.com",
+            "full_name": "Mark White",
+            "address1": "12345 Houston Rd.",
+            "address2": "7219 Nebraska Ave.",
+            "city": "Huntsville",
+            "state": "AL",
+            "zip_code": "78239", 
+            "skills": "Plumbing,Construction,German - Language, Cooking, Cleaning, Mathematics Skills",
+            "preferences": "Events near downtown are preferred. No events after 6 pm.",
+            "availability": "07/25/2024,07/26/2024,07/27/2024,08/03/2024,08/09/2024,09/15/2024"
+        }
+        response = client.post(reverse('CreateProfile'), content_type="application/json",
+                                data=json.dumps(body_data))
+        self.assertEquals(response.status_code, 200)
+
+    def test_UpdateProfile(self):
+        client = Client()
+        body_data = {
+            "user": "sample@sample.com",
+            "full_name": "Mark White",
+            "address1": "12345 Houston Rd.",
+            "address2": "7219 Nebraska Ave.",
+            "city": "Huntsville",
+            "state": "AL",
+            "zip_code": "78239", 
+            "skills": "Plumbing,Construction,German - Language, Cooking, Cleaning, Mathematics Skills",
+            "preferences": "Events near downtown are preferred. No events after 6 pm.",
+            "availability": "07/25/2024,07/26/2024,07/27/2024,08/03/2024,08/09/2024,09/15/2024"
+        }
+        response = client.post(reverse('UpdateProfile'), content_type="application/json",
+                                data=json.dumps(body_data))
+        self.assertEquals(response.status_code, 200)
+
+    def test_GetMonthlyEvents(self):
+        client = Client()
+        response = client.get(reverse('GetMonthlyEvents'))
+        self.assertEquals(response.status_code, 200)
         
         
 
