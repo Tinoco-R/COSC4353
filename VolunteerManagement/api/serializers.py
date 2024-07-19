@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Event
+from .models import Event, Event_Volunteers
 
 # Axel's models:
 from .models import User
@@ -31,6 +31,18 @@ class DeleteEventSerializer(serializers.ModelSerializer):
             'Event_ID': {'required': True}
         }
 
+class EventVolunteerMatchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Event_Volunteers
+        fields = ['Event_ID', 'Volunteer']
+
+class CreateEventVolunteerMatchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Event_Volunteers
+        fields = ['Event_ID', 'Volunteer']
+        extra_kwargs = {
+            'Event_ID': {'required': True}
+        }
 
 # Axel' code:
 class UserSerializer(serializers.ModelSerializer):

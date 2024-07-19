@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import generics, status
-from .serializers import EventSerializer, CreateEventSerializer, UpdateEventSerializer, DeleteEventSerializer
-from .models import Event, Skill
+from .serializers import EventSerializer, CreateEventSerializer, UpdateEventSerializer, DeleteEventSerializer, EventVolunteerMatchSerializer, CreateEventVolunteerMatchSerializer
+from .models import Event, Skill, Event_Volunteers
 from rest_framework.views import APIView;
 from rest_framework.response import Response;
 from django.contrib.auth.models import User
@@ -20,6 +20,23 @@ class EventsListView(generics.ListAPIView):
     #for event in events:
     #    print(event.__dict__)
     #    print()
+
+# Allows us to view all volunteers for a given event
+class EventVolunteerListView(generics.ListAPIView):
+    serializer_class = EventVolunteerMatchSerializer # Converts to json format
+    #queryset  = Event_Volunteers.objects.all().order_by('Event_ID') # Returns all event objects
+
+    def get_queryset(self):
+        #eventId = request.data.get('Event_ID')
+        eventId = self.request.query_params.get('Event_ID', None)
+        
+        if eventId is not None:
+            queryset = Event_Volunteers.objects.filter(Event_ID=eventId).order_by('Event_ID')
+        else:
+            queryset = Event_Volunteers.objects.none()
+        print(queryset.order_by('Event_ID'))
+        return queryset.order_by('Event_ID')
+
 
 # Updates pre-existing Event
 class UpdateEventView(APIView):
@@ -131,6 +148,30 @@ class CreateEventView(APIView):
             return Response(EventSerializer(event).data, status=status.HTTP_201_CREATED)
         
         else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class EventVolunteerMatch(APIView):
+    serializer_class = CreateEventVolunteerMatchSerializer
+    print("In view")
+    def post(self, request, format=None):
+        print("Data", request.data)
+        
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            print("Valid", serializer.data)
+
+            eventId = request.data.get('Event_ID')
+            volunteer = serializer.data.get('Volunteer')
+            print("Event ID:", eventId)
+            print("Volunteer:", volunteer)
+
+            eventVolunteer = Event_Volunteers(Event_ID = eventId, Volunteer = volunteer)
+            eventVolunteer.save()
+
+            return Response(EventVolunteerMatchSerializer(eventVolunteer).data, status=status.HTTP_201_CREATED)
+        
+        else:
+            print("Not valid")
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 ##########################################################

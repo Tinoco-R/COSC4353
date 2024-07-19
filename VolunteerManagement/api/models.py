@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models.manager import Manager
 import string, random
 
 
@@ -37,6 +38,34 @@ class Event(models.Model):
     Urgency = models.CharField(max_length= 10, default = "")
     #Created_By = models.ForeignKey('auth.User', on_delete=models.CASCADE)
     Created_At = models.DateTimeField(auto_now_add = True)
+
+""" class Event_Volunteers(models.Model):
+    Event_ID = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+    Volunteer = models.CharField(max_length = 30) """
+
+""" class EventVolunteersManager(Manager):
+    def get_queryset(self):
+        return super().get_queryset()
+
+class Event_Volunteers(models.Model):
+    Event_ID = models.CharField()
+    Volunteer = models.CharField(max_length=30)
+
+    objects = EventVolunteersManager()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['Event_ID', 'Volunteer'], name='pk')
+        ] """
+
+class Event_Volunteers(models.Model):
+    Event_ID = models.CharField(max_length=10)
+    Volunteer = models.CharField(max_length=30)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['Event_ID', 'Volunteer'], name='unique_event_volunteer')
+        ]
 
 # Axel's code
 class User(UserDefault):
