@@ -43,7 +43,7 @@ class UpdateEventView(APIView):
     serializer_class = UpdateEventSerializer
 
     def post(self, request, format=None, **kwargs):
-        
+        print("request.data", request.data)
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():                
             eventId = request.data.get('Event_ID')
@@ -81,7 +81,7 @@ class UpdateEventView(APIView):
             event.Urgency = eventUrgency
             event.save()
 
-            return Response(EventSerializer(event).data, status=status.HTTP_201_CREATED)
+            return Response(EventSerializer(event).data, status=status.HTTP_200_OK)
         
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -148,6 +148,7 @@ class CreateEventView(APIView):
             return Response(EventSerializer(event).data, status=status.HTTP_201_CREATED)
         
         else:
+            print(serializer.errors)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class EventVolunteerMatch(APIView):
