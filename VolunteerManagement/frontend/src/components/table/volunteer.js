@@ -21,13 +21,19 @@ export default class VolunteerDetailsAdmin extends Component {
         super(props);
         this.state = {
             currentIndex: 0,
+            matchingSkills: 0,
             showSkills: {},
             activeCards: [],
             filteredVolunteers: [],
             allVolunteers: [],
-            matchingSkills: 0,
             eventMembers: [],
+            activeVolunteers: []
         };
+    }
+
+    reinitialize() {
+        this.state.activeCards = [];
+        this.state.activeVolunteers = [];
     }
 
     // Allows an admin to match volunteers to an event
@@ -37,13 +43,15 @@ export default class VolunteerDetailsAdmin extends Component {
         const { selectedEventName } = this.props;
 
         // Selected Volunteers
-        let selectedVolunteers = this.getSelectedVolunteers();
+        //let selectedVolunteers = this.getSelectedVolunteers();
+        let activeVolunteers = this.state.activeVolunteers;
+        console.log("activeVolunteers", activeVolunteers)
 
         const formData = {};
         formData.Event_ID = selectedEvent;
         formData.Volunteer = [];
-        for (let index = 0; index < selectedVolunteers.length; index++) {
-            const volunteerName = selectedVolunteers[index].name;
+        for (let index = 0; index < activeVolunteers.length; index++) {
+            const volunteerName = activeVolunteers[index].name;
             formData.Volunteer.push(volunteerName);
         }
 
@@ -51,7 +59,7 @@ export default class VolunteerDetailsAdmin extends Component {
             ShowNotification(`Match Volunteers to Events`, `Please select an Event on the left, and any number of Volunteers on the right.`)
             return;
         }
-        else if (selectedVolunteers.length === 0) {
+        else if (activeVolunteers.length === 0) {
             ShowNotification(`Event: ${selectedEventName}`, `Please select any number of volunteers to add to this event.`)
             return;            
         }
@@ -63,8 +71,8 @@ export default class VolunteerDetailsAdmin extends Component {
                 // Check if creating a new row or updating an existing row
                 let eventUrl = "http://localhost:8000/api/eventVolunteerMatch/";
 
-                for (let index = 0; index < selectedVolunteers.length; index++) {
-                    const volunteerName = selectedVolunteers[index].name;
+                for (let index = 0; index < activeVolunteers.length; index++) {
+                    const volunteerName = activeVolunteers[index].name;
                     const volunteerData = {
                         Event_ID: selectedEvent,
                         Volunteer: volunteerName
@@ -102,8 +110,10 @@ export default class VolunteerDetailsAdmin extends Component {
     // Initial filter (of 0)
     // Need to update to actually pull volunteers from the database
     componentDidMount() {
+        const filteredList = this.filterVolunteersBySkills();
+
         this.setState({
-            filteredVolunteers: this.filterVolunteersBySkills(),
+            filteredVolunteers: filteredList,
             allVolunteers: volunteerCardData
         });
     }
@@ -111,6 +121,12 @@ export default class VolunteerDetailsAdmin extends Component {
     componentDidUpdate(prevProps) {
         // If the selected Event changes, fetch volunteers of the newly selected Event
         if (prevProps.selectedEvent !== this.props.selectedEvent) {
+            // Remove active cards and any selected volunteers
+            this.setState({ activeCards: [], activeVolunteers: [] });
+
+            // Go back to page 0
+            this.setState({ currentIndex: 0 })
+
             fetchEventVolunteers(this.props.selectedEvent).then(volunteersOfEvent => {
                 console.log(`Fetching new data for Event ID:${this.props.selectedEvent}`)
 
@@ -119,10 +135,7 @@ export default class VolunteerDetailsAdmin extends Component {
                 this.setState({
                     eventMembers: volunteerNamesArray,
                 });
-/* 
-                this.filterVolunteersBySkills(0, volunteerNamesArray)
-                this.removePreExistingActiveVolunteers();
-*/
+                
                 // Waits for async event to finish before proceeding
                 setTimeout(() => {
                     this.filterVolunteersBySkills(0, volunteerNamesArray);
@@ -192,6 +205,8 @@ export default class VolunteerDetailsAdmin extends Component {
                 filteredVolunteers.push(volunteer);
             }
         }
+
+        // filteredVolunteers 
       
         return filteredVolunteers;
     };
@@ -204,25 +219,49 @@ export default class VolunteerDetailsAdmin extends Component {
     };
 
     // Sets the actively clicked card
-    cardClick(index, name) {
+    cardClick(index, name, data, filteredVol) {
         // Check if selection already selected to then deselect it
         const isActive = this.state.activeCards.includes(index);
         const isPartOfEvent = this.state.eventMembers.includes(name);
+
+        console.log("Clicked Card Data:", data);
+        console.log("Active Cards:", this.state.activeCards);
+
+        console.log("Filtered:", filteredVol)
 
         // Remove index from activeCards
         if (isActive || isPartOfEvent) {
             this.setState(prevState => ({
                 activeCards: prevState.activeCards.filter(cardIndex => cardIndex!== index)
-            }));
+            }), () => {
+                this.updateActiveVolunteers(this.state.activeCards, filteredVol);
+            });
+    
         }
 
         // Add index to activeCards if the Volunteer is not a part of that event
         else if (!isPartOfEvent) {
             this.setState(prevState => ({
                 activeCards: [...prevState.activeCards, index]
-            }));
+            }), () => {
+                this.updateActiveVolunteers(this.state.activeCards, filteredVol);
+            });
+    
         }
     }
+
+    updateActiveVolunteers(activeCards, filteredVol) {
+        let chosenVolunteers = [];
+        
+        for (let i = 0; i < activeCards.length; i++) {
+            const volunteerIndex = activeCards[i];
+            chosenVolunteers.push(filteredVol[volunteerIndex]);
+        }
+        this.setState(prevState => ({
+            activeVolunteers: chosenVolunteers
+        }));
+    }
+    
 
     // Default card shows information on what the cards below have
     defaultCard() {
@@ -238,16 +277,17 @@ export default class VolunteerDetailsAdmin extends Component {
     }
 
     // Actual volunteer cards with information over a volunteer: Name, Rating, Attendance, and all their Skills
-    basicCard(data, isActive, className, cardsToShow) {
+    basicCard(data, isActive, className, cardsToShow, count, filter) {
         const { selectedSkills } = this.props;
         let row = (data.row - 1);
+        //console.log("(row, count):", row, count);
 
         // For volunteers who are part of an event already, background color is red
         
         const isPartOfEvent = this.state.eventMembers.includes(data.name);
 
         return(
-            <Card id="volunteerCard" event={data.event} onClick={() => this.cardClick(row, data.name)} className={`volunteer-card ${isActive? className : ''}`} sx={{ bgcolor: theme.palette.primary.main, mb: 2, cursor: 'pointer', ...isPartOfEvent ? { backgroundColor: 'red' } : (isActive ? { backgroundColor: '#86C232' } : {}) }}>
+            <Card id="volunteerCard" event={data.event} innerIndex={count} onClick={() => this.cardClick(count, data.name, data, filter)} className={`volunteer-card ${isActive? className : ''}`} sx={{ bgcolor: theme.palette.primary.main, mb: 2, cursor: 'pointer', ...isPartOfEvent ? { backgroundColor: 'red' } : (isActive ? { backgroundColor: '#86C232' } : {}) }}>
                 <CardContent>
                     <Typography sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 1, color: theme.palette.secondary.main }} gutterBottom>
                         <strong>{data.name}</strong>
@@ -297,8 +337,8 @@ export default class VolunteerDetailsAdmin extends Component {
                             marks={[{ value: 0 }, { value: 1 }, { value: 2 }, { value: 3 }]}
                             min={0}
                             max={3}
-                            onChange={(event, newValue) => this.setState({ matchingSkills: newValue })}
-
+                            // When adjusting the slider: set the new number of matching skills, reset any selected cards/volunteers, and go back to page 0
+                            onChange={(event, newValue) => this.setState({ matchingSkills: newValue, activeCards: [], activeVolunteers: [], currentIndex: 0 })}
                         />
                     </Box>
                         <Button onClick={() => this.setState({ currentIndex: Math.max(this.state.currentIndex - 1, 0) })} disabled={this.state.currentIndex === 0} style={{backgroundColor: "#86C232"}}  variant="contained" type="submit" fontFamily="'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif" sx={{ mx: 1 }}>Previous</Button>
@@ -317,7 +357,7 @@ export default class VolunteerDetailsAdmin extends Component {
                         const isActive = this.state.activeCards.includes(index)
                             return (
                                 <Grid item xs={6} key={index}>
-                                    {this.basicCard(val, isActive, isActive? 'activeCard' : '', maxCardsToShow)}
+                                    {this.basicCard(val, isActive, isActive? 'activeCard' : '', maxCardsToShow, index, filteredVolunteers)}
                                 </Grid>
                             );
                         })}

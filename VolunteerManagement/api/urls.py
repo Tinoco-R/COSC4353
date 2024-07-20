@@ -37,5 +37,7 @@ urlpatterns = [
     path('eventVolunteerMatch/', EventVolunteerMatch.as_view(), name='event_volunteer_match'),
     path('eventVolunteerMatchView/', EventVolunteerListView.as_view(), name='view_event_volunteers'),
 
+    # Volunteer History
+
     path('', include('frontend.urls'))
 ]
