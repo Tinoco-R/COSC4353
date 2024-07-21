@@ -35,7 +35,7 @@ export default class VolunteerDetailsAdmin extends Component {
         this.state.activeCards = [];
         this.state.activeVolunteers = [];
     }
-
+    
     // Allows an admin to match volunteers to an event
     matchVolunteers = () => {
         // Selected Event
@@ -65,6 +65,7 @@ export default class VolunteerDetailsAdmin extends Component {
         ShowDetails(`Add Volunteers to ${selectedEventName || "[No Event Selected]"}`, formData, (isConfirmed) => {
             if (isConfirmed) {
                 console.log('Adding volunteers to event...');
+                // Can we add the volunteers to eventMembers here
                 
                 // Check if creating a new row or updating an existing row
                 let eventUrl = "http://localhost:8000/api/eventVolunteerMatch/";
@@ -94,13 +95,16 @@ export default class VolunteerDetailsAdmin extends Component {
                         if (data.non_field_errors) {
                             console.log('Validation errors:', data.non_field_errors);
                         }
+
+                        // Add the volunteer to the list of event members (turn them red)
+                        this.setState(prevState => ({
+                            eventMembers: [...prevState.eventMembers, volunteerName]
+                        }));
                     })
                     .catch((error) => {
                         console.error('Error:', error);
                     });
-                    
-                    //window.location.reload(); 
-                }               
+                }
             }
         },)
     }

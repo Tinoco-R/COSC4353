@@ -104,13 +104,8 @@ class DeleteEventView(APIView):
     def post(self, request, format=None, **kwargs):
         
         serializer = self.serializer_class(data=request.data)
-        print(serializer)
-        print()
-
 
         if serializer.is_valid():
-            print(serializer.validated_data)
-            print()         
             eventId = request.data.get('Event_ID')
 
             # Get existing row
