@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import generics, status
 from .serializers import EventSerializer, CreateEventSerializer, UpdateEventSerializer, DeleteEventSerializer, EventVolunteerMatchSerializer, CreateEventVolunteerMatchSerializer
-from .models import Event, Skill, Event_Volunteers
+from .models import Event, Skill, Event_Volunteers, Event_Update_Volunteers
 from rest_framework.views import APIView;
 from rest_framework.response import Response;
 from django.contrib.auth.models import User
@@ -16,15 +16,9 @@ class EventsListView(generics.ListAPIView):
     queryset  = Event.objects.all().order_by('Event_ID') # Returns all event objects
     serializer_class = EventSerializer # Converts to json format
 
-    #events = Event.objects.all()
-    #for event in events:
-    #    print(event.__dict__)
-    #    print()
-
 # Allows us to view all volunteers for a given event
 class EventVolunteerListView(generics.ListAPIView):
     serializer_class = EventVolunteerMatchSerializer # Converts to json format
-    #queryset  = Event_Volunteers.objects.all().order_by('Event_ID') # Returns all event objects
 
     def get_queryset(self):
         #eventId = request.data.get('Event_ID')
@@ -42,8 +36,7 @@ class EventVolunteerListView(generics.ListAPIView):
 class UpdateEventView(APIView):
     serializer_class = UpdateEventSerializer
 
-    def post(self, request, format=None, **kwargs):
-        print("request.data", request.data)
+    def post(self, request, format = None, **kwargs):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():                
             eventId = request.data.get('Event_ID')
@@ -62,7 +55,25 @@ class UpdateEventView(APIView):
 
             # Get existing row
             try:
-                event = Event.objects.get(Event_ID=eventId)
+                event = Event.objects.get(Event_ID = eventId)
+                print("Updating", event.Event_ID)
+
+                # Get all current volunteers for the event (using Event_Volunteers)
+                if event is not None:
+                    queryset = Event_Volunteers.objects.filter(Event_ID = event.Event_ID).order_by('Event_ID', 'Volunteer')
+                    for volunteer in queryset:
+                        volunteerName = volunteer.Volunteer
+                        print(" Adding", volunteer.Volunteer, "to Event_Update_Volunteers...")
+
+                        # Add the Event ID and Volunteer name to the Event Updates table (used to know if volunteers have yet to be alerted of changes to an event they are registered to)
+                        Event_Update_Volunteers.objects.create(
+                                Event_ID = event.Event_ID,
+                                Volunteer = volunteerName,
+                        )
+
+                else:
+                    queryset = Event_Volunteers.objects.none()
+
             except Event.DoesNotExist:
                 return Response({"error": "Event not found"}, status=status.HTTP_404_NOT_FOUND)
             

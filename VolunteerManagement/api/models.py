@@ -39,6 +39,15 @@ class Event_Volunteers(models.Model):
             models.UniqueConstraint(fields=['Event_ID', 'Volunteer'], name='unique_event_volunteer')
         ]
 
+class Event_Update_Volunteers(models.Model):
+    Event_ID = models.CharField(max_length=10)
+    Volunteer = models.CharField(max_length=30)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['Event_ID', 'Volunteer'], name='unique_event_volunteers')
+        ]
+
 # Axel's code
 class User(UserDefault):
     #user_id = models.IntegerField(unique=True)

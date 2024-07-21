@@ -43,9 +43,7 @@ export default class VolunteerDetailsAdmin extends Component {
         const { selectedEventName } = this.props;
 
         // Selected Volunteers
-        //let selectedVolunteers = this.getSelectedVolunteers();
         let activeVolunteers = this.state.activeVolunteers;
-        console.log("activeVolunteers", activeVolunteers)
 
         const formData = {};
         formData.Event_ID = selectedEvent;
@@ -224,11 +222,6 @@ export default class VolunteerDetailsAdmin extends Component {
         const isActive = this.state.activeCards.includes(index);
         const isPartOfEvent = this.state.eventMembers.includes(name);
 
-        console.log("Clicked Card Data:", data);
-        console.log("Active Cards:", this.state.activeCards);
-
-        console.log("Filtered:", filteredVol)
-
         // Remove index from activeCards
         if (isActive || isPartOfEvent) {
             this.setState(prevState => ({
@@ -280,8 +273,6 @@ export default class VolunteerDetailsAdmin extends Component {
     basicCard(data, isActive, className, cardsToShow, count, filter) {
         const { selectedSkills } = this.props;
         let row = (data.row - 1);
-        //console.log("(row, count):", row, count);
-
         // For volunteers who are part of an event already, background color is red
         
         const isPartOfEvent = this.state.eventMembers.includes(data.name);
