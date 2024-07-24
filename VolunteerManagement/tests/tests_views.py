@@ -1,9 +1,13 @@
 # Test for views.py
 
 from django.test import TestCase, Client
+from django.utils import timezone
 from django.urls import reverse
 from api.models import *
 from api.views import *
+from api.serializers import *
+from rest_framework import status
+import datetime
 
 import json
 
@@ -325,7 +329,317 @@ class testViews(TestCase):
         client = Client()
         response = client.get(reverse('GetMonthlyEvents'))
         self.assertEquals(response.status_code, 200)
-        
-        
+
+# Testing to see all volunteers for a given event
+class EventVolunteerListViewTests(TestCase):
+
+    def setUp(self):
+        self.client = Client()
+        self.factory = RequestFactory()
+        self.view = EventVolunteerListView.as_view()
+
+    # Given an Event ID, will return all volunteers registered at that event (in this case 3)
+    def test_with_event_id(self):
+        eventVolunteer1 = Event_Volunteers.objects.create(
+            Event_ID=1,
+            Volunteer="Alice"
+        )
+        eventVolunteer2 = Event_Volunteers.objects.create(
+            Event_ID=1,
+            Volunteer="Bob"
+        )
+        eventVolunteer3 = Event_Volunteers.objects.create(
+            Event_ID=1,
+            Volunteer="Charlie"
+        )
+
+        response = self.client.get(reverse('view_event_volunteers'), {'Event_ID': 1})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Gather the volunteers and assert they show as expected
+        volunteers = [volunteer['Volunteer'] for volunteer in response.data]
+
+        # Check that the returned queryset contains all expected event volunteers
+        self.assertIn('Alice', volunteers)
+        self.assertIn('Bob', volunteers)
+        self.assertIn('Charlie', volunteers)
+
+    # If no Event ID is given, we can't provide a list of volunteers (composite keys) so the response should be empty
+    def test_with_no_event_id(self):
+        response = self.client.get(reverse('view_event_volunteers'))
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 0)
+
+# Testing to see if we can update an existing row of data in the DB
+class UpdateEventViewTests(TestCase):
+
+    def setUp(self):
+        self.client = Client()
+        self.factory = RequestFactory()
+        self.view = UpdateEventView.as_view()
+
+        # Initial Test Event (to be modified during test)
+        self.event = Event.objects.create(
+            Name="Initial Event Name",
+            Administrator="Admin Joe",
+            Description="This is a testing description",
+            Address="123 Main St",
+            City="TestCity",
+            State="Texas",
+            Zip_Code="77777",
+            Date="2024/07/19",
+            Start_Time="12:00 PM",
+            Duration="3h 0m",
+            Skills="Dexterity, Teamwork",
+            Urgency="Low",
+            Created_At=timezone.now(),
+        )
+
+    def test_update_event(self):
+        # Modified event values
+        newData = {
+            "Event_ID": self.event.pk,
+            "Name": "Updated Event Name",
+            "Administrator": "Super Admin Joe",
+            "Description": "This is a shorter description",
+            "Address": "456 Main St",
+            "City": "Test Town",
+            "State": "Oklahoma",
+            "Zip_Code": "88888",
+            "Date": "2024/07/20",
+            "Start_Time": "02:00 PM",
+            "Duration": "4h 0m",
+            "Skills": "Dexterity, Teamwork, Patience",
+            "Urgency": "Critical",
+        }
+
+        # Convert newData dictionary to JSON
+        newDataJSON = json.dumps(newData)
+
+        # Tests good data update
+        response = self.client.post('/api/eventUpdate/', data=newDataJSON, content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Load our updated event
+        updated_event = Event.objects.get(pk=self.event.pk)
+
+        # Assert that the event was updated correctly
+        self.assertEqual(updated_event.Name, newData["Name"])
+        self.assertEqual(updated_event.Administrator, newData["Administrator"])
+        self.assertEqual(updated_event.Description, newData["Description"])
+        self.assertEqual(updated_event.Address, newData["Address"])
+        self.assertEqual(updated_event.City, newData["City"])
+        self.assertEqual(updated_event.State, newData["State"])
+        self.assertEqual(updated_event.Zip_Code, newData["Zip_Code"])
+        self.assertEqual(updated_event.Date, newData["Date"])
+        self.assertEqual(updated_event.Start_Time, newData["Start_Time"])
+        self.assertEqual(updated_event.Duration, newData["Duration"])
+        self.assertEqual(updated_event.Skills, newData["Skills"])
+        self.assertEqual(updated_event.Urgency, newData["Urgency"])
+
+    def test_update_fake_event(self):
+        # Modified event values
+        nonExistingData = {
+            "Event_ID": -1,
+            "Name": "Updated Event Name",
+            "Administrator": "Super Admin Joe",
+            "Description": "This is a shorter description",
+            "Address": "456 Main St",
+            "City": "Test Town",
+            "State": "Oklahoma",
+            "Zip_Code": "88888",
+            "Date": "2024/07/20",
+            "Start_Time": "02:00 PM",
+            "Duration": "4h 0m",
+            "Skills": "Dexterity, Teamwork, Patience",
+            "Urgency": "Critical",
+        }
+
+        # Convert newData dictionary to JSON
+        newDataJSON = json.dumps(nonExistingData)
+
+        # Tests fake event update
+        response = self.client.post('/api/eventUpdate/', data=newDataJSON, content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_update_event_empty_Values(self):
+        # Modified event values
+        emptyData = {
+            "Event_ID": self.event.pk,
+            "Name": "",
+            "Administrator": "",
+            "Description": "",
+            "Address": "",
+            "City": "",
+            "State": "",
+            "Zip_Code": "",
+            "Date": "",
+            "Start_Time": "",
+            "Duration": "",
+            "Skills": "",
+            "Urgency": "",
+        }
+
+        # Convert newData dictionary to JSON
+        newDataJSON = json.dumps(emptyData)
+
+        # Tests update with bad fields
+        response = self.client.post('/api/eventUpdate/', data=newDataJSON, content_type='application/json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+# Testing to see if we can create a new row of data in the DB
+class CreateEventViewTests(TestCase):
+
+    def setUp(self):
+        self.client = Client()
+        self.view = CreateEventView.as_view()
+
+    def test_create_event_good(self):
+        newEventData = {
+            "Name": "My Event Name",
+            "Administrator": "Admin User Joe",
+            "Description": "Exciting event description",
+            "Address": "456 New St",
+            "City": "Test City",
+            "State": "Texas",
+            "Zip_Code": "12345",
+            "Date": "2024/07/22",
+            "Start_Time": "12:00 PM",
+            "Duration": "2h 30m",
+            "Skills": "Patience, Strength",
+            "Urgency": "High",
+        }
+        newEventDataJSON = json.dumps(newEventData)
+
+        # Send POST request to create a new event
+        response = self.client.post(
+            path=reverse('create_event'),
+            data=newEventDataJSON,
+            content_type='application/json',
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+    
+    def test_create_event_bad(self):
+        newEventData = {
+            "Name": "Missing Fields Jimmy"
+        }
+        newEventDataJSON = json.dumps(newEventData)
+
+        # Send POST request to create a new event
+        response = self.client.post(
+            path=reverse('create_event'),
+            data=newEventDataJSON,
+            content_type='application/json',
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_event_empty(self):
+        emptyEventData = {
+            "Name": "",
+            "Administrator": "",
+            "Description": "",
+            "Address": "",
+            "City": "",
+            "State": "",
+            "Zip_Code": "",
+            "Date": "20",
+            "Start_Time": "",
+            "Duration": "",
+            "Skills": "",
+            "Urgency": "",
+        }
+        newEventDataJSON = json.dumps(emptyEventData)
+
+        # Send POST request to create a new event
+        response = self.client.post(
+            path=reverse('create_event'),
+            data=newEventDataJSON,
+            content_type='application/json',
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("Name cannot be empty.", str(response.content))
+        self.assertIn("Description cannot be empty.", str(response.content))
+        self.assertIn("Address cannot be empty.", str(response.content))
+        self.assertIn("City cannot be empty.", str(response.content))
+        self.assertIn("State cannot be empty.", str(response.content))
+        self.assertIn("Zip Code cannot be empty.", str(response.content))
 
 
+# Testing to see if we can delete an existing row of data in the DB
+class DeleteEventViewTests(TestCase):
+
+    def setUp(self):
+        self.client = Client()
+        self.view = DeleteEventView.as_view()
+
+        # Initial Test Event (to be deleted during test)
+        self.event = Event.objects.create(
+            Name="Initial Event Name",
+            Administrator="Admin Joe",
+            Description="This is a testing description",
+            Address="123 Main St",
+            City="TestCity",
+            State="Texas",
+            Zip_Code="77777",
+            Date="2024/07/19",
+            Start_Time="12:00 PM",
+            Duration="3h 0m",
+            Skills="Dexterity, Teamwork",
+            Urgency="Low",
+            Created_At=timezone.now(),
+        )
+
+    def test_delete_event_good(self):
+        # Gets the primary key (Event ID) of the just created event so that we can find it and delete it
+        eventID = {"Event_ID" : self.event.pk}
+        deleteEventDataJSON = json.dumps(eventID)
+
+        # Send POST request to delete above event
+        response = self.client.post(
+            path=reverse('delete_event'),
+            data=deleteEventDataJSON,
+            content_type='application/json',
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_delete_nonexistent_event_(self):
+        # Attempts to delete a non-existing event and should return 404 NOT FOUND
+        eventID = {"Event_ID" : -1}
+        deleteEventDataJSON = json.dumps(eventID)
+
+        # Send POST request to delete above event
+        response = self.client.post(
+            path=reverse('delete_event'),
+            data=deleteEventDataJSON,
+            content_type='application/json',
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+    
+    def test_delete_event_bad(self):
+        # We will not be sending anything so that we can see if we get the expected "BAD REQUEST" response
+        eventID = {"Event_ID": "Not a Number"}
+        deleteEventDataJSON = json.dumps(eventID)
+
+        # Send POST request to delete above event
+        response = self.client.post(
+            path=reverse('delete_event'),
+            data=deleteEventDataJSON,
+            content_type='application/json',
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    
+""" 
+# Testing to see if we can update an existing row of data in the DB
+class UpdateEventViewTests(TestCase):
+
+    def setUp(self):
+        self.client = Client()
+        self.factory = RequestFactory()
+        self.view = UpdateEventView.as_view() """

@@ -9,7 +9,9 @@ export default class VolunteerMatching extends Component {
     constructor(props) {
         super(props);
         this.state = {
-          selectedSkills: ""
+          selectedSkills: "",
+          selectedEvent: "",
+          selectedEventName: "",
         };
     }
 
@@ -39,7 +41,20 @@ export default class VolunteerMatching extends Component {
                           selectionType="single"
                           // Get the list of skills for the selected row on the data table
                           onRowSelectionModelChange={(selectionModel) => {
+                              // ID of selected Row
                               let selectedRowId = selectionModel[0];
+                              
+                              // Full data of row (just need Event Name for now)
+                              const selectedEvent = eventData.find(event => event.id === selectedRowId);
+
+                              this.state.selectedEvent = selectedRowId;
+                              if (selectedEvent && selectedEvent.name) {
+                                this.state.selectedEventName = selectedEvent.name;
+                              }
+                              else {
+                                this.state.selectedEventName = "";
+                              }
+                              
                               if (selectedRowId!== undefined) {
                                   const rowSkills = eventData[selectedRowId - 1].skills;
                                   this.setState({ selectedSkills: rowSkills });
@@ -63,7 +78,7 @@ export default class VolunteerMatching extends Component {
                   </div>
                     </div>
                     <div style={{ flex: 1 }}>
-                        <VolunteerDetailsAdmin selectedSkills={this.convertSelectedSkillsToStringArray(this.state.selectedSkills)} />
+                        <VolunteerDetailsAdmin selectedSkills={this.convertSelectedSkillsToStringArray(this.state.selectedSkills)} selectedEvent={this.state.selectedEvent} selectedEventName={this.state.selectedEventName} />
                     </div>
                 </div>
             </>

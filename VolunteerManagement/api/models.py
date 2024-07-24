@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models.manager import Manager
 import string, random
 
 
@@ -7,15 +8,6 @@ from django.contrib.auth.models import User as UserDefault
 
 from django.contrib.postgres.fields import ArrayField
 from datetime import date
-
-# Generates unique ID code and ensures it doesn't yet exist in the database
-def generate_unique_code():
-    length = 10
-    
-    while True:
-        code = ''.join(random.choices(string.ascii_uppercase, k = length))
-        if Event.objects.filter(code).count() == 0:
-            break
 
 class Skill(models.Model):
     ID = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
@@ -37,6 +29,24 @@ class Event(models.Model):
     Urgency = models.CharField(max_length= 10, default = "")
     #Created_By = models.ForeignKey('auth.User', on_delete=models.CASCADE)
     Created_At = models.DateTimeField(auto_now_add = True)
+
+class Event_Volunteers(models.Model):
+    Event_ID = models.CharField(max_length=10)
+    Volunteer = models.CharField(max_length=30)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['Event_ID', 'Volunteer'], name='unique_event_volunteer')
+        ]
+
+class Event_Update_Volunteers(models.Model):
+    Event_ID = models.CharField(max_length=10)
+    Volunteer = models.CharField(max_length=30)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['Event_ID', 'Volunteer'], name='unique_event_volunteers')
+        ]
 
 # Axel's code
 class User(UserDefault):

@@ -53,7 +53,7 @@ export function ShowDetails(title, form, onConfirm, deleting = false){
         confirmText = "Delete Event";
     }
     else {
-        cancelText = "Edit Event Form";
+        cancelText = "Edit Form";
         confirmText = "Send To Database";
     }
     const formHtml = Object.entries(form).map(([key, value]) => {
