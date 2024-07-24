@@ -69,7 +69,7 @@ class Date(models.Model):
 # the class below is the class that should contain
 # data like the availability of the user, their skills,
 # preferences, etc.
-'''
+
 class Profile(models.Model): 
     user = models.OneToOneField(UserDefault, on_delete=models.CASCADE)
 
@@ -83,8 +83,17 @@ class Profile(models.Model):
     skills = models.CharField(null=False, blank=False)
     #skills = models.ManyToManyField(to=Skill, related_name='user_skills_relation')
     preferences = models.TextField(null=True, blank=True, max_length=1000)
-    availability = models.ManyToManyField(to=Date, related_name='dates_availability')
-'''
+    availability = models.CharField(null=False, blank=False, default='')
+    #availability = models.ManyToManyField(to=Date, related_name='dates_availability')
+
+class Event_Matched_Notification(models.Model):
+    event_id = models.IntegerField(null=False, blank=False)
+    username = models.CharField(null=False, blank=False)
+    acknowledged = models.BooleanField(null=False, blank=False)
+
+class States(models.Model):
+    abbreviation = models.CharField(null=False, blank=False, max_length=2)
+    name = models.CharField(null=False, blank=False)
 
 
 

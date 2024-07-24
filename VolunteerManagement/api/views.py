@@ -1,10 +1,15 @@
 from django.shortcuts import render
 from rest_framework import generics, status
 from .serializers import EventSerializer, CreateEventSerializer, UpdateEventSerializer, DeleteEventSerializer
-from .models import Event, Skill
+from .models import Event, Skill, States
 from rest_framework.views import APIView;
 from rest_framework.response import Response;
 from django.contrib.auth.models import User
+from .models import Profile, Event_Matched_Notification
+
+from datetime import date
+from datetime import time
+from datetime import datetime, timedelta
 
 # Allows us to view all event details (not being used? maybe use to only output one event)
 class EventView(generics.CreateAPIView):
@@ -672,6 +677,7 @@ def CreateProfile(request): # POST REQUEST ONLY
         #######################################################
 
 
+        '''
         new_profile_created = hard_coded_data.Profile(user=user,
                                                     full_name=full_name,
                                                     address1=address1,
@@ -683,12 +689,28 @@ def CreateProfile(request): # POST REQUEST ONLY
                                                     preferences=preferences,
                                                     availability=availability)
 
-        if new_profile_created is not None:
+        '''
+        try:
+            new_profile_created = Profile(user=user,
+                                        full_name=full_name,
+                                        address1=address1,
+                                        address2=address2,
+                                        city=city,
+                                        state=state,
+                                        zip_code=zip_code,
+                                        skills=skills,
+                                        preferences=preferences,
+                                        availability=availability)
+            new_profile_created.save()
+        
+        #if new_profile_created is not None:
             print('User profile created:')
             print(new_profile_created)
             response_tmp = {"status" : "OK"}
             response = json.dumps(response_tmp)
             return HttpResponse(response)
+        except:
+            print('ERROR: Could not create profile.')
     else: # Validation failed
         response_tmp = {"status" : "ERROR"}
         response = json.dumps(response_tmp)
@@ -868,7 +890,7 @@ def UpdateProfile(request): # POST REQUEST ONLY
         and (validated_availability != ''):   
     
         # Validation was successfull, proceeding      
-        user = request.user # get the user object for the user making the request
+        user_from_request = request.user # get the user object for the user making the request
 
         # Reading the input from the request (all fields required to perform the update):
         
@@ -887,6 +909,7 @@ def UpdateProfile(request): # POST REQUEST ONLY
         preferences = decoded_request_body["preferences"]
         availability = decoded_request_body["availability"]
 
+        '''
         new_profile_created = hard_coded_data.Profile(user=user,
                                                     full_name=full_name,
                                                     address1=address1,
@@ -897,13 +920,31 @@ def UpdateProfile(request): # POST REQUEST ONLY
                                                     skills=skills,
                                                     preferences=preferences,
                                                     availability=availability)
+        '''
 
-        if new_profile_created is not None:
-            print('User profile created:')
-            print(new_profile_created)
+        # attempt to update the instance, if it fails catch the exepction
+        try:
+            profile_to_update = Profile.objects.get(user=user_from_request)# get the instance from the database
+            
+            profile_to_update.full_name=full_name,
+            profile_to_update.address1=address1
+            profile_to_update.address2=address2
+            profile_to_update.city=city
+            profile_to_update.state=state
+            profile_to_update.zip_code=zip_code
+            profile_to_update.skills=skills
+            profile_to_update.preferences=preferences
+            profile_to_update.availability=availability
+            profile_to_update.save()
+
+        #if new_profile_created is not None:
+            print('User profile updated:')
+            print(profile_to_update)
             response_tmp = {"status" : "OK"}
             response = json.dumps(response_tmp)
             return HttpResponse(response)
+        except:
+            print("ERROR: Profile could not be updated")
     else:
         response_tmp = {"status" : "ERROR"}
         response = json.dumps(response_tmp)
@@ -930,7 +971,17 @@ def GetProfile(request): # GET REQUEST ONLY
 
     print(request.user)
 
-    if (str(request.user) == "ax.alvarenga19@gmail.com"):
+    try:
+        profile_from_database = Profile.objects.get(user=request.user)
+    except:
+        print("ERROR: Could not retrieve an existing profile from the database")
+        profile_dictionary = {"user" : "None"}
+        response = json.dumps(profile_dictionary)
+        return HttpResponse(response)
+    
+
+    #if (str(request.user) == "ax.alvarenga19@gmail.com"):
+    '''
         user = hard_coded_data.Profile(user="sample@sample.com",
                                         full_name="Mark White",
                                         address1="12345 Houston Rd.",
@@ -964,37 +1015,32 @@ def GetProfile(request): # GET REQUEST ONLY
 
     ## End of temporary block of code                                                       
     ##############################################################
-
+    '''
 
     # API endpoint Implementation    
-    
+    '''
     user = hard_coded_data.get_profile(username=request.user)
 
     if user is not None: # the user already created a profile
         print('Profile found')
+    '''
 
-        profile_dictionary = {
-            "user": user.get_user(),
-            "full_name": user.get_full_name(),
-            "address1": user.get_address1(),
-            "address2": user.get_address2(),
-            "city": user.get_city(),
-            "state": user.get_state(),
-            "zip_code": user.get_zip_code(),
-            "skills": user.get_skills(),
-            "preferences": user.get_preferences(),
-            "availability": user.get_availability()
-        }
+    profile_dictionary = {
+        "user": profile_from_database.user,#.get_user(),
+        "full_name": profile_from_database.full_name, #user.get_full_name(),
+        "address1": profile_from_database.address1,#user.get_address1(),
+        "address2": profile_from_database.address2,#user.get_address2(),
+        "city": profile_from_database.city,#user.get_city(),
+        "state": profile_from_database.state,#user.get_state(),
+        "zip_code": profile_from_database.zip_code,#user.get_zip_code(),
+        "skills": profile_from_database.skills,#user.get_skills(),
+        "preferences": profile_from_database.preferences,#user.get_preferences(),
+        "availability": profile_from_database.availability#user.get_availability()
+    }
 
-        response = json.dumps(profile_dictionary)
-        return HttpResponse(response)
-    
-    else:
-        print('Profile not found')
-        # the user has not created a profile yet, return "Noprofile"    
-        profile_dictionary = {"user" : "None"}
-        response = json.dumps(profile_dictionary)
-        return HttpResponse(response)
+    response = json.dumps(profile_dictionary)
+    return HttpResponse(response)   
+
     
 
 
@@ -1009,18 +1055,44 @@ def GetMatchNotifications(request): # Called by the front-end the moment the use
 
     #notifications_for_user = hard_coded_data.notifications[user]
 
-    eventMatched1 = hard_coded_data.EventMatchedNotification()
-    eventUpdated1 = hard_coded_data.EventChangeNotification()
-    eventReminder1 = hard_coded_data.EventReminderNotification()
+    # Get all the event match notifications for the logged in user
 
-    notifications_for_user = [eventMatched1, eventUpdated1, eventReminder1]
+    events_matched_notifications = Event_Matched_Notification.objects.filter(
+        username = request.user,
+        acknowledged = False
+    )
 
-    if len(notifications_for_user) > 0:
-        response_tmp = {
-            "matchNotification1": "You have been matched to the event Sugar Land Park Cleaning \
-                                on 07/26/2024."
-        }
-        response = json.dumps(response_tmp)
+    #eventMatched1 = hard_coded_data.EventMatchedNotification()
+    #eventUpdated1 = hard_coded_data.EventChangeNotification()
+    #eventReminder1 = hard_coded_data.EventReminderNotification()
+
+    #notifications_for_user = [eventMatched1, eventUpdated1, eventReminder1]
+
+    if len(events_matched_notifications) > 0:
+        notifications = {}
+        i = 1
+        for notification in events_matched_notifications:
+            notification_number = "matchNotification"+str(i)
+
+            
+
+            associated_event = Event.objects.get(Event_ID = notification.event_id)
+            notification_message = "You have been matched to event " + \
+                                    associated_event.Name + " " + \
+                                    "in " + associated_event.City + ", " + \
+                                    associated_event.State + " " + \
+                                    "on " + associated_event.Date + " " \
+                                    "at " + associated_event.Start_Time
+
+            notifications.update({
+                notification_number : notification_message
+                })
+            i += 1
+        #response_tmp = {
+        #    "matchNotification1": "You have been matched to the event Sugar Land Park Cleaning \
+        #                        on 07/26/2024."
+        #}
+        response = json.dumps(notifications)
         return HttpResponse(response)
     
     else:
@@ -1037,21 +1109,50 @@ def GetUpdateNotifications(request): # Called by the front-end the moment the us
     print(user)
 
     #notifications_for_user = hard_coded_data.notifications[user]
-
+    events_updated_notifications = Event_Matched_Notification.objects.filter(
+        username = request.user
+    )
     #if (user == "ax.alvareng19@gmail.com"): # Hard-coded data for 1 volunteer now
+    '''
     eventMatched1 = hard_coded_data.EventMatchedNotification()
     eventUpdated1 = hard_coded_data.EventChangeNotification()
     eventReminder1 = hard_coded_data.EventReminderNotification()
+    '''
 
-    notifications_for_user = [eventMatched1, eventUpdated1, eventReminder1]
+    #notifications_for_user = [eventMatched1, eventUpdated1, eventReminder1]
 
-    if len(notifications_for_user) > 0:
-        response_tmp = {
-            "changeNotification1": "There was a change in the location of the event Kids STEM camp \
-                with Houston Children Foundation on 07/30/2024. New location: Houston Zoo"
-        }
-        response = json.dumps(response_tmp)
+    if len(events_updated_notifications) > 0:
+
+        notifications = {}
+        i = 1
+        for notification in events_updated_notifications:
+            notification_number = "changeNotification"+str(i)
+
+            
+
+            associated_event = Event.objects.get(Event_ID = notification.event_id)
+            notification_message = "There has been an update to the event " + \
+                                    associated_event.Name + "." + \
+                                    "-Current Details: " + \
+                                    "City: " + associated_event.City + ", " + \
+                                    associated_event.State + " " + \
+                                    "Date: " + associated_event.Date + " " \
+                                    "Time: " + associated_event.Start_Time
+
+            notifications.update({
+                notification_number : notification_message
+                })
+            i += 1
+
+        response = json.dumps(notifications)
         return HttpResponse(response)
+        
+        #response_tmp = {
+        #    "changeNotification1": "There was a change in the location of the event Kids STEM camp \
+        #        with Houston Children Foundation on 07/30/2024. New location: Houston Zoo"
+        #}
+        #response = json.dumps(response_tmp)
+        #return HttpResponse(response)
     
     else:
         response_tmp = {"message": "None"} # No notifications
@@ -1067,19 +1168,88 @@ def GetReminderNotifications(request): # Called by the front-end the moment the 
     print(user)
 
     #notifications_for_user = hard_coded_data.notifications[user]
+    events_matched_notifications = Event_Matched_Notification.objects.filter(
+        username = request.user,
+        acknowledged = False
+    )
 
-    eventMatched1 = hard_coded_data.EventMatchedNotification()
-    eventUpdated1 = hard_coded_data.EventChangeNotification()
-    eventReminder1 = hard_coded_data.EventReminderNotification()
+    #eventMatched1 = hard_coded_data.EventMatchedNotification()
+    #eventUpdated1 = hard_coded_data.EventChangeNotification()
+    #eventReminder1 = hard_coded_data.EventReminderNotification()
 
-    notifications_for_user = [eventMatched1, eventUpdated1, eventReminder1]
+    #notifications_for_user = [eventMatched1, eventUpdated1, eventReminder1]
 
-    if len(notifications_for_user) > 0:
-        response_tmp = {                         
-            "reminderNotification1": "Event Reminder: House Building event is coming up in 3 days. \
-                Details of the event: Location: Humble, TX, Date: 08/12/2024"
-        }
-        response = json.dumps(response_tmp)
+    if len(events_matched_notifications) > 0:
+        #response_tmp = {                         
+        #    "reminderNotification1": "Event Reminder: House Building event is coming up in 3 days. \
+        #        Details of the event: Location: Humble, TX, Date: 08/12/2024"
+        #}
+        notifications = {}
+        i = 1
+        for notification in events_matched_notifications:
+            notification_number = "matchNotification"+str(i)
+
+            
+
+            associated_event = Event.objects.get(Event_ID = notification.event_id)
+            
+            ## Check if the event date and time is within 24 hours 
+            ## of the current date and time
+            event_date = date.fromisoformat(associated_event.Date)
+            event_time = (associated_event.Start_Time).split(' ') # format: HH:MM AM/PM (no padding zero)
+            event_hour_int = int(event_time[0][:event_time[0].find(':')]) # HH:MM
+            event_minute_int = int(event_time[0][event_time[0].find(':') + 1:])
+            #event_am_or_pm_string = event_time[1] # AM/PM
+            
+
+            
+
+            #current_date = date.today()
+            current_time = datetime.now()
+
+            event_datetime = datetime.datetime(event_date.year, event_date.month, event_date.day,
+                                             event_hour_int, event_minute_int)
+            
+            current_datetime = datetime.datetime(current_time.year, current_time.month, current_time.day,
+                                                 current_time.hour, current_time.minute)
+            
+            delta = event_datetime - current_datetime
+
+            # If the day difference is more than 1 day, we know
+            # the event is not within 24 hours
+            if (delta.days >= 1): # for programming ease, the notification will be given when there is less than 1 day to the event
+                event_is_within_24_hours = False
+            else:
+                # Check the time
+                # if the event time is the same as or earlier in the day
+                # with than the current time, the event is within 24 hours
+                
+                # convert the times to 24 hr format and compare with
+                # inequality operators
+                #current_time_24_hr_format = None
+                #event_time_24_hr_format = None
+
+                #if event_time_24_hr_format <= current_time_24_hr_format:
+                #    event_is_within_24_hours = True
+                #else:
+                #    event_is_within_24_hours = False
+                event_is_within_24_hours = True
+
+            ##
+            if (event_is_within_24_hours):
+                notification_message = "Reminder - You have an event coming up within 1 day.\
+                                        Event: " + \
+                                        associated_event.Name + " " + \
+                                        "in " + associated_event.City + ", " + \
+                                        associated_event.State + " " + \
+                                        "on " + associated_event.Date + " " \
+                                        "at " + associated_event.Start_Time
+
+                notifications.update({
+                    notification_number : notification_message
+                    })
+                i += 1
+        response = json.dumps(notifications)
         return HttpResponse(response)
     
     else:
@@ -1103,8 +1273,22 @@ def GetReminderNotifications(request): # Called by the front-end the moment the 
 
 @csrf_exempt
 def GetSkills(request):
-    skills_dictionary = hard_coded_data.skills
+    #skills_dictionary = hard_coded_data.skills
+    '''
+    skills = {
+    "roofing": "roofing",
+    "construction": "construction",
+    "mowing": "mowing",
+    "vietnameseLanguage": "Vietnamese - Language",
+    "computerSkills": "Computer Skilss"
+    }
+    '''
     try:
+        skills_dictionary = {}
+        skills = Skill.objects.get_queryset()
+        for skill in skills:
+            skills_dictionary.update({skill.Name: skill.Name})
+
         response = json.dumps(skills_dictionary)
         return HttpResponse(response)
     except:
@@ -1116,9 +1300,14 @@ def GetSkills(request):
 @csrf_exempt
 def GetStates(request):
     print(request.user)
-    states_dictionary = hard_coded_data.states
-    print(states_dictionary)
+    #states_dictionary = hard_coded_data.states
+    #print(states_dictionary)
     try:
+        states_dictionary = {}
+        states = States.objects.get_queryset()
+        for state in states:
+            states_dictionary.update({state.abbreviation : state.abbreviation})
+
         response = json.dumps(states_dictionary)
         print(response)
         return HttpResponse(response)
@@ -1157,6 +1346,8 @@ def GetMonthlyEvents(request):
                 #"month": event2.month
             }
         }
+
+        
 
         response = json.dumps(events)
         return HttpResponse(response)
