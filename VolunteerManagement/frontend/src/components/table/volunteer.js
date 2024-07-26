@@ -88,7 +88,6 @@ export default class VolunteerDetailsAdmin extends Component {
                     })
                     .then(response => response.json())
                     .then(data => {
-                        console.log('Response data:', data);
                         if (data.message) {
                             console.log('Server message:', data.message);
                         }

@@ -28,6 +28,7 @@ class EventVolunteerListView(generics.ListAPIView):
             queryset = Event_Volunteers.objects.filter(Event_ID=eventId).order_by('Event_ID')
         else:
             queryset = Event_Volunteers.objects.none()
+        print("EventVolunteerList")
         print(queryset.order_by('Event_ID'))
         return queryset.order_by('Event_ID')
 

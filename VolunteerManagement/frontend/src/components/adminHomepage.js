@@ -11,6 +11,7 @@ import ViewVolunteers from "./viewVolunteers"
 import AllAdminEvents from "./allAdminEvents"
 import VolunteerMatching from "./volunteerMatching"
 import Event from "./table/event"
+import DefineSkills from "./defineSkills";
 
 import { BrowserRouter as Router, Routes, Route, Link, Navigate } from "react-router-dom";
 
@@ -43,6 +44,7 @@ export default class AdminHomePage extends Component {
                     <Route path='admin/volunteers/view' element = {<ViewVolunteers />} />
                     <Route path='admin/volunteers/manage' element = {<ManageNewRegistrations />} />
                     <Route path='admin/volunteers/matching' element = {<VolunteerMatching />} />
+                    <Route path='admin/volunteers/skills' element = {<DefineSkills />} />
 
                     // Notifications
                     <Route path='admin/notifications' element = {<p>Notifications</p>} />
