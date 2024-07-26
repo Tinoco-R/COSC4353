@@ -46,44 +46,35 @@ export default class PersonalAdminEvents extends Component {
             setTimeout(() => {
                 // Get all the volunteers for each event (used to show a count)
                 let events = this.state.events;
-                
+                let cards = [];
                 // Loop through all events to get the volunteer count for that event
                 for (let index = 0; index < events.length; index++) {
-                    const eventId = events[index].Event_ID;
-                    console.log("Event_ID", eventId);
+                    let data = {};
+                    const event = events[index];
+                    //console.log("Event", event);
+
+                    data.eventId = event.Event_ID;
+                    data.eventName = event.Name;
+                    data.eventAddress = event.Address;
+                    data.eventDate = event.Date;
+                    data.eventStart = event.Start_Time;
+                    data.eventDuration = event.Duration;
+                    data.eventUrgency = event.Urgency;
 
                     // Fetch event volunteers
-                    fetchEventVolunteers(eventId).then(volunteersOfEvent => {
-                        console.log(`Fetching data for Event ID:${eventId}`)
-            
+                    fetchEventVolunteers(data.eventId).then(volunteersOfEvent => {
                         // Keep track of the members for the currently selected event
                         const volunteerNamesArray = volunteersOfEvent.map(volunteer => volunteer.Volunteer);
-                        
+                        data.eventVolunteers = volunteerNamesArray.length;
                     });
+
+                    cards.push(data);
                 }
+                //console.log("Cards", cards);
+                
+                this.setState({ cardData: cards });
             }, 0);
         });
-        
-
-        fetchEventVolunteers(this.props.selectedEvent).then(volunteersOfEvent => {
-            console.log(`Fetching new data for Event ID:${this.props.selectedEvent}`)
-
-            // Keep track of the members for the currently selected event
-            const volunteerNamesArray = volunteersOfEvent.map(volunteer => volunteer.Volunteer);
-            this.setState({
-                eventMembers: volunteerNamesArray,
-            });
-            
-            // Waits for async event to finish before proceeding
-            setTimeout(() => {
-                this.filterVolunteersBySkills(0, volunteerNamesArray);
-                this.removePreExistingActiveVolunteers();
-            }, 0);
-        });
-
-
-        // Filter events to show only those for the logged in administrator
-        
     }
 
     // Filter events to show only those for the logged in administrator
@@ -96,23 +87,25 @@ export default class PersonalAdminEvents extends Component {
                 filtered.push(event);
             }
         }
-        console.log("Filtered:", filtered);
 
         return filtered;
     }
 
     basicCard(data) {
         return(
-            <Card id="card" event={data.event} onClick={() => window.location.href += "/" + data.event} sx={{ minWidth: 100, minHeight: 140, bgcolor: theme.palette.primary.main, mb: 2 }}>
+            <Card id="card" event={data.eventId} onClick={() => window.location.href += "/" + data.eventId} sx={{ minWidth: 100, minHeight: 140, bgcolor: theme.palette.primary.main, mb: 2 }}>
                 <CardContent>
-                    <CustomTypography variant="h5" component="div" className="location" gutterBottom>
-                        {data.address}
+                    <CustomTypography variant="h5" component="div" className="name" gutterBottom>
+                        {data.eventName}
+                    </CustomTypography>
+                    <CustomTypography className="location" gutterBottom>
+                        {data.eventAddress}
                     </CustomTypography>
                     <CustomTypography gutterBottom>
-                        {data.registered}/{data.required}
+                        {data.eventVolunteers} {`Urgency: ${data.eventUrgency}`}
                     </CustomTypography>
                     <CustomTypography gutterBottom>
-                        {data.date} {data.range}
+                        {data.eventDate} {data.eventStart} {data.eventDuration}
                     </CustomTypography>
                 </CardContent>
             </Card>
@@ -130,7 +123,10 @@ export default class PersonalAdminEvents extends Component {
     }
 
     render() {
-        console.log("Testing with hardcoded administrator name: ADMIN");
+/*
+         console.log("Testing with hardcoded administrator name: ADMIN");
+        console.log("Cards:", this.state.cardData);
+*/
 
         return (
             <ThemeProvider theme={theme}>
@@ -139,7 +135,7 @@ export default class PersonalAdminEvents extends Component {
                         <h1>My Events</h1>
                     </StyledLabel>
                     <Grid container spacing={2}>
-                        {cardData.map((val, index) => {
+                        {this.state.cardData.map((val, index) => {
                             return (
                                 <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
                                     {this.basicCard(val)}
