@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework import generics, status
-from .serializers import EventSerializer, CreateEventSerializer, UpdateEventSerializer, DeleteEventSerializer, EventVolunteerMatchSerializer, CreateEventVolunteerMatchSerializer
+from .serializers import EventSerializer, CreateEventSerializer, UpdateEventSerializer, DeleteEventSerializer, EventVolunteerMatchSerializer, CreateEventVolunteerMatchSerializer, VolunteerHistorySerializer, UpdateVolunteerHistorySerializer
 from .models import Event, Skill, Event_Volunteers, Event_Update_Volunteers
 from rest_framework.views import APIView;
 from rest_framework.response import Response;
@@ -32,6 +32,43 @@ class EventVolunteerListView(generics.ListAPIView):
         print(queryset.order_by('Event_ID'))
         return queryset.order_by('Event_ID')
 
+# Allows us to view all volunteer history
+class VolunteerHistory(generics.ListAPIView):
+    queryset  = Event_Volunteers.objects.all()
+    print(queryset)
+    serializer_class = VolunteerHistorySerializer # Converts to json format
+
+# Updates a volunteer's attendance at an Event
+class UpdateVolunteerHistory(APIView):
+    serializer_class = UpdateVolunteerHistorySerializer
+    
+    def post(self, request, format = None, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        print("serializer", serializer)
+        if serializer.is_valid():
+            eventId = serializer.data.get('Event_ID')
+            volunteer = serializer.data.get('Volunteer')
+            attended = serializer.data.get('Attended')
+
+            if (attended == "N"):
+                modification = "Y"
+            else:
+                modification = "N"
+
+            try:
+                volunteerHistory = Event_Volunteers.objects.get(Event_ID = eventId, Volunteer = volunteer)
+                print("Volunteer History:", volunteerHistory)
+
+            except Event.DoesNotExist:
+                return Response({"error": "Event not found"}, status=status.HTTP_404_NOT_FOUND)
+            
+            volunteerHistory.Attended = modification
+            volunteerHistory.save()
+
+            return Response(VolunteerHistorySerializer(volunteerHistory).data, status=status.HTTP_200_OK)
+
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # Updates pre-existing Event
 class UpdateEventView(APIView):
@@ -39,7 +76,7 @@ class UpdateEventView(APIView):
 
     def post(self, request, format = None, **kwargs):
         serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():                
+        if serializer.is_valid():
             eventId = request.data.get('Event_ID')
             eventName = serializer.data.get('Name')
             eventAdministrator = serializer.data.get('Administrator')

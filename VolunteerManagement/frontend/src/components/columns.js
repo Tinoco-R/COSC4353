@@ -10,17 +10,9 @@ export const eventMatchingColumns = [
 
 export const volunteerViewColumns = [
     { field: 'id', headerName: 'ID', flex: 1 },
-    { field: 'volunteer', headerName: 'Volunteer', flex: 1 },
-    { field: 'name', headerName: 'Event Name', flex: 2 },
-    { field: 'administrator', headerName: 'Administrator', flex: 2 },
-    { field: 'description', headerName: 'Description', flex: 4 },
-    { field: 'address', headerName: 'Address', flex: 4 },
-    { field: 'date', headerName: 'Date', flex: 2 },
-    { field: 'time', headerName: 'Time', flex: 1 },
-    { field: 'duration', headerName: 'Duration', flex: 1 },
-    { field: 'skills', headerName: 'Skills', flex: 4 },
-    { field: 'urgency', headerName: 'Urgency', flex: 1 },
-    { field: 'participated', headerName: 'Participated', flex: 2 }
+    { field: 'Event_ID', headerName: 'Event ID', flex: 1 },
+    { field: 'Volunteer', headerName: 'Volunteer', flex: 1 },
+    { field: 'Attended', headerName: 'Attended', flex: 1 },
 ];
 
 export const eventModificationColumns = [
