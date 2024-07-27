@@ -9,7 +9,7 @@ import { Item, StyledLabel } from "./item";
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { DataGrid } from '@mui/x-data-grid';
 import { eventModificationColumns } from "./columns";
-import { eventData, fetchEvents } from "./eventData";
+import { fetchEvents } from "./eventData";
 
 const theme = createTheme({
   components: {

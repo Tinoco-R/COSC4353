@@ -1,19 +1,51 @@
 // DataTable Below from https://mui.com/material-ui/react-table/
 import React, { Component } from "react";
 import { DataGrid } from '@mui/x-data-grid';
-import { volunteerHistoryData } from "./volunteerHistoryData";
+//import { volunteerHistoryData } from "./volunteerHistoryData";
 import { volunteerViewColumns } from "./columns";
+import { fetchVolunteerHistory } from "./eventData";
+
 
 export default class ViewVolunteers extends Component {
     constructor(props) {
         super(props);
+        this.state = {
+            history: [],
+            selectedId: "",
+            volunteer: "",
+            attended: ""
+        }
     }
+
+    componentDidMount() {
+        // Get all events from the database
+        fetchVolunteerHistory().then(history => {
+            this.setState({
+                history: history
+            });
+        });
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        if (prevState.selectedId !== this.state.selectedId) {
+            console.log(this.state);
+            
+            const jsonData = JSON.stringify({ Event_ID: this.state.selectedId, Volunteer: this.state.volunteer })
+            console.log("Data:", jsonData);
+
+            fetchVolunteerHistory().then(history => {
+                this.setState({
+                    history: history
+                });
+            });
+        }
+    }                   
 
     render() {
         return (
             <div style={{ height: 400, width: "95%", height: "90%" }}>
                 <DataGrid
-                    rows={volunteerHistoryData}
+                    rows={this.state.history}
                     columns={volunteerViewColumns}
                     initialState={{
                         pagination: { paginationModel: { page: 0, pageSize: 20 } },
@@ -27,10 +59,38 @@ export default class ViewVolunteers extends Component {
                     // Get the list of skills for the selected row on the data table
                     onRowSelectionModelChange={(selectionModel) => {
                         let selectedRowId = selectionModel[0];
-                        if (selectedRowId!== undefined) {
-                            const rowSkills = volunteerHistoryData[selectedRowId - 1].skills;
-                            this.setState({ selectedSkills: rowSkills });
-                        }
+                        const selectedEvent = this.state.history.find(event => event.id === selectedRowId);
+
+                        console.log("selectedEvent", selectedEvent);
+                        this.setState({ selectedId: selectedRowId });
+                        this.setState({ volunteer: selectedEvent.Volunteer });
+                        this.setState({ attended: selectedEvent.Attended });
+
+                        const jsonData = JSON.stringify({ Event_ID: this.state.selectedId, Volunteer: this.state.volunteer, Attended: this.state.attended })
+                        console.log("Data:", jsonData);
+
+                        // Update attendance 
+                        fetch('http://localhost:8000/api/updateVolunteerHistory/', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: jsonData
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log('Response data:', data);
+                            if (data.message) {
+                                console.log('Server message:', data.message);
+                            }
+                            if (data.non_field_errors) {
+                                console.log('Validation errors:', data.non_field_errors);
+                            }
+                        })
+                        .catch((error) => {
+                            console.error('Error:', error);
+                        });
+
                     }}
                     sx={{
                         ".MuiDataGrid-row.Mui-selected:hover": { backgroundColor: "rgb(97 137 47 / 15%)", },

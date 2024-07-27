@@ -11,6 +11,18 @@ class EventSerializer(serializers.ModelSerializer):
         fields = ('Event_ID', 'Name', 'Administrator', 'Description', 'Address', 'City', 'State', 'Zip_Code', 'Date', 'Start_Time', 'Urgency', 'Created_At', 'Skills', 'Duration')
         #fields = ('Event_ID', 'Name', 'Administrator', 'Description', 'Address', 'City', 'State', 'Zip_Code', 'Date', 'Start_Time', 'Urgency', 'Created_At', 'Created_By', 'Skills', 'Duration')
 
+class VolunteerHistorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Event_Volunteers
+        fields = ('id', 'Event_ID', 'Volunteer', 'Attended')
+
+class UpdateVolunteerHistorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Event_Volunteers
+        fields = ('Event_ID', 'Volunteer', 'Attended')
+        validators = []
+
+
 class CreateEventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event

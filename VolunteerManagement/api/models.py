@@ -33,6 +33,7 @@ class Event(models.Model):
 class Event_Volunteers(models.Model):
     Event_ID = models.CharField(max_length=10)
     Volunteer = models.CharField(max_length=30)
+    Attended = models.CharField(max_length=1, default="N")
 
     class Meta:
         constraints = [

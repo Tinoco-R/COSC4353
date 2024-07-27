@@ -15,3 +15,12 @@ export const fetchEventVolunteers = async (Event_ID) => {
   }
   return response.json();
 };
+
+// Fetches all volunteer history from the backend and sends it as json
+export const fetchVolunteerHistory = async () => {
+  const response = await fetch(`/api/volunteerHistory/`);
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  }
+  return response.json();
+};
