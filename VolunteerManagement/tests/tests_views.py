@@ -326,6 +326,25 @@ class testViews(TestCase):
             print("SUCCESS: Create Profile with invalid data failed, as expected")
         #self.assertEquals(response.status_code, 200)
 
+        body_data3 = {
+            "user": "sample@com",
+            "full_name": "xyxyxyxyxyxyxxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyx",
+            "address1": "xyxyxyxyxyxyxyxyxyxyxyxyxyxyxxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxxyxyxyxyxyxyxxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyx",
+            "address2": "xyxyxyxyxyxxyxyxyxyxyxyxxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxxyxyxyxyxyxyxxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyx",
+            "city": "xyxyxyxyxyxxyxyxyxyxyxyxxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxxyxyxyxyxyxyxxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyx",
+            "state": "New York State", # Invalid State 2-character abbreviation
+            "zip_code": "123456900987654321", # Invalid zip code
+            "skills": "",
+            "preferences": "",
+            "availability": ""
+        }
+        try:
+            response = client.post(reverse('CreateProfile'), content_type="application/json",
+                                    data=json.dumps(body_data3))
+        except:
+            print("SUCCESS: Create Profile with invalid data failed, as expected")
+            
+
     def test_UpdateProfile(self):
         client = Client()
         body_data = {
@@ -343,6 +362,44 @@ class testViews(TestCase):
         response = client.post(reverse('UpdateProfile'), content_type="application/json",
                                 data=json.dumps(body_data))
         self.assertEquals(response.status_code, 200)
+
+        body_data2 = {
+            "user": "sample@com",
+            "full_name": "",
+            "address1": "",
+            "address2": "",
+            "city": "",
+            "state": "",
+            "zip_code": "", 
+            "skills": "",
+            "preferences": "",
+            "availability": ""
+        }
+        try:
+            response = client.post(reverse('UpdateProfile'), content_type="application/json",
+                                    data=json.dumps(body_data2))
+        except:
+            print("SUCCESS: Create Profile with invalid data failed, as expected")
+        #self.assertEquals(response.status_code, 200)
+
+        body_data3 = {
+            "user": "sample@com",
+            "full_name": "xyxyxyxyxyxyxxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyx",
+            "address1": "xyxyxyxyxyxyxyxyxyxyxyxyxyxyxxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxxyxyxyxyxyxyxxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyx",
+            "address2": "xyxyxyxyxyxxyxyxyxyxyxyxxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxxyxyxyxyxyxyxxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyx",
+            "city": "xyxyxyxyxyxxyxyxyxyxyxyxxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxxyxyxyxyxyxyxxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyxyx",
+            "state": "New York State", # Invalid State 2-character abbreviation
+            "zip_code": "123456900987654321", # Invalid zip code
+            "skills": "",
+            "preferences": "",
+            "availability": ""
+        }
+        try:
+            response = client.post(reverse('UpdateProfile'), content_type="application/json",
+                                    data=json.dumps(body_data3))
+        except:
+            print("SUCCESS: Create Profile with invalid data failed, as expected")
+
 
     def test_GetMonthlyEvents(self):
         client = Client()
