@@ -19,7 +19,7 @@ class testViews(TestCase):
 
     def setUp(self): # source: https://docs.djangoproject.com/en/5.0/topics/testing/advanced/ (setUp and requests object code is from this link)
         self.factory = RequestFactory()
-        self.user = User.objects.create_user(username="testuser@mail.com",
+        self.user = User.objects.create_user(username="zzlezdrimsyeqdimyu@hthlm.com",
                                              password="secret@key")
 
     '''
@@ -307,6 +307,25 @@ class testViews(TestCase):
                                 data=json.dumps(body_data))
         self.assertEquals(response.status_code, 200)
 
+        body_data2 = {
+            "user": "sample@com",
+            "full_name": "",
+            "address1": "",
+            "address2": "",
+            "city": "",
+            "state": "",
+            "zip_code": "", 
+            "skills": "",
+            "preferences": "",
+            "availability": ""
+        }
+        try:
+            response = client.post(reverse('CreateProfile'), content_type="application/json",
+                                    data=json.dumps(body_data2))
+        except:
+            print("SUCCESS: Create Profile with invalid data failed, as expected")
+        #self.assertEquals(response.status_code, 200)
+
     def test_UpdateProfile(self):
         client = Client()
         body_data = {
@@ -327,8 +346,14 @@ class testViews(TestCase):
 
     def test_GetMonthlyEvents(self):
         client = Client()
-        response = client.get(reverse('GetMonthlyEvents'))
-        self.assertEquals(response.status_code, 200)
+        request = self.factory.get('/api/GetMonthlyEvents')
+        request.user = "zzlezdrimsyeqdimyu@hthlm.com"
+        #request.user.pk = 2
+        response = GetMonthlyEvents(request=request)
+        self.assertEqual(response.status_code, 200)
+
+        #response = client.get(reverse('GetMonthlyEvents'))
+        #self.assertEquals(response.status_code, 200)
 
 # Testing to see all volunteers for a given event
 class EventVolunteerListViewTests(TestCase):

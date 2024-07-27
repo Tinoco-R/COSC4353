@@ -5,7 +5,7 @@ from .models import Event, Skill, Event_Volunteers, Event_Update_Volunteers, Sta
 from rest_framework.views import APIView;
 from rest_framework.response import Response;
 from django.contrib.auth.models import User
-from .models import Profile, Event_Matched_Notification
+from .models import Profile, Event_Matched_Notification, Event_Update_Volunteers
 
 from datetime import date
 from datetime import time
@@ -627,16 +627,29 @@ def CreateProfile(request): # POST REQUEST ONLY
             print("ERROR: Some error. City could not be validated.")
 
     # State validation
-
-    state_is_valid = checkers.is_string(decoded_request_body["state"], minimum_length=1, 
+    print('decoded request body:')
+    print(decoded_request_body)
+    tmp = ""
+    try:
+        tmp = decoded_request_body["state"] #["value"]
+    except:
+        try:
+            tmp = decoded_request_body["state"]["value"]
+        except:
+            print("ERROR: Something went wrong trying to read State for profile")
+    
+    print('key value pairs')
+    #for key, value in decoded_request_body.iteritems():
+    #    print(key, value)
+    state_is_valid = checkers.is_string(tmp, minimum_length=1, 
                                            maximum_length=2)
     if state_is_valid: # State is valid and not empty
         print("OK: State is valid.")
-        validated_state = decoded_request_body["state"]
+        validated_state = tmp#decoded_request_body["state"]["value"]
     else:
-        if (len(decoded_request_body["state"]) == 0):
-            print("ERROR: Field <State> is empty.")
-        elif (len(decoded_request_body["state"]) > 2):
+        if (len(tmp) == 0):
+            print("ERROR: Field <State> not assigned any value.")
+        elif (len(tmp) > 2):
             print("ERROR: Field <State> has more than 2 characters.")
         else:
             print("ERROR: Some error. State could not be validated.")
@@ -659,17 +672,47 @@ def CreateProfile(request): # POST REQUEST ONLY
         else:
             print("ERROR: Some error. Zip code could not be validated.")
 
-    # Skills validation (string)
+    # Skills validation (string) (check all elements are valid)
+    skills_is_valid = None
+    for skill in decoded_request_body["skills"]:
+        try:
+            skills_is_valid = checkers.is_string(skill, minimum_length=1)
+            if skills_is_valid is False:
+                print('Invalid skill input')
+                break
+        except:
+            try:
+                skills_is_valid = checkers.is_string(skill["value"], minimum_length=1)
+                if skills_is_valid is False:
+                    print('Invalid skill input')
+                    break
+            except:
+                print("ERROR validating the skills for the Profile")
 
-    skills_is_valid = checkers.is_string(decoded_request_body["skills"], minimum_length=1)
+    skills_string = ""
+    try:
+        skills_string = decoded_request_body["skills"]
+    except:
+        try:
+            for i in range(0,len(decoded_request_body["skills"])):
+                if i != (len(decoded_request_body["skills"]) - 1):
+                    skills_string += decoded_request_body["skills"][i]["value"] + ','
+                else:
+                    skills_string += decoded_request_body["skills"][i]["value"]
+        except:
+            print('ERROR: Could not validate the skills for the Profile Creation')
+
+    print('Skills string: ' + skills_string)
+
     if skills_is_valid: # Skills is valid and not empty
         print("OK: Skills is valid.")
-        validated_skills = decoded_request_body["skills"]
+        validated_skills = skills_string
     else:
         if (len(decoded_request_body["skills"]) == 0):
             print("ERROR: Field <Skills> is empty.")
         else:
             print("ERROR: Some error. Skills could not be validated.")
+        print(len(decoded_request_body["skills"]))
 
     # Preferences validation (Preferences can be emty because it is optional)
 
@@ -709,9 +752,9 @@ def CreateProfile(request): # POST REQUEST ONLY
             address2 = validated_address2# decoded_request_body["address2"]
         
         city = decoded_request_body["city"]
-        state = decoded_request_body["state"]
+        state = validated_state#decoded_request_body["state"]["value"]
         zip_code = decoded_request_body["zip_code"]
-        skills = decoded_request_body["skills"]    
+        skills = validated_skills 
         preferences = validated_preferences#decoded_request_body["preferences"]
         availability = decoded_request_body["availability"]
 
@@ -739,6 +782,7 @@ def CreateProfile(request): # POST REQUEST ONLY
 
         '''
         try:
+            user = User.objects.get(username=request.user)
             new_profile_created = Profile(user=user,
                                         full_name=full_name,
                                         address1=address1,
@@ -749,6 +793,8 @@ def CreateProfile(request): # POST REQUEST ONLY
                                         skills=skills,
                                         preferences=preferences,
                                         availability=availability)
+            print('New Profile:')
+            print(new_profile_created)
             new_profile_created.save()
         
         #if new_profile_created is not None:
@@ -757,12 +803,12 @@ def CreateProfile(request): # POST REQUEST ONLY
             response_tmp = {"status" : "OK"}
             response = json.dumps(response_tmp)
             return HttpResponse(response)
-        except:
-            print('ERROR: Could not create profile.')
-    else: # Validation failed
-        response_tmp = {"status" : "ERROR"}
-        response = json.dumps(response_tmp)
-        return HttpResponse(response)
+        except Exception as error:
+            print('ERROR: Could not create profile.', error)
+    #else: # Validation failed
+            response_tmp = {"status" : "ERROR"}
+            response = json.dumps(response_tmp)
+            return HttpResponse(response)
 
 
 
@@ -865,19 +911,27 @@ def UpdateProfile(request): # POST REQUEST ONLY
             print("ERROR: Some error. City could not be validated.")
 
     # State validation
-
-    state_is_valid = checkers.is_string(decoded_request_body["state"], minimum_length=1, 
+    print('decoded request body:')
+    print(decoded_request_body)
+    tmp = ""
+    try:
+        tmp = decoded_request_body["state"] #["value"]
+    except:
+        try:
+            tmp = decoded_request_body["state"]["value"]
+        except:
+            print("ERROR: Something went wrong trying to read State for profile")
+    state_is_valid = checkers.is_string(tmp, minimum_length=1, 
                                            maximum_length=2)
     if state_is_valid: # State is valid and not empty
         print("OK: State is valid.")
-        validated_state = decoded_request_body["state"]
+        validated_state = tmp#["value"]
     else:
         if (len(decoded_request_body["state"]) == 0):
             print("ERROR: Field <State> is empty.")
-        elif (len(decoded_request_body["state"]) > 2):
+        elif (len(decoded_request_body["state"]["value"]) > 2):
             print("ERROR: Field <State> has more than 2 characters.")
-        else:
-            print("ERROR: Some error. State could not be validated.")
+
     
     # Zip Code validation
 
@@ -899,15 +953,46 @@ def UpdateProfile(request): # POST REQUEST ONLY
 
     # Skills validation (string)
 
-    skills_is_valid = checkers.is_string(decoded_request_body["skills"],minimum_length=1)
+    skills_is_valid = None
+    for skill in decoded_request_body["skills"]:
+        try:
+            skills_is_valid = checkers.is_string(skill, minimum_length=1)
+            if skills_is_valid is False:
+                print('Invalid skill input')
+                break
+        except:
+            try:
+                skills_is_valid = checkers.is_string(skill["value"], minimum_length=1)
+                if skills_is_valid is False:
+                    print('Invalid skill input')
+                    break
+            except:
+                print("ERROR validating the skills for the Profile")
+
+    skills_string = ""
+    try:
+        skills_string = decoded_request_body["skills"]
+    except:
+        try:
+            for i in range(0,len(decoded_request_body["skills"])):
+                if i != (len(decoded_request_body["skills"]) - 1):
+                    skills_string += decoded_request_body["skills"][i]["value"] + ','
+                else:
+                    skills_string += decoded_request_body["skills"][i]["value"]
+        except:
+            print('ERROR: Could not validate the skills for the Profile Creation')
+
+    print('Skills string: ' + skills_string)
+
     if skills_is_valid: # Skills is valid and not empty
         print("OK: Skills is valid.")
-        validated_skills = decoded_request_body["skills"]
+        validated_skills = skills_string
     else:
         if (len(decoded_request_body["skills"]) == 0):
             print("ERROR: Field <Skills> is empty.")
         else:
             print("ERROR: Some error. Skills could not be validated.")
+        print(len(decoded_request_body["skills"]))
 
     # Preferences validation (Preferences can be emty because it is optional)
 
@@ -932,13 +1017,22 @@ def UpdateProfile(request): # POST REQUEST ONLY
     ##############################
 
     # If input validation succeeded, proceed:
+    print('Printing validations -test')
+    print(validated_full_name)
+    print(validated_address1)
+    print(validated_city)
+    print(validated_state)
+    print(validated_zip_code)
+    print(validated_skills)
+    print(validated_availability)
+
     if (validated_full_name != '') and (validated_address1 != '') \
         and (validated_city != '') and (validated_state != '') \
         and (validated_zip_code != '') and (validated_skills != '') \
-        and (validated_availability != ''):   
+        and (validated_availability != ''):  
     
         # Validation was successfull, proceeding      
-        user_from_request = request.user # get the user object for the user making the request
+        user_from_request = str(request.user) # get the user object for the user making the request
 
         # Reading the input from the request (all fields required to perform the update):
         
@@ -951,9 +1045,9 @@ def UpdateProfile(request): # POST REQUEST ONLY
             address2 = decoded_request_body["address2"]
         
         city = decoded_request_body["city"]
-        state = decoded_request_body["state"]
+        state = validated_state#decoded_request_body["state"]["value"]
         zip_code = decoded_request_body["zip_code"]
-        skills = decoded_request_body["skills"]    
+        skills = validated_skills#decoded_request_body["skills"]    
         preferences = decoded_request_body["preferences"]
         availability = decoded_request_body["availability"]
 
@@ -972,8 +1066,14 @@ def UpdateProfile(request): # POST REQUEST ONLY
 
         # attempt to update the instance, if it fails catch the exepction
         try:
-            profile_to_update = Profile.objects.get(user=user_from_request)# get the instance from the database
-            
+            print(request.user.id)
+            #user_object = User.objects.get(username=user_from_request)
+            #print(user_object)
+            #users = User.get_queryset()
+            #print(users)
+            profile_to_update = Profile.objects.get(user_id=request.user.id)# get the instance from the database
+            print(profile_to_update)
+
             profile_to_update.full_name=full_name,
             profile_to_update.address1=address1
             profile_to_update.address2=address2
@@ -991,12 +1091,13 @@ def UpdateProfile(request): # POST REQUEST ONLY
             response_tmp = {"status" : "OK"}
             response = json.dumps(response_tmp)
             return HttpResponse(response)
-        except:
-            print("ERROR: Profile could not be updated")
-    else:
-        response_tmp = {"status" : "ERROR"}
-        response = json.dumps(response_tmp)
-        return HttpResponse(response)
+        except Exception as error:
+            print("ERROR: Profile could not be updated", error)
+    #else:
+            print("Some error")
+            response_tmp = {"status" : "ERROR"}
+            response = json.dumps(response_tmp)
+            return HttpResponse(response)
 
 
 
@@ -1018,6 +1119,7 @@ def GetProfile(request): # GET REQUEST ONLY
     # value, simulating the data stored in the database for that user
 
     print(request.user)
+    #user = request.user
 
     try:
         profile_from_database = Profile.objects.get(user=request.user)
@@ -1027,7 +1129,7 @@ def GetProfile(request): # GET REQUEST ONLY
         response = json.dumps(profile_dictionary)
         return HttpResponse(response)
     
-
+    print(type(profile_from_database))
     #if (str(request.user) == "ax.alvarenga19@gmail.com"):
     '''
         user = hard_coded_data.Profile(user="sample@sample.com",
@@ -1072,9 +1174,23 @@ def GetProfile(request): # GET REQUEST ONLY
     if user is not None: # the user already created a profile
         print('Profile found')
     '''
+    print("profile from database")
+    #print("user",request.user)
+    print(type(str(request.user)))
+    print(profile_from_database)
+    #print(profile_from_database.user)
+    print(profile_from_database.full_name)
+    print(profile_from_database.address1)
+    print(profile_from_database.address2)
+    print(profile_from_database.city)
+    print(profile_from_database.state)
+    print(profile_from_database.zip_code)
+    print(profile_from_database.skills)
+    print(profile_from_database.preferences)
+    print(profile_from_database.availability)
 
     profile_dictionary = {
-        "user": profile_from_database.user,#.get_user(),
+        "user": str(request.user),#profile_from_database.user,#.get_user(),
         "full_name": profile_from_database.full_name, #user.get_full_name(),
         "address1": profile_from_database.address1,#user.get_address1(),
         "address2": profile_from_database.address2,#user.get_address2(),
@@ -1085,9 +1201,13 @@ def GetProfile(request): # GET REQUEST ONLY
         "preferences": profile_from_database.preferences,#user.get_preferences(),
         "availability": profile_from_database.availability#user.get_availability()
     }
+    print(type(profile_dictionary))
 
-    response = json.dumps(profile_dictionary)
-    return HttpResponse(response)   
+    try:
+        response = json.dumps(profile_dictionary)
+    except Exception as error:
+        print(error)
+    return HttpResponse(response)
 
     
 
@@ -1154,19 +1274,20 @@ def GetMatchNotifications(request): # Called by the front-end the moment the use
 def GetUpdateNotifications(request): # Called by the front-end the moment the user visits the alerts page
 
     user = request.user
-    print(user)
+    print(user.id)
 
     #notifications_for_user = hard_coded_data.notifications[user]
-    events_updated_notifications = Event_Matched_Notification.objects.filter(
-        username = request.user
-    )
+    #events_updated_notifications = []
+    events_updated_notifications = Event_Update_Volunteers.objects.filter(pk=user.id)
+    
+    #print(events_updated_notifications)
     #if (user == "ax.alvareng19@gmail.com"): # Hard-coded data for 1 volunteer now
     '''
     eventMatched1 = hard_coded_data.EventMatchedNotification()
     eventUpdated1 = hard_coded_data.EventChangeNotification()
     eventReminder1 = hard_coded_data.EventReminderNotification()
     '''
-
+    print(events_updated_notifications)
     #notifications_for_user = [eventMatched1, eventUpdated1, eventReminder1]
 
     if len(events_updated_notifications) > 0:
@@ -1178,7 +1299,7 @@ def GetUpdateNotifications(request): # Called by the front-end the moment the us
 
             
 
-            associated_event = Event.objects.get(Event_ID = notification.event_id)
+            associated_event = Event.objects.get(Event_ID = notification.Event_ID)
             notification_message = "There has been an update to the event " + \
                                     associated_event.Name + "." + \
                                     "-Current Details: " + \
@@ -1220,6 +1341,7 @@ def GetReminderNotifications(request): # Called by the front-end the moment the 
         username = request.user,
         acknowledged = False
     )
+    print(events_matched_notifications)
 
     #eventMatched1 = hard_coded_data.EventMatchedNotification()
     #eventUpdated1 = hard_coded_data.EventChangeNotification()
@@ -1243,7 +1365,35 @@ def GetReminderNotifications(request): # Called by the front-end the moment the 
             
             ## Check if the event date and time is within 24 hours 
             ## of the current date and time
-            event_date = date.fromisoformat(associated_event.Date)
+            
+            if "-" in associated_event.Date:
+                date_clean = associated_event.Date.split("-")
+                if date_clean[0][0] == "0":
+                    date_clean_month = date_clean[0][1:]
+                else:
+                    date_clean_month = date_clean[0]
+                
+                if date_clean[0][1] == "0":
+                    date_clean_day = date_clean[1][1:]
+                else:
+                    date_clean_day = date_clean[1]
+            else:
+                date_clean = associated_event.Date.split("/")
+                if date_clean[0][0] == "0":
+                    date_clean_month = date_clean[0][1:]
+                else:
+                    date_clean_month = date_clean[0]
+                
+                if date_clean[0][1] == "0":
+                    date_clean_day = date_clean[1][1:]
+                else:
+                    date_clean_day = date_clean[1]
+
+            event_date = date(year=int(date_clean[2]),
+                               month=int(date_clean[0]),
+                               day=int(date_clean[1]))
+            print("event_date:")
+            print(event_date)
             event_time = (associated_event.Start_Time).split(' ') # format: HH:MM AM/PM (no padding zero)
             event_hour_int = int(event_time[0][:event_time[0].find(':')]) # HH:MM
             event_minute_int = int(event_time[0][event_time[0].find(':') + 1:])
@@ -1255,18 +1405,21 @@ def GetReminderNotifications(request): # Called by the front-end the moment the 
             #current_date = date.today()
             current_time = datetime.now()
 
-            event_datetime = datetime.datetime(event_date.year, event_date.month, event_date.day,
-                                             event_hour_int, event_minute_int)
+            event_datetime = datetime(event_date.year, event_date.month, event_date.day,
+                                        event_hour_int, event_minute_int)
             
-            current_datetime = datetime.datetime(current_time.year, current_time.month, current_time.day,
+            current_datetime = datetime(current_time.year, current_time.month, current_time.day,
                                                  current_time.hour, current_time.minute)
             
+            print('event datetime', event_datetime)
+            print('current datetime', current_datetime)
             delta = event_datetime - current_datetime
-
+            print('delta days')
+            print(delta.days)
             # If the day difference is more than 1 day, we know
             # the event is not within 24 hours
-            if (delta.days >= 1): # for programming ease, the notification will be given when there is less than 1 day to the event
-                event_is_within_24_hours = False
+            if (delta.days == 0): # for programming ease, the notification will be given when there is less than 1 day to the event
+                event_is_within_24_hours = True
             else:
                 # Check the time
                 # if the event time is the same as or earlier in the day
@@ -1281,8 +1434,10 @@ def GetReminderNotifications(request): # Called by the front-end the moment the 
                 #    event_is_within_24_hours = True
                 #else:
                 #    event_is_within_24_hours = False
-                event_is_within_24_hours = True
-
+                event_is_within_24_hours = False
+            
+            print('event is within 24 hours', event_is_within_24_hours)
+            
             ##
             if (event_is_within_24_hours):
                 notification_message = "Reminder - You have an event coming up within 1 day.\
@@ -1333,10 +1488,20 @@ def GetSkills(request):
     '''
     try:
         skills_dictionary = {}
+        print('trying to get skills')
         skills = Skill.objects.get_queryset()
+        print(type(skills))
+        print('got skills')
+        #print(type(skills))
+        
+        #print(skills)
         for skill in skills:
+        #pass
+            print(skill)#.Name
             skills_dictionary.update({skill.Name: skill.Name})
-
+            
+        print('skills dictionary')
+        print(skills_dictionary)
         response = json.dumps(skills_dictionary)
         return HttpResponse(response)
     except:
@@ -1366,6 +1531,7 @@ def GetStates(request):
 
 @csrf_exempt
 def GetMonthlyEvents(request):
+    '''
     event1 = hard_coded_data.event1
     event2 = hard_coded_data.event2
     print(event1.calendarId)
@@ -1399,7 +1565,90 @@ def GetMonthlyEvents(request):
 
         response = json.dumps(events)
         return HttpResponse(response)
-    
+    '''
+    #print(request.user.pk)
+    #user = User.objects.get(id=request.user.pk)
+    username_str = str(request.user)
+    print("username_str", username_str)
+    user = User.objects.get(username=username_str)
+    print('user:',user)
+    print('username:', user.username)
+    #user = User.objects.get(username=str(request.user)) # get user object for the user that made the request
+    events = Event_Volunteers.objects.filter(id = int(user.pk)) # get alll the events for this user
+    print(events)
+    if (len(events) > 0):
+        events_dictionary = {}
+        i = 1
+        for event in events:
+            event_id = event.Event_ID
+            '''
+            "event1": {
+                "id": event1.id,
+                "calendarId": event1.calendarId,
+                "category": event1.category,
+                "end": event1.end,
+                "start": event1.start,
+                "title": event1.title,
+                #"month": event1.month
+            }
+            '''
+            event_from_database = Event.objects.get(Event_ID = event_id)
+            # if the event is in the currently selected month, proceed, else, skip this event
+            #event_date = datetime.fromisoformat(event_from_database.Date)
+            #currently_selected_month = datetime.now() 
+            
+            #if (event_date.month == current_date.month):
+
+            # Send everything to the front end (all events, client should filter those according to the curently selected month)
+            
+            # calculate the event end time
+
+            event_date = event_from_database.Date.split('-')
+            event_duration = event_from_database.Duration
+
+            if ' ' in event_duration:
+                duration_list = event_duration.split(' ')
+                duration_hrs_str = duration_list[0][:-1] # exclude last character which is the h for hours
+                duration_min_str = duration_list[1][:-1] # exclude last character which is the m for minutes
+                duration_hrs_int = int(duration_hrs_str)
+                duration_min_int = int(duration_min_str)
+
+            else:
+                # take the event duration to be hours and convert it immediately to integer
+                duration_in_hours = str(event_duration)
+            
+            event_start_time = event_from_database.Start_Time.split(' ')
+            event_am_or_pm_str = event_start_time[1]
+            event_start_hr_int = int(event_start_time[0][ :  event_start_time[0].find(':')])
+            event_start_min_int = int(event_start_time[0][event_start_time[0].find(':') + 1 : ])
+
+            print(event_date)
+            start_time = datetime(year=int(event_date[0]), month=int(event_date[1]), day=int(event_date[2]),
+                                  hour=event_start_hr_int, minute=event_start_min_int)
+            duration_time = timedelta(minutes=(duration_hrs_int*60 + duration_min_int))
+
+            end_time = start_time + duration_time #time(hour=start_time.) + duration_time
+            #end_time_str = end_time.strftime("%I:%M %p")
+            end_hr_int = end_time.hour
+            end_min_int = end_time.min
+            end_hr_and_min_str = str(end_hr_int) + ':' + str(end_min_int)
+            
+            event_number = "event" + str(i)
+            events_dictionary.update({
+                event_number : {
+                "id": event_from_database.Event_ID,
+                "calendarId": "cal1",#event1.calendarId, # constant
+                "category": "time",#event1.category, # constant
+                "end": end_hr_and_min_str,#event1.end, # end time
+                "start": event_from_database.Start_Time, # start time
+                "title": event_from_database.Name # name
+                }
+            })
+            i += 1
+            print('checkpoint')
+        response = json.dumps(events_dictionary)
+        print(response)
+        return HttpResponse(response)
     else:
         response = "ERROR"
         return HttpResponse(response)

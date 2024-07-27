@@ -10,7 +10,7 @@ from django.contrib.postgres.fields import ArrayField
 from datetime import date
 
 class Skill(models.Model):
-    ID = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
+    id = models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')
     Name = models.CharField(max_length = 20, unique = True)
 
 class Event(models.Model):
@@ -33,7 +33,6 @@ class Event(models.Model):
 class Event_Volunteers(models.Model):
     Event_ID = models.CharField(max_length=10)
     Volunteer = models.CharField(max_length=30)
-
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=['Event_ID', 'Volunteer'], name='unique_event_volunteer')
