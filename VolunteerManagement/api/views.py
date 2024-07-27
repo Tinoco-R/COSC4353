@@ -64,7 +64,7 @@ class UpdateVolunteerHistory(APIView):
                 volunteerHistory = Event_Volunteers.objects.get(Event_ID = eventId, Volunteer = volunteer)
                 print("Volunteer History:", volunteerHistory)
 
-            except Event.DoesNotExist:
+            except Event_Volunteers.DoesNotExist:
                 return Response({"error": "Event not found"}, status=status.HTTP_404_NOT_FOUND)
             
             volunteerHistory.Attended = modification
@@ -150,6 +150,12 @@ class DeleteEventView(APIView):
 
         if serializer.is_valid():
             eventId = request.data.get('Event_ID')
+
+            # Validates Event ID to be a number
+            try:
+                eventId = int(eventId)
+            except ValueError:
+                return Response({"error": "Invalid Event ID format"}, status=status.HTTP_400_BAD_REQUEST)
 
             # Get existing row
             try:

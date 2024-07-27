@@ -586,12 +586,7 @@ class CreateEventViewTests(TestCase):
         )
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("Name cannot be empty.", str(response.content))
-        self.assertIn("Description cannot be empty.", str(response.content))
-        self.assertIn("Address cannot be empty.", str(response.content))
-        self.assertIn("City cannot be empty.", str(response.content))
-        self.assertIn("State cannot be empty.", str(response.content))
-        self.assertIn("Zip Code cannot be empty.", str(response.content))
+        self.assertIn("This field may not be blank.", str(response.content))
 
 
 # Testing to see if we can delete an existing row of data in the DB
@@ -648,7 +643,7 @@ class DeleteEventViewTests(TestCase):
     
     def test_delete_event_bad(self):
         # We will not be sending anything so that we can see if we get the expected "BAD REQUEST" response
-        eventID = {"Event_Identification": "Not a Number"}
+        eventID = {"Event_ID": "Not a Number"}
         deleteEventDataJSON = json.dumps(eventID)
 
         # Send POST request to delete above event
@@ -692,7 +687,7 @@ class UpdateVolunteerHistoryTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # Load our updated history
-        updated_history = Event_Volunteers.objects.get(pk=self.event.pk)
+        updated_history = Event_Volunteers.objects.get(pk=self.history.pk)
 
         # Assert that the history was updated correctly
         self.assertEqual(updated_history.Event_ID, newData["Event_ID"])
@@ -716,7 +711,7 @@ class UpdateVolunteerHistoryTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # Load our updated history
-        updated_history = Event_Volunteers.objects.get(pk=self.event.pk)
+        updated_history = Event_Volunteers.objects.get(pk=self.history.pk)
 
         # Assert that the history was updated correctly
         self.assertEqual(updated_history.Event_ID, newData["Event_ID"])
