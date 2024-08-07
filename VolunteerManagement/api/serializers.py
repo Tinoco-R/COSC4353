@@ -3,7 +3,8 @@ from .models import Event, Event_Volunteers
 import datetime
 
 # Axel's models:
-from .models import User
+#from .models import User
+from django.contrib.auth.models import User
 
 class EventSerializer(serializers.ModelSerializer):
     class Meta:

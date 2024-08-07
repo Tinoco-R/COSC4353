@@ -286,10 +286,13 @@ export default function MyProfile(){
     
     const [userState, setUserState] = useState(""); // https://stackoverflow.com/questions/71094599/how-to-get-value-from-react-select-form
 
-    const [value, setValue] = useState(new Date()); // stuck here, trying to get the data from user
-
+    const [value_dates, setValue] = useState([]);//([]);//useState(new Date()); // stuck here, trying to get the data from user
+    console.log("value:");
+    console.log(value_dates);
 
     const navigate = useNavigate();
+
+    var datesSelected;
 
     const onSubmit = (data) => {
 
@@ -320,8 +323,29 @@ export default function MyProfile(){
         }
 
         console.log('Dates selected:')
-        console.log(value)
-        //console.log(MultiDatePicker.value);
+        //console.log(value);
+        console.log(datesSelected);
+        console.log("DatePicker value:");
+        console.log(DatePicker.value);
+        console.log("values variable before API call:");
+        var finalDateValues = "";
+        value_dates.forEach((element) => {
+            var tmp_val = element.toString();
+            //var tmp_val_json = element.toJSON();
+            console.log("to json:");
+            //console.log(tmp_val_json);
+            //var tmp_date = element.Date.prototype.getDate();
+            //var tmp_day = element.prototype.getDay();
+            //var tmp_year = element.prototype.getFullYear();
+            //finalDateValues += tmp_date + "/" + tmp_day + "/" + tmp_year + ","
+            finalDateValues += tmp_val + ',';
+            console.log(tmp_val)
+        });
+        console.log('finalDateValues string before removing last comma:', finalDateValues);
+        finalDateValues = finalDateValues.substring(0, finalDateValues.length - 1);
+        console.log('finalDateValues string after removing last comma:', finalDateValues);
+
+        
 
         var submitt_form = fetch(api_profile_url,{
             headers: {
@@ -347,7 +371,7 @@ export default function MyProfile(){
                 zip_code: data.zipCode,
                 skills: userSkill,//data.skills,
                 preferences: data.Preferences,
-                availability: value//data.availability
+                availability: finalDateValues//value_dates//data.availability
             }),
             credentials: "same-origin"
         }).then((res) => {
@@ -414,12 +438,29 @@ export default function MyProfile(){
     console.log(states);
 
 
-    
+    console.log("modified value_dates:", value_dates.toString());
+    /*value_dates.forEach((element) => {
+        console.log("Value in value_dates array:");
+        console.log(element.toString());
+    })*/
     function handleDateChange(data) {
         console.log('date change, data:')
         console.log(data);
-        console.log(data[0]);
+        data.forEach((element) => console.log(element));
 
+        console.log(data[0]);
+        //setValue(data); // Add the data to the state for the multidate picker
+        console.log("value:");
+        console.log(value_dates);
+        console.log('updated value:');
+        //setValue(data);
+        console.log(value_dates);
+        datesSelected = data;
+        console.log('dateSelected:');
+        console.log(datesSelected);
+        console.log('data value:');
+        console.log(data[0].value)
+        
     }
 
     return (
@@ -545,16 +586,16 @@ export default function MyProfile(){
             <label for='availability'>Availability</label>
             {
                     hasProfile ? (
-                        <p style={{fontWeight: 'normal'}}>Current value: {profile.preferences}</p>
+                        <p style={{fontWeight: 'normal'}}>Current value: {profile.availability}</p>
                     ):
                         <p style={{fontWeight: 'normal'}}>No value saved yet</p>
             }
         <DatePicker
             multiple 
-            value={value}
+            value={value_dates}//{[null]}//{value}
             minDate={new Date()}
             format="MMMM DD YYYY"
-            onChange={(data) => handleDateChange(data)}
+            onChange={setValue}//{(data) => handleDateChange(data)} // setValue()
             required
         />
         </div>

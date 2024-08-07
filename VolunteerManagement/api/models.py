@@ -4,7 +4,7 @@ import string, random
 
 
 from django.core.validators import MinLengthValidator # https://stackoverflow.com/questions/15845116/how-to-set-min-length-for-models-textfield
-from django.contrib.auth.models import User as UserDefault
+#from django.contrib.auth.models import User as UserDefault
 
 from django.contrib.postgres.fields import ArrayField
 from datetime import date
@@ -50,7 +50,7 @@ class Event_Update_Volunteers(models.Model):
         ]
 
 # Axel's code
-class User(UserDefault):
+#class User(UserDefault):
     #user_id = models.IntegerField(unique=True)
     #username = models.CharField(max_length=100) # email
     #password = models.CharField()
@@ -61,7 +61,7 @@ class User(UserDefault):
 
 
     #verified = models.BooleanField() # True means verified, False means not verified
-    pass
+#    pass
     # is_staff attribute from django will replace type attribute
     #type = models.BooleanField() # True for Admin, False for Volunteer
 
@@ -82,7 +82,8 @@ class Date(models.Model):
 # preferences, etc.
 
 class Profile(models.Model): 
-    user = models.OneToOneField(UserDefault, on_delete=models.CASCADE)
+    user_id = models.IntegerField()
+    #user = models.OneToOneField(UserDefault, on_delete=models.CASCADE)
 
     full_name = models.CharField(null=False, blank=False, max_length=50, default='') # "blank=False" (required)
     # must ensure, in the view, at the programming level that the value is not null

@@ -158,14 +158,33 @@ const clickEventHandler = (event) => {
   // the event id of the event that was clicked is included in the event object
   // guide: https://github.com/nhn/tui.calendar/blob/main/docs/en/apis/calendar.md#clickevent
   console.log(event);
-
+  console.log("id of event clicked:", event["event"]["id"]);
+  var event_of_id_clicked = event["event"]["id"];
   //popupCall();
   //<popupComponent />;
+
+  var event_clicked;
+  jsonArr.forEach((element) => {
+    if (element["id"] === event_of_id_clicked)
+      event_clicked = element;
+  })
+
+  console.log("Object for event clicked:", event_clicked);
+
+  var event_details = "";
+  event_details += event_clicked["title"];
+  // Get the start date and time
+  var start_date_object = new Date(event_clicked["start"]);
+  console.log(start_date_object);
+  event_details += " on " + start_date_object.toDateString();
+  event_details += " from " + start_date_object.toLocaleTimeString();
+  var end_date_object = new Date(event_clicked["end"]);
+  event_details += " to " + end_date_object.toLocaleTimeString();
 
   // credit, examples at: https://sweetalert2.github.io/
   Swal.fire({
     title: '<h5> Event details </h5>',
-    text: 'Cleaning event on June 30, 2024 at 10:00 am',
+    text: event_details,
     /*icon: 'warning',*/
     showCancelButton: false,
     showConfirmButton: true,
@@ -198,7 +217,7 @@ const clickEventHandler = (event) => {
 // Link might be useful:
 // https://stackoverflow.com/questions/57611199/i-need-to-show-a-react-material-ui-confirmation-dialog-box-or-a-sweet-alert-conf
 
-
+const jsonArr = [];
 
 //Popup component
 
@@ -303,14 +322,21 @@ export class CustomCalendar extends React.Component{
       //console.log(initialEvents)
       console.log('jsonData:');
       console.log(jsonData);
-      const jsonArr = []
       
       let e = null;
       for (e in jsonData){
-        jsonArr.push(e);
+        console.log('e value:');
+        console.log((jsonData[e]));
+        //jsonArr.push(e);
+        jsonArr.push(jsonData[e]);
       }
 
+      console.log("jsonArr for state:");
+      jsonArr.forEach((element) => {console.log(element)});
+
       this.setState({initialEvents: jsonArr});
+      console.log("Calendar state:");
+      console.log(this.state);
       //this.setState(jsonData["event1"]);
     } catch (error) {
       console.error("Error fetching data:", error);
