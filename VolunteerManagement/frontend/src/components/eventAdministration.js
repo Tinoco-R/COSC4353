@@ -185,6 +185,49 @@ export default class EventAdministration extends Component {
         return filteredEvents;
     };
 
+    generateReportPdf = () => {
+        fetch('http://localhost:8000/api/eventReport/pdf', {
+            method: 'GET',
+        })
+        .then((response) => response.blob())
+        .then((blob) => {
+            // Create blob link to download the file
+            const url = window.URL.createObjectURL(new Blob([blob]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'eventReport.pdf');
+            document.body.appendChild(link);
+            link.click();
+            link.parentNode.removeChild(link);
+        })
+        .catch((error) => {
+            console.error('Error generating report:', error);
+            alert('Failed to generate report. Please try again.');
+        });
+    };
+
+    // Generates a PDF report
+    generateReportCsv = () => {
+        fetch('http://localhost:8000/api/eventReport/csv', {
+            method: 'GET',
+        })
+        .then((response) => response.blob())
+        .then((blob) => {
+            // Create blob link to download the file
+            const url = window.URL.createObjectURL(new Blob([blob]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'eventReport.csv');
+            document.body.appendChild(link);
+            link.click();
+            link.parentNode.removeChild(link);
+        })
+        .catch((error) => {
+            console.error('Error generating report:', error);
+            alert('Failed to generate report. Please try again.');
+        });
+    };
+
     render() {
         const filteredRows = this.filterEventsBySearch( this.state.search );
 
@@ -217,6 +260,14 @@ export default class EventAdministration extends Component {
                             {this.state.selectedRowData !== null && (
                                 <StyledButton type="submit" onClick={() => {this.handleClickEvent("confirm", this.state.selectedRowData)} } >Confirm</StyledButton>
                             )}
+                            </div>
+
+                            <div>
+                                <Button style={{backgroundColor: "#86C232"}} onClick={() => {this.generateReportPdf()}} variant="contained" fontFamily="'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif">PDF Report</Button>
+                            </div>
+                            
+                            <div>
+                                <Button style={{backgroundColor: "#86C232"}} onClick={() => {this.generateReportCsv()}} variant="contained" fontFamily="'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif">CSV Report</Button>
                             </div>
                         </div>
                     </Grid>

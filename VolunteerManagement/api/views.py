@@ -21,7 +21,17 @@ from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
 from django.http import HttpResponse
 
-
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+from reportlab.lib.units import inch
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus.doctemplate import BaseDocTemplate
+from reportlab.platypus.tableofcontents import TableOfContents
+from reportlab.platypus.frames import Frame
+from reportlab.platypus.flowables import Spacer
+from reportlab.lib.units import inch
 
 ##  Helper map
 
@@ -138,11 +148,107 @@ def csvReportVolunteer(request):
 
     return response
 
-def csvReportEvent():
-    return(1)
+def pdfReportEvent(request):
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter, leftMargin=0.5*inch, rightMargin=0.5*inch, topMargin=0.5*inch, bottomMargin=0.5*inch)
+    styles = getSampleStyleSheet()
+    styleN = styles['Normal']
+    styleN.spaceBefore = 6
+    styleN.spaceAfter = 6
+    styleN.fontSize = 10
+    styleN.leading = 14
 
-def pdfReportEvent():
-    return(1)
+    # Fetch data from the models
+    events = Event.objects.all().order_by('Event_ID')
+    data = [["Name", "Administrator", "Date", "Volunteers", "Skills", "Location"]]  # Table headers
+
+    # For each event, get how many volunteers are registered for it
+    for event in events:
+        eventID = event.Event_ID
+        eventName = event.Name
+        eventAdmin = event.Administrator
+        eventDate = event.Date
+        eventSkills = event.Skills
+        eventLocation = event.Address + ", " + event.City + ", " + event.State + ", " + event.Zip_Code
+        
+        eventVolunteers = Event_Volunteers.objects.filter(Event_ID=eventID)
+        eventVolunteerCount = eventVolunteers.count()
+
+        namePara     = Paragraph(eventName, styleN)
+        adminPara    = Paragraph(eventAdmin, styleN)
+        skillsPara   = Paragraph(eventSkills, styleN)
+        locationPara = Paragraph(eventLocation, styleN)
+
+        # Convert eventDate to datetime object
+        if isinstance(eventDate, str):
+            try:
+                eventDate = datetime.strptime(eventDate, "%Y-%m-%d").date()
+            except ValueError:
+                eventDate = datetime.strptime(eventDate, "%m/%d/%Y").date()
+
+        #data.append([eventName, eventAdmin, str(eventDate), str(eventVolunteerCount), eventSkills, eventLocation])
+        data.append([namePara, adminPara, eventDate, eventVolunteerCount, skillsPara, locationPara])
+
+
+    # Create a Table with the data
+    colWidths = [doc.width * 0.2, doc.width * 0.2, doc.width * 0.15, doc.width * 0.15, doc.width * 0.15, doc.width * 0.15]
+    table = Table(data, colWidths=colWidths)
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 14),
+
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('BOX', (0, 0), (-1, -1), 1, colors.black) 
+    ]))
+
+    elements = [table]
+    doc.build(elements)
+    buffer.seek(0)
+
+    return FileResponse(buffer, as_attachment=True, filename='eventReport.pdf')
+
+def csvReportEvent(request):
+    # Fetch data from the models
+    events = Event.objects.all().order_by('Event_ID')
+    data = [["Name", "Administrator", "Date", "Volunteers", "Skills", "Location"]]  # Table headers
+
+
+    # For each event, get how many volunteers are registered for it
+    for event in events:
+        eventID = event.Event_ID
+        eventName = event.Name
+        eventAdmin = event.Administrator
+        eventDate = event.Date
+        eventSkills = event.Skills
+        eventLocation = event.Address + ", " + event.City + ", " + event.State + ", " + event.Zip_Code
+            
+        eventVolunteers = Event_Volunteers.objects.filter(Event_ID=eventID)
+        eventVolunteerCount = eventVolunteers.count()
+
+        # Convert eventDate to datetime object
+        if isinstance(eventDate, str):
+            try:
+                eventDate = datetime.strptime(eventDate, "%Y-%m-%d").date()
+            except ValueError:
+                eventDate = datetime.strptime(eventDate, "%m/%d/%Y").date()
+
+        data.append([eventName, eventAdmin, str(eventDate), str(eventVolunteerCount), eventSkills, eventLocation])
+
+    # Create a CSV response
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="eventReport.csv"'
+
+    writer = csv.writer(response)
+    writer.writerows(data)
+
+    return response
 
 # Allows us to view all event details (not being used? maybe use to only output one event)
 class EventView(generics.CreateAPIView):
