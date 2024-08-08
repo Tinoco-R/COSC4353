@@ -1,5 +1,8 @@
 from django.urls import path, include
-from .views import EventView, CreateEventView, UpdateEventView, EventsListView, DeleteEventView, EventVolunteerMatch, EventVolunteerListView, VolunteerHistory, UpdateVolunteerHistory
+from .views import EventView, CreateEventView, UpdateEventView, EventsListView, DeleteEventView
+from .views import EventVolunteerMatch, EventVolunteerListView
+from .views import VolunteerHistory, UpdateVolunteerHistory
+from .views import pdfReportVolunteer, csvReportVolunteer, pdfReportEvent, csvReportEvent
 
 # Axel's imports
 from .views import UserView#, UserDetail
@@ -42,6 +45,13 @@ urlpatterns = [
     # Volunteer History
     path('volunteerHistory/', VolunteerHistory.as_view(), name='volunteer_history'),
     path('updateVolunteerHistory/', UpdateVolunteerHistory.as_view(), name='update_volunteer_history'),
+
+    # Reports
+    path('volunteerReport/pdf', pdfReportVolunteer, name='volunteer_report_pdf'),
+    path('volunteerReport/csv', csvReportVolunteer, name='volunteer_report_csv'),
+    
+    path('eventReport/pdf', pdfReportEvent, name='event_report_pdf'),
+    path('eventReport/csv', csvReportEvent, name='event_report_csv'),
 
     path('', include('frontend.urls'))
 ]

@@ -27,9 +27,14 @@ urlpatterns = [
     path('admin/volunteers/matching', index),
     path('admin/volunteers/skills', index),
 
+    # Reports
+    path('admin/reports', index),
+    path('admin/reports/event', index),
+    path('admin/reports/volunteer', index),
+
     # Notifications
-    path('admin/notifications', index),
-    path('admin/notifications/setup', index),
+    #path('admin/notifications', index),
+    #path('admin/notifications/setup', index),
 
     # Volunteer Pages
     

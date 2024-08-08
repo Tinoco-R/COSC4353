@@ -1,3 +1,4 @@
+import csv
 from django.shortcuts import render
 from rest_framework import generics, status
 from .serializers import EventSerializer, CreateEventSerializer, UpdateEventSerializer, DeleteEventSerializer, EventVolunteerMatchSerializer, CreateEventVolunteerMatchSerializer, VolunteerHistorySerializer, UpdateVolunteerHistorySerializer
@@ -7,10 +8,19 @@ from rest_framework.response import Response;
 from django.contrib.auth.models import User
 from django.contrib.auth import logout
 from .models import Profile, Event_Matched_Notification, Event_Update_Volunteers
-
 from datetime import date
 from datetime import time
 from datetime import datetime, timedelta
+from django.http import FileResponse
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from io import BytesIO
+from django.forms.models import model_to_dict
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+from django.http import HttpResponse
+
 
 
 ##  Helper map
@@ -18,6 +28,121 @@ from datetime import datetime, timedelta
 matchEventNotificationMap = {} # Map users to array of notification messages. Delete user key at logout
 #############
 
+# Generates a PDF report for volunteer history via a table
+def pdfReportVolunteer(request):
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter)
+
+    # Fetch data from the models
+    volunteers = Event_Volunteers.objects.values('Volunteer').distinct().order_by('Volunteer')
+    data = [["Volunteer", "Event Name", "Event ID", "Date", "Attendance"]]  # Table headers
+
+    # Loop through each volunteer registered for an event
+    for volunteer in volunteers:
+        volunteerName = volunteer['Volunteer']
+        volunteerEvents = Event_Volunteers.objects.filter(Volunteer=volunteerName)
+        eventIds = volunteerEvents.values_list('Event_ID', flat=True)
+        eventIds = [int(event_id) for event_id in eventIds]
+        events = Event.objects.filter(Event_ID__in=eventIds).order_by('Event_ID')
+
+        # Loop through each event the volunteer is a part of
+        for event in events:
+            try:
+                attendance = Event_Volunteers.objects.get(Volunteer=volunteerName, Event_ID=event.Event_ID).Attended
+            except Event_Volunteers.DoesNotExist:
+                attendance = "N" 
+
+            eventName = event.Name
+            eventID = event.Event_ID
+            eventDate = event.Date
+
+            # Convert eventDate to datetime object
+            if isinstance(eventDate, str):
+                try:
+                    eventDate = datetime.strptime(eventDate, "%Y-%m-%d").date()
+                except ValueError:
+                    eventDate = datetime.strptime(eventDate, "%m/%d/%Y").date()
+
+            # Check if the event is in the future
+            if eventDate > datetime.now().date():
+                status = "N/A"
+            else:
+                status = "Attended" if attendance == "Y" else "Did Not Attend"
+            data.append([volunteerName, eventName, str(eventID), str(eventDate), status])
+
+    # Create a Table with the data
+    table = Table(data)
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 14),
+
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black)
+    ]))
+
+    elements = [table]
+    doc.build(elements)
+    buffer.seek(0)
+
+    return FileResponse(buffer, as_attachment=True, filename='volunteerHistoryReport.pdf')
+
+def csvReportVolunteer(request):
+    # Fetch data from the models
+    volunteers = Event_Volunteers.objects.values('Volunteer').distinct().order_by('Volunteer')
+    data = [["Volunteer", "Event Name", "Event ID", "Date", "Attendance"]]  # Table headers
+
+    # Loop through each volunteer registered for an event
+    for volunteer in volunteers:
+        volunteerName = volunteer['Volunteer']
+        volunteerEvents = Event_Volunteers.objects.filter(Volunteer=volunteerName)
+        eventIds = volunteerEvents.values_list('Event_ID', flat=True)
+        eventIds = [int(event_id) for event_id in eventIds]
+        events = Event.objects.filter(Event_ID__in=eventIds).order_by('Event_ID')
+
+        # Loop through each event the volunteer is a part of
+        for event in events:
+            try:
+                attendance = Event_Volunteers.objects.get(Volunteer=volunteerName, Event_ID=event.Event_ID).Attended
+            except Event_Volunteers.DoesNotExist:
+                attendance = "N" 
+
+            eventName = event.Name
+            eventID = event.Event_ID
+            eventDate = event.Date
+
+            # Convert eventDate to datetime object
+            if isinstance(eventDate, str):
+                try:
+                    eventDate = datetime.strptime(eventDate, "%Y-%m-%d").date()
+                except ValueError:
+                    eventDate = datetime.strptime(eventDate, "%m/%d/%Y").date()
+
+            # Check if the event is in the future
+            if eventDate > datetime.now().date():
+                status = "N/A"
+            else:
+                status = "Attended" if attendance == "Y" else "Did Not Attend"
+            data.append([volunteerName, eventName, str(eventID), str(eventDate), status])
+
+    # Create a CSV response
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="volunteerHistoryReport.csv"'
+
+    writer = csv.writer(response)
+    writer.writerows(data)
+
+    return response
+
+def csvReportEvent():
+    return(1)
+
+def pdfReportEvent():
+    return(1)
 
 # Allows us to view all event details (not being used? maybe use to only output one event)
 class EventView(generics.CreateAPIView):

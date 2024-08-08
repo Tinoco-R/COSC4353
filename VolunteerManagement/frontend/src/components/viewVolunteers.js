@@ -5,6 +5,7 @@ import { DataGrid } from '@mui/x-data-grid';
 import { volunteerViewColumns } from "./columns";
 import { fetchVolunteerHistory } from "./eventData";
 import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
 
 export default class ViewVolunteers extends Component {
     constructor(props) {
@@ -30,10 +31,7 @@ export default class ViewVolunteers extends Component {
 
     componentDidUpdate(prevProps, prevState) {
         if (prevState.items !== this.state.items) {
-            console.log("New selectiuon:", this.state);
-            
             const jsonData = JSON.stringify({ Event_ID: this.state.selectedId, Volunteer: this.state.volunteer, Attended: this.state.attended })
-            console.log("Data in update:", jsonData);
 
             fetchVolunteerHistory().then(history => {
                 this.setState({
@@ -45,31 +43,72 @@ export default class ViewVolunteers extends Component {
     }
 
     alterStatus() {
-        let jsonData = this.state.finalSelection;
-        console.log("Final:", jsonData);
-        
-   
-            fetch('http://localhost:8000/api/updateVolunteerHistory/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: jsonData
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Response data:', data);
-                if (data.message) {
-                    console.log('Server message:', data.message);
-                }
-                if (data.non_field_errors) {
-                    console.log('Validation errors:', data.non_field_errors);
-                }
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
+        let jsonData = this.state.finalSelection;      
+        fetch('http://localhost:8000/api/updateVolunteerHistory/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: jsonData
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Response data:', data);
+            if (data.message) {
+                console.log('Server message:', data.message);
+            }
+            if (data.non_field_errors) {
+                console.log('Validation errors:', data.non_field_errors);
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
     }
+
+    // Generates a PDF report
+    generateReportPdf = () => {
+        fetch('http://localhost:8000/api/volunteerReport/pdf', {
+            method: 'GET',
+        })
+        .then((response) => response.blob())
+        .then((blob) => {
+            // Create blob link to download the file
+            const url = window.URL.createObjectURL(new Blob([blob]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'volunteerReport.pdf');
+            document.body.appendChild(link);
+            link.click();
+            link.parentNode.removeChild(link);
+        })
+        .catch((error) => {
+            console.error('Error generating report:', error);
+            alert('Failed to generate report. Please try again.');
+        });
+    };
+
+    // Generates a PDF report
+    generateReportCsv = () => {
+        fetch('http://localhost:8000/api/volunteerReport/csv', {
+            method: 'GET',
+        })
+        .then((response) => response.blob())
+        .then((blob) => {
+            // Create blob link to download the file
+            const url = window.URL.createObjectURL(new Blob([blob]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'volunteerReport.csv');
+            document.body.appendChild(link);
+            link.click();
+            link.parentNode.removeChild(link);
+        })
+        .catch((error) => {
+            console.error('Error generating report:', error);
+            alert('Failed to generate report. Please try again.');
+        });
+    };
 
     render() {
         return (
@@ -88,17 +127,9 @@ export default class ViewVolunteers extends Component {
                     onRowSelectionModelChange={(selectionModel) => {
                         const selectedItemsCount = selectionModel.length;
 
-                        console.log("Selections:", selectionModel);
                         
                         selectionModel.forEach(selectedRowId => {
                             const selectedEvent = this.state.history.find(event => event.id === selectedRowId);
-
-                            console.log("selectedEvent", selectedEvent);
-
-/*                             // Skip empty data
-                            if (!selectedEvent || !selectedEvent.Event_ID || !selectedEvent.Volunteer || selectedEvent.Attended === undefined) {
-                                return;
-                            } */
 
                             this.setState({ selectedId: selectedEvent.Event_ID });
                             this.setState({ volunteer: selectedEvent.Volunteer });
@@ -133,6 +164,7 @@ export default class ViewVolunteers extends Component {
                             });
                         })
                     }}
+
                     sx={{
                         ".MuiDataGrid-row.Mui-selected:hover": { backgroundColor: "rgb(97 137 47 / 15%)", },
                         ".MuiDataGrid-row.Mui-selected": { backgroundColor: "rgb(134 194 50 / 15%)", },
@@ -149,7 +181,11 @@ export default class ViewVolunteers extends Component {
                     }}
                 />
                 <br></br>
-                <Button style={{backgroundColor: "#86C232"}} onClick={() => {this.alterStatus()}} variant="contained" type="submit" fontFamily="'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif">Alter Attended Status</Button>
+                <Grid container spacing={1} justifyContent="space-between">
+                    <Button style={{backgroundColor: "#86C232"}} onClick={() => {this.alterStatus()}} variant="contained" type="submit" fontFamily="'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif">Alter Attended Status</Button>
+                    <Button style={{backgroundColor: "#86C232"}} onClick={() => {this.generateReportPdf()}} variant="contained" fontFamily="'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif">Generate PDF Report</Button>
+                    <Button style={{backgroundColor: "#86C232"}} onClick={() => {this.generateReportCsv()}} variant="contained" fontFamily="'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif">Generate CSV Report</Button>
+                </Grid>
             </div>
         );
     }

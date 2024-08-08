@@ -17,6 +17,8 @@ import CallToActionSharpIcon from '@mui/icons-material/CallToActionSharp';
 import EditNotificationsIcon from '@mui/icons-material/EditNotifications';
 import EditNotificationsOutlinedIcon from '@mui/icons-material/EditNotificationsOutlined';
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
+import SummarizeIcon from '@mui/icons-material/Summarize';
+import AssessmentIcon from '@mui/icons-material/Assessment';
 
 // Need to get main panels for volunteer homepage and have the export return one of the lists below
 
@@ -42,12 +44,12 @@ export const adminData = [
                 link: "events/my"
             },
             
-            {
+/*             {
                 item: "b",
                 title: "All Events",
                 icon: <DateRangeIcon />,
                 link: "events/all"
-            },
+            }, */
             
             {
                 item: "c",
@@ -79,28 +81,34 @@ export const adminData = [
                 link: "volunteers/view"
             },
         
-            {
+/*             {
                 item: "c",
                 title: "Manage New Registrations",
                 icon: <ManageAccountsIcon />,
                 link: "volunteers/manage"
-            },
+            }, */
         ]
     },
 
-    // Notifications
+/*     // Reports
     {
         row: 4,
-        title: "Notifications",
+        title: "Reports",
         icon: <CallToActionSharpIcon />,
-        link: "notifications",
+        link: "reports",
         subNav: [
             {
                 item: "a",
-                title: "Setup Notification System",
-                icon: <EditNotificationsIcon />,
-                link: "notifications/setup"
+                title: "Event Management",
+                icon: <SummarizeIcon />,
+                link: "reports/event"
+            },
+            {
+                item: "a",
+                title: "Volunteer Participation",
+                icon: <AssessmentIcon />,
+                link: "reports/volunteer"
             }
         ]
-    } 
+    }  */
 ];
