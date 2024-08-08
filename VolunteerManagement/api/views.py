@@ -57,7 +57,7 @@ class UpdateVolunteerHistory(APIView):
     
     def post(self, request, format = None, **kwargs):
         serializer = self.serializer_class(data=request.data)
-        print("serializer", serializer)
+
         if serializer.is_valid():
             eventId = serializer.data.get('Event_ID')
             volunteer = serializer.data.get('Volunteer')
@@ -68,9 +68,10 @@ class UpdateVolunteerHistory(APIView):
             else:
                 modification = "N"
 
+            print('Modding', eventId, volunteer, "to", modification)
+
             try:
                 volunteerHistory = Event_Volunteers.objects.get(Event_ID = eventId, Volunteer = volunteer)
-                print("Volunteer History:", volunteerHistory)
 
             except Event_Volunteers.DoesNotExist:
                 return Response({"error": "Event not found"}, status=status.HTTP_404_NOT_FOUND)

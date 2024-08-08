@@ -4,7 +4,7 @@ import { DataGrid } from '@mui/x-data-grid';
 //import { volunteerHistoryData } from "./volunteerHistoryData";
 import { volunteerViewColumns } from "./columns";
 import { fetchVolunteerHistory } from "./eventData";
-
+import Button from '@mui/material/Button';
 
 export default class ViewVolunteers extends Component {
     constructor(props) {
@@ -13,7 +13,9 @@ export default class ViewVolunteers extends Component {
             history: [],
             selectedId: "",
             volunteer: "",
-            attended: ""
+            attended: "",
+            finalSelection: "",
+            items: 0
         }
     }
 
@@ -27,19 +29,47 @@ export default class ViewVolunteers extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (prevState.selectedId !== this.state.selectedId) {
-            console.log(this.state);
+        if (prevState.items !== this.state.items) {
+            console.log("New selectiuon:", this.state);
             
-            const jsonData = JSON.stringify({ Event_ID: this.state.selectedId, Volunteer: this.state.volunteer })
-            console.log("Data:", jsonData);
+            const jsonData = JSON.stringify({ Event_ID: this.state.selectedId, Volunteer: this.state.volunteer, Attended: this.state.attended })
+            console.log("Data in update:", jsonData);
 
             fetchVolunteerHistory().then(history => {
                 this.setState({
-                    history: history
+                    history: history,
+                    finalSelection: jsonData
                 });
             });
         }
-    }                   
+    }
+
+    alterStatus() {
+        let jsonData = this.state.finalSelection;
+        console.log("Final:", jsonData);
+        
+   
+            fetch('http://localhost:8000/api/updateVolunteerHistory/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: jsonData
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Response data:', data);
+                if (data.message) {
+                    console.log('Server message:', data.message);
+                }
+                if (data.non_field_errors) {
+                    console.log('Validation errors:', data.non_field_errors);
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    }
 
     render() {
         return (
@@ -53,44 +83,55 @@ export default class ViewVolunteers extends Component {
                     pageSizeOptions={[5, 10, 20]}
                     disableSelectionOnClick
                     checkboxSelection
-                    disableMultipleSelection
-                    disableMultipleRowSelection
-                    selectionType="single"
+                    selectionType="multiple"
                     // Get the list of skills for the selected row on the data table
                     onRowSelectionModelChange={(selectionModel) => {
-                        let selectedRowId = selectionModel[0];
-                        const selectedEvent = this.state.history.find(event => event.id === selectedRowId);
+                        const selectedItemsCount = selectionModel.length;
 
-                        console.log("selectedEvent", selectedEvent);
-                        this.setState({ selectedId: selectedRowId });
-                        this.setState({ volunteer: selectedEvent.Volunteer });
-                        this.setState({ attended: selectedEvent.Attended });
+                        console.log("Selections:", selectionModel);
+                        
+                        selectionModel.forEach(selectedRowId => {
+                            const selectedEvent = this.state.history.find(event => event.id === selectedRowId);
 
-                        const jsonData = JSON.stringify({ Event_ID: this.state.selectedId, Volunteer: this.state.volunteer, Attended: this.state.attended })
-                        console.log("Data:", jsonData);
+                            console.log("selectedEvent", selectedEvent);
 
-                        // Update attendance 
-                        fetch('http://localhost:8000/api/updateVolunteerHistory/', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: jsonData
+/*                             // Skip empty data
+                            if (!selectedEvent || !selectedEvent.Event_ID || !selectedEvent.Volunteer || selectedEvent.Attended === undefined) {
+                                return;
+                            } */
+
+                            this.setState({ selectedId: selectedEvent.Event_ID });
+                            this.setState({ volunteer: selectedEvent.Volunteer });
+                            this.setState({ attended: selectedEvent.Attended });
+                            this.setState({ items: selectedItemsCount });
+
+                            const jsonData = JSON.stringify({ Event_ID: this.state.selectedId, Volunteer: this.state.volunteer, Attended: this.state.attended })
+                            
+                            this.setState({ finalSelection: jsonData });
+                            console.log("Data:", jsonData);
+
+                            // Update attendance 
+                            fetch('http://localhost:8000/api/updateVolunteerHistory/', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: jsonData
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log('Response data:', data);
+                                if (data.message) {
+                                    console.log('Server message:', data.message);
+                                }
+                                if (data.non_field_errors) {
+                                    console.log('Validation errors:', data.non_field_errors);
+                                }
+                            })
+                            .catch((error) => {
+                                console.error('Error:', error);
+                            });
                         })
-                        .then(response => response.json())
-                        .then(data => {
-                            console.log('Response data:', data);
-                            if (data.message) {
-                                console.log('Server message:', data.message);
-                            }
-                            if (data.non_field_errors) {
-                                console.log('Validation errors:', data.non_field_errors);
-                            }
-                        })
-                        .catch((error) => {
-                            console.error('Error:', error);
-                        });
-
                     }}
                     sx={{
                         ".MuiDataGrid-row.Mui-selected:hover": { backgroundColor: "rgb(97 137 47 / 15%)", },
@@ -107,6 +148,8 @@ export default class ViewVolunteers extends Component {
                         ".MuiDataGrid-row": { "&.MuiDataGrid-cell": { color: "white", }, },
                     }}
                 />
+                <br></br>
+                <Button style={{backgroundColor: "#86C232"}} onClick={() => {this.alterStatus()}} variant="contained" type="submit" fontFamily="'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif">Alter Attended Status</Button>
             </div>
         );
     }
