@@ -494,21 +494,107 @@ class UpdateEventViewTests(TestCase):
         self.view = UpdateEventView.as_view()
 
         # Initial Test Event (to be modified during test)
-        self.event = Event.objects.create(
-            Name="Initial Event Name",
-            Administrator="Admin Joe",
-            Description="This is a testing description",
-            Address="123 Main St",
-            City="TestCity",
-            State="Texas",
-            Zip_Code="77777",
-            Date="2024/07/19",
-            Start_Time="12:00 PM",
-            Duration="3h 0m",
-            Skills="Dexterity, Teamwork",
-            Urgency="Low",
-            Created_At=timezone.now(),
-        )
+        self.event_data = {
+            'Event_ID': 1,
+            'Name': 'Test Event',
+            'Administrator': 'Admin Joe',
+            'Description': 'This is a testing description',
+            'Address': '123 Main St',
+            'City': 'TestCity',
+            'State': 'TX',
+            'Zip_Code': '77777',
+            'Date': '2024-07-19',
+            'Start_Time': '12:00 PM',
+            'Urgency': 'Low',
+            'Skills': 'Dexterity, Teamwork',
+            'Duration': '3h 0m'
+        }
+        self.event = Event.objects.create(**self.event_data)
+
+    def test_name_cannot_be_empty(self):
+        self.event_data['Name'] = ''
+        serializer = UpdateEventSerializer(data=self.event_data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('Name', serializer.errors)
+
+    def test_description_cannot_be_empty(self):
+        self.event_data['Description'] = ''
+        serializer = UpdateEventSerializer(data=self.event_data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('Description', serializer.errors)
+
+    def test_description_exceeds_max_length(self):
+        self.event_data['Description'] = 'A' * 257
+        serializer = UpdateEventSerializer(data=self.event_data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('Description', serializer.errors)
+
+    def test_address_cannot_be_empty(self):
+        self.event_data['Address'] = ''
+        serializer = UpdateEventSerializer(data=self.event_data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('Address', serializer.errors)
+
+    def test_address_exceeds_max_length(self):
+        self.event_data['Address'] = 'A' * 76
+        serializer = UpdateEventSerializer(data=self.event_data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('Address', serializer.errors)
+
+    def test_city_cannot_be_empty(self):
+        self.event_data['City'] = ''
+        serializer = UpdateEventSerializer(data=self.event_data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('City', serializer.errors)
+
+    def test_city_exceeds_max_length(self):
+        self.event_data['City'] = 'A' * 29
+        serializer = UpdateEventSerializer(data=self.event_data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('City', serializer.errors)
+
+    def test_state_cannot_be_empty(self):
+        self.event_data['State'] = ''
+        serializer = UpdateEventSerializer(data=self.event_data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('State', serializer.errors)
+
+    def test_state_exceeds_max_length(self):
+        self.event_data['State'] = 'A' * 14
+        serializer = UpdateEventSerializer(data=self.event_data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('State', serializer.errors)
+
+    def test_zip_code_cannot_be_empty(self):
+        self.event_data['Zip_Code'] = ''
+        serializer = UpdateEventSerializer(data=self.event_data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('Zip_Code', serializer.errors)
+
+    def test_zip_code_exceeds_max_length(self):
+        self.event_data['Zip_Code'] = '123456'
+        serializer = UpdateEventSerializer(data=self.event_data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('Zip_Code', serializer.errors)
+
+    def test_urgency_exceeds_max_length(self):
+        self.event_data['Urgency'] = 'A' * 11
+        serializer = UpdateEventSerializer(data=self.event_data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('Urgency', serializer.errors)
+
+    def test_skills_exceeds_max_length(self):
+        self.event_data['Skills'] = 'A' * 201
+        serializer = UpdateEventSerializer(data=self.event_data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('Skills', serializer.errors)
+
+    def test_duration_exceeds_max_length(self):
+        self.event_data['Duration'] = 'A' * 7
+        serializer = UpdateEventSerializer(data=self.event_data)
+        self.assertFalse(serializer.is_valid())
+        self.assertIn('Duration', serializer.errors)
+
 
     def test_update_event(self):
         # Modified event values
@@ -874,3 +960,187 @@ class VolunteerMatchingTests(TestCase):
         # Tests good data update
         response = self.client.post('/api/eventVolunteerMatch/', data=newDataJSON, content_type='application/json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+class VolunteerReportTest(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.request1 = self.factory.get('/api/pdfReportVolunteer')
+        self.request2 = self.factory.get('/api/csvReportVolunteer')
+        
+        # Initial Event
+        self.event1 = Event.objects.create(
+            Name="Initial Event Name",
+            Administrator="Admin Joe",
+            Description="This is a testing description",
+            Address="123 Main St",
+            City="TestCity",
+            State="Texas",
+            Zip_Code="77777",
+            Date="2024-07-19",
+            Start_Time="12:00 PM",
+            Duration="3h 0m",
+            Skills="Dexterity, Teamwork",
+            Urgency="Low",
+            Created_At=timezone.now(),
+        )
+        # Initial Event
+        self.event2 = Event.objects.create(
+            Name="Cool Event",
+            Administrator="Admin Jimmy",
+            Description="This is a second testing description",
+            Address="233 Bronze St",
+            City="TestTown",
+            State="Texas",
+            Zip_Code="77777",
+            Date="09/24/2024",
+            Start_Time="12:00 PM",
+            Duration="4h 0m",
+            Skills="Patience, Dexterity, Teamwork",
+            Urgency="High",
+            Created_At=timezone.now(),
+        )
+
+        Event_Volunteers.objects.create(
+            Event_ID=self.event1.Event_ID,
+            Volunteer="John Doe",
+            Attended="Y"
+        )
+        Event_Volunteers.objects.create(
+            Event_ID=self.event1.Event_ID,
+            Volunteer="Jane Doe",
+            Attended=""
+        )
+        Event_Volunteers.objects.create(
+            Event_ID=self.event1.Event_ID,
+            Volunteer="William Dafoe",
+            Attended="Y"
+        )
+        Event_Volunteers.objects.create(
+            Event_ID=self.event1.Event_ID,
+            Volunteer="Johny Bravo",
+            Attended="Y"
+        )
+        Event_Volunteers.objects.create(
+            Event_ID=self.event2.Event_ID,
+            Volunteer="John Doe",
+            Attended="Y"
+        )
+        Event_Volunteers.objects.create(
+            Event_ID=self.event2.Event_ID,
+            Volunteer="Jane Doe",
+            Attended="Y"
+        )
+
+    def test_pdf_report_volunteer_response(self):
+        response = pdfReportVolunteer(self.request1)
+
+        # Check the content type is PDF
+        self.assertEqual(response['Content-Type'], 'application/pdf')
+        self.assertEqual(response.status_code, 200)
+
+        content_disposition = 'attachment; filename="volunteerHistoryReport.pdf"'
+        self.assertEqual(response['Content-Disposition'], content_disposition)
+        self.assertTrue(isinstance(response, FileResponse))
+
+    def test_csv_report_volunteer_response(self):
+        response = csvReportVolunteer(self.request2)
+
+        # Check the content type is CSV
+        self.assertEqual(response['Content-Type'], 'text/csv')
+        self.assertEqual(response.status_code, 200)
+
+        content_disposition = 'attachment; filename="volunteerHistoryReport.csv"'
+        self.assertEqual(response['Content-Disposition'], content_disposition)
+        self.assertTrue(isinstance(response, HttpResponse))
+
+class EventReportTest(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.request1 = self.factory.get('/api/pdfReportEvent')
+        self.request2 = self.factory.get('/api/csvReportEvent')
+        
+        # Initial Event
+        self.event1 = Event.objects.create(
+            Name="Initial Event Name",
+            Administrator="Admin Joe",
+            Description="This is a testing description",
+            Address="123 Main St",
+            City="TestCity",
+            State="Texas",
+            Zip_Code="77777",
+            Date="2024-07-19",
+            Start_Time="12:00 PM",
+            Duration="3h 0m",
+            Skills="Dexterity, Teamwork",
+            Urgency="Low",
+            Created_At=timezone.now(),
+        )
+        # Initial Event
+        self.event2 = Event.objects.create(
+            Name="Cool Event",
+            Administrator="Admin Jimmy",
+            Description="This is a second testing description",
+            Address="233 Bronze St",
+            City="TestTown",
+            State="Texas",
+            Zip_Code="77777",
+            Date="09/24/2024",
+            Start_Time="12:00 PM",
+            Duration="4h 0m",
+            Skills="Patience, Dexterity, Teamwork",
+            Urgency="High",
+            Created_At=timezone.now(),
+        )
+
+        Event_Volunteers.objects.create(
+            Event_ID=self.event1.Event_ID,
+            Volunteer="John Doe",
+            Attended="Y"
+        )
+        Event_Volunteers.objects.create(
+            Event_ID=self.event1.Event_ID,
+            Volunteer="Jane Doe",
+            Attended=""
+        )
+        Event_Volunteers.objects.create(
+            Event_ID=self.event1.Event_ID,
+            Volunteer="William Dafoe",
+            Attended="Y"
+        )
+        Event_Volunteers.objects.create(
+            Event_ID=self.event1.Event_ID,
+            Volunteer="Johny Bravo",
+            Attended="Y"
+        )
+        Event_Volunteers.objects.create(
+            Event_ID=self.event2.Event_ID,
+            Volunteer="John Doe",
+            Attended="Y"
+        )
+        Event_Volunteers.objects.create(
+            Event_ID=self.event2.Event_ID,
+            Volunteer="Jane Doe",
+            Attended="Y"
+        )
+
+    def test_pdf_report_event_response(self):
+        response = pdfReportEvent(self.request1)
+
+        # Check the content type is PDF
+        self.assertEqual(response['Content-Type'], 'application/pdf')
+        self.assertEqual(response.status_code, 200)
+
+        content_disposition = 'attachment; filename="eventReport.pdf"'
+        self.assertEqual(response['Content-Disposition'], content_disposition)
+        self.assertTrue(isinstance(response, FileResponse))
+
+    def test_csv_report_event_response(self):
+        response = csvReportEvent(self.request2)
+
+        # Check the content type is CSV
+        self.assertEqual(response['Content-Type'], 'text/csv')
+        self.assertEqual(response.status_code, 200)
+
+        content_disposition = 'attachment; filename="eventReport.csv"'
+        self.assertEqual(response['Content-Disposition'], content_disposition)
+        self.assertTrue(isinstance(response, HttpResponse))

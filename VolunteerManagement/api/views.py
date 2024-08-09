@@ -57,6 +57,7 @@ def pdfReportVolunteer(request):
 
         # Loop through each event the volunteer is a part of
         for event in events:
+            print("In loop")
             try:
                 attendance = Event_Volunteers.objects.get(Volunteer=volunteerName, Event_ID=event.Event_ID).Attended
             except Event_Volunteers.DoesNotExist:
@@ -65,6 +66,7 @@ def pdfReportVolunteer(request):
             eventName = event.Name
             eventID = event.Event_ID
             eventDate = event.Date
+            print("eventDate before", eventDate)
 
             # Convert eventDate to datetime object
             if isinstance(eventDate, str):
@@ -72,6 +74,7 @@ def pdfReportVolunteer(request):
                     eventDate = datetime.strptime(eventDate, "%Y-%m-%d").date()
                 except ValueError:
                     eventDate = datetime.strptime(eventDate, "%m/%d/%Y").date()
+            print("eventDate after", eventDate)
 
             # Check if the event is in the future
             if eventDate > datetime.now().date():
