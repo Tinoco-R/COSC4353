@@ -30,55 +30,80 @@ export default class PersonalAdminEvents extends Component {
             events: [],
             administrator: "ADMIN",
             cardData: [],
+            username: "",
         }
     }
 
     componentDidMount() {
         // Fetch current administrator username (hardcoded atm)
-        let admin = this.state.administrator;
+        
+        fetch('/api/User', {
+            headers: {
+                "Content-Type": "application/json",
+                "Host": "http://127.0.0.1:8000",
+                "Origin": "http://127.0.0.1:8000",
+                "User-Agent": "",
+                "Accept": "*/*",
+                "Accept-Encoding": "gzip,deflate,br",
+                "Connection": "keep-alive",
+                "mode": "cors",
+            },
+            method: "GET",
+            credentials: "same-origin"
+        })
+        .then(res => res.json())
+        .then(data => {
+            console.log("data:", data.username)
+            this.setState({ username: data.username });
+            this.setState({ administrator: data.username });
 
-        // Get all events from the database
-        fetchEvents().then(events => {
-            this.setState({
-                events: this.filterEvents(admin, events)
+            let admin = data.username;
+            console.log("ADMIN:", admin);
+
+            // Get all events from the database
+            fetchEvents().then(events => {
+                this.setState({
+                    events: this.filterEvents(admin, events)
+                });
+
+                setTimeout(() => {
+                    // Get all the volunteers for each event (used to show a count)
+                    let events = this.state.events;
+                    let cards = [];
+                    // Loop through all events to get the volunteer count for that event
+                    for (let index = 0; index < events.length; index++) {
+                        let data = {};
+                        const event = events[index];
+                        //console.log("Event", event);
+
+                        data.eventId = event.Event_ID;
+                        data.eventName = event.Name;
+                        data.eventAddress = event.Address;
+                        data.eventDate = event.Date;
+                        data.eventStart = event.Start_Time;
+                        data.eventDuration = event.Duration;
+                        data.eventUrgency = event.Urgency;
+
+                        // Fetch event volunteers
+                        fetchEventVolunteers(data.eventId).then(volunteersOfEvent => {
+                            // Keep track of the members for the currently selected event
+                            const volunteerNamesArray = volunteersOfEvent.map(volunteer => volunteer.Volunteer);
+                            data.eventVolunteers = volunteerNamesArray.length;
+                        });
+
+                        cards.push(data);
+                    }
+                    //console.log("Cards", cards);
+                    
+                    this.setState({ cardData: cards });
+                }, 0);
             });
-
-            setTimeout(() => {
-                // Get all the volunteers for each event (used to show a count)
-                let events = this.state.events;
-                let cards = [];
-                // Loop through all events to get the volunteer count for that event
-                for (let index = 0; index < events.length; index++) {
-                    let data = {};
-                    const event = events[index];
-                    //console.log("Event", event);
-
-                    data.eventId = event.Event_ID;
-                    data.eventName = event.Name;
-                    data.eventAddress = event.Address;
-                    data.eventDate = event.Date;
-                    data.eventStart = event.Start_Time;
-                    data.eventDuration = event.Duration;
-                    data.eventUrgency = event.Urgency;
-
-                    // Fetch event volunteers
-                    fetchEventVolunteers(data.eventId).then(volunteersOfEvent => {
-                        // Keep track of the members for the currently selected event
-                        const volunteerNamesArray = volunteersOfEvent.map(volunteer => volunteer.Volunteer);
-                        data.eventVolunteers = volunteerNamesArray.length;
-                    });
-
-                    cards.push(data);
-                }
-                //console.log("Cards", cards);
-                
-                this.setState({ cardData: cards });
-            }, 0);
         });
     }
 
     // Filter events to show only those for the logged in administrator
     filterEvents(admin, events) {
+        console.log("Filtering...", admin);
         let filtered = [];
         for (let index = 0; index < events.length; index++) {
             const event = events[index];
@@ -93,7 +118,7 @@ export default class PersonalAdminEvents extends Component {
 
     basicCard(data) {
         return(
-            <Card id="card" event={data.eventId} onClick={() => window.location.href += "/" + data.eventId} sx={{ minWidth: 100, minHeight: 140, bgcolor: theme.palette.primary.main, mb: 2 }}>
+            <Card id="card" event={data.eventId} /* onClick={() => window.location.href += "/" + data.eventId} */ sx={{ minWidth: 100, minHeight: 140, bgcolor: theme.palette.primary.main, mb: 2 }}>
                 <CardContent>
                     <CustomTypography variant="h5" component="div" className="name" gutterBottom>
                         {data.eventName}

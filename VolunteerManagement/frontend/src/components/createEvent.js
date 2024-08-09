@@ -61,6 +61,26 @@ export default class CreateEvent extends Component {
     }
 
     componentDidMount() {
+        fetch('/api/User', {
+            headers: {
+                "Content-Type": "application/json",
+                "Host": "http://127.0.0.1:8000",
+                "Origin": "http://127.0.0.1:8000",
+                "User-Agent": "",
+                "Accept": "*/*",
+                "Accept-Encoding": "gzip,deflate,br",
+                "Connection": "keep-alive",
+                "mode": "cors",
+            },
+            method: "GET",
+            credentials: "same-origin"
+        })
+        .then(res => res.json())
+        .then(data => {
+            console.log("data:", data.username)
+            this.setState({ eventAdministrator: data.username });
+        })
+
         fetchEvents().then(events => {
             this.setState({
                 events: events,
@@ -445,8 +465,8 @@ export default class CreateEvent extends Component {
             formData.Address = this.state.eventAddress;
             formData.City = this.state.eventCity;
             if (this.state.updating) {
-                formData.State = this.state.eventState;
-                formData.Urgency = this.state.eventUrgency;
+                formData.State = this.state.eventState[0];
+                formData.Urgency = this.state.eventUrgency[0];
             }
             else {
                 formData.State = this.state.eventState[0];
