@@ -47,6 +47,7 @@ urlpatterns = [
     path("sign-up/", views.index, name="index"),
     path("verification/", views.index, name="index"),
     path("reset-password/", views.index, name="index"),
+    path("new-password/<str:username>", views.index, name="index"),
     path("volunteer/logout/", views.index, name="index"),
     path("email-address-received/", views.index, name="index"),
     path("notification/", views.index, name="index"),

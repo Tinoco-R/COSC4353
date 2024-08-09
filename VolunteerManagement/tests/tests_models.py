@@ -7,7 +7,8 @@ from api import tokens
 import six
 from django.contrib.auth.base_user import AbstractBaseUser
 
-from api.models import User
+#from api.models import User
+from django.contrib.auth.models import User
 
 class testUserModel(TestCase):
 

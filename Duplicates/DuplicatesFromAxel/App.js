@@ -26,6 +26,7 @@ import Login from "./login/Login";
 import Signup from "./login/Signup";
 import InitialVerification from "./login/InitialVerification";
 import ResetPassword from "./login/ResetPassword";
+import NewPassword from "./login/NewPassword";
 import Logout from "./login/Logout";
 import EmailAddressReceivedConfirmation from "./login/EmailAddressReceivedConfirmation";
 import NotificationComponent from "./notification/NotificationComponent";
@@ -76,6 +77,14 @@ export default function App() {
                     element={ 
                         <>
                         < ResetPassword />
+                        </>
+                    } 
+                     />
+
+                    <Route exact path ="/new-password/:username" 
+                    element={ 
+                        <>
+                        < NewPassword />
                         </>
                     } 
                      />

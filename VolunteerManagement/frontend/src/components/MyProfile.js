@@ -464,11 +464,11 @@ export default function MyProfile(){
     }
 
     return (
-        <>
+        <div id="profile" >
         <h1 className='myProfileTitle'>My Profile</h1>
         <form onSubmit={handleSubmit(onSubmit)}>
             <div className='myProfileFormBox'>
-                <label for='fullName'>Full Name</label>
+                <label for='fullName' className='profile_label_text'>Full Name</label>
                 {
                     hasProfile ? (
                         <p style={{fontWeight: 'normal'}}>Current value: {profile.full_name}</p>
@@ -479,7 +479,7 @@ export default function MyProfile(){
                 <p className='inputValidationError'>{errors.fullName?.message}</p>
             </div>
             <div className='myProfileFormBox'>
-                <label for='Address1'>Address 1</label>
+                <label for='Address1' className='profile_label_text'>Address 1</label>
                 {
                     hasProfile ? (
                         <p style={{fontWeight: 'normal'}}>Current value: {profile.address1}</p>
@@ -490,7 +490,7 @@ export default function MyProfile(){
                 <p className='inputValidationError'>{errors.Address1?.message}</p>
             </div>
             <div className='myProfileFormBox'>
-                <label for='Address2'>Address 2</label>
+                <label for='Address2' className='profile_label_text'>Address 2</label>
                 {
                     hasProfile ? (
                         <p style={{fontWeight: 'normal'}}>Current value: {profile.address2}</p>
@@ -501,7 +501,7 @@ export default function MyProfile(){
                 <p className='inputValidationError'>{errors.Address2?.message}</p>
             </div>
             <div className='myProfileFormBox'>
-                <label for='City'>City</label> {/* Per the regular expression, City will reject all inputs consisting only of numbers */}
+                <label for='City' className='profile_label_text'>City</label> {/* Per the regular expression, City will reject all inputs consisting only of numbers */}
                 {
                     hasProfile ? (
                         <p style={{fontWeight: 'normal'}}>Current value: {profile.city}</p>
@@ -511,8 +511,8 @@ export default function MyProfile(){
                 <input {...register('City', { required: 'City is required', pattern: { value: /[a-z]|[A-Z]/, message: 'Invalid input, you must include at least one character'}, maxLength: { value: 100, message: 'Max length is 100'}} )} />
                 <p className='inputValidationError'>{errors.City?.message}</p>
             </div>
-            <div className='myProfileFormBox'>
-                <label for='State'>State</label>
+            <div className='myProfileFormBox' id="profile_state_dropdown">
+                <label for='State' className='profile_label_text'>State</label>
                 {
                     hasProfile ? (
                         <p style={{fontWeight: 'normal'}}>Current value: {profile.state}</p>
@@ -527,8 +527,9 @@ export default function MyProfile(){
                     sty
                      />
             </div>
+            <br></br>
             <div className='myProfileFormBox'>
-                <label for='zipCode'>ZIP Code</label> {/* credit for regex for digits: user1299656 on https://stackoverflow.com/questions/9011524/regex-to-check-whether-a-string-contains-only-numbers*/}
+                <label for='zipCode' className='profile_label_text'>ZIP Code</label> {/* credit for regex for digits: user1299656 on https://stackoverflow.com/questions/9011524/regex-to-check-whether-a-string-contains-only-numbers*/}
                 {
                     hasProfile ? (
                         <p style={{fontWeight: 'normal'}}>Current value: {profile.zip_code}</p>
@@ -538,8 +539,8 @@ export default function MyProfile(){
                 <input {...register('zipCode', { required: 'ZIP Code is required', pattern: { value: /^[0-9]*$/, message: 'Input must be numbers only'}, minLength: { value: 5, message: 'Min length is 5'}, maxLength: { value: 9, message: 'Max length is 9'}} )} />
                 <p className='inputValidationError'>{errors.zipCode?.message}</p>
             </div>
-            <div className='myProfileFormBox'>
-                <label for='Skills'>Skills</label>
+            <div className='myProfileFormBox' id="profile_skills_dropdown">
+                <label for='Skills' className='profile_label_text'>Skills</label>
                 {
                     hasProfile ? (
                         <p style={{fontWeight: 'normal'}}>Current value: {profile.skills}</p>
@@ -554,9 +555,10 @@ export default function MyProfile(){
                     required
                      />
             </div>
+            <br></br>
 
             <div className='myProfileFormBox'>
-                <label for='Preferences'>Preferences</label>
+                <label for='Preferences' className='profile_label_text'>Preferences</label>
                 {
                     hasProfile ? (
                         <p style={{fontWeight: 'normal'}}>Current value: {profile.preferences}</p>
@@ -583,7 +585,7 @@ export default function MyProfile(){
         </div>*/}
 
         <div className='myProfileFormBox'>
-            <label for='availability'>Availability</label>
+            <label for='availability' className='profile_label_text'>Availability</label>
             {
                     hasProfile ? (
                         <p style={{fontWeight: 'normal'}}>Current value: {profile.availability}</p>
@@ -599,13 +601,15 @@ export default function MyProfile(){
             required
         />
         </div>
+        
+        <br></br>
 
         <div className='myProfileFormSubmitButton'>
                 <input className='greenButtonStyle' type='submit' value='Save' />
             </div>
         </form>
 
-        </>
+        </div>
     );
 
     
