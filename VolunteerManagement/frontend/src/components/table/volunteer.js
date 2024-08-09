@@ -43,6 +43,7 @@ export default class VolunteerDetailsAdmin extends Component {
         // Selected Event
         const { selectedEvent } = this.props;
         const { selectedEventName } = this.props;
+        const { selectedEventDate } = this.props;
 
         // Selected Volunteers
         let activeVolunteers = this.state.activeVolunteers;
@@ -150,6 +151,7 @@ export default class VolunteerDetailsAdmin extends Component {
                 // Waits for async event to finish before proceeding
                 setTimeout(() => {
                     this.filterVolunteersBySkills(0, volunteerNamesArray);
+                    //this.filterVolunteersByAvailability();
                     this.removePreExistingActiveVolunteers();
                 }, 0);
             });
@@ -181,6 +183,7 @@ export default class VolunteerDetailsAdmin extends Component {
     filterVolunteersBySkills = ( skillsToMatch = 0, eventMembers = [] ) => {
         // Selected skills are the skills of the selected event
         const { selectedSkills } = this.props;
+        const { selectedEventDate } = this.props;
         let volunteers = this.state.profiles;
 
         // No filter
@@ -195,7 +198,9 @@ export default class VolunteerDetailsAdmin extends Component {
             const skills = volunteer.skills;
             const skillsArray = skills ? skills.split(',') : [];
 
-            //const name = volunteer.name;
+            const availability = volunteer.availability;
+            const availabilityArray = availability ? availability.split(',') : [];
+
             const name = volunteer.full_name;
 
             if (eventMembers.includes(name)) {
@@ -215,16 +220,13 @@ export default class VolunteerDetailsAdmin extends Component {
             }
 
             // Volunteer matched or exceeded specified number of required skills
-            if (skillsLeft <= 0) {
+            if (skillsLeft <= 0 && availabilityArray.includes(selectedEventDate)) {
+                console.log("Volunteer", name, "with availabilty", availabilityArray,"against:", selectedEventDate);
                 filteredVolunteers.push(volunteer);
             }
-        }
-
-        // filteredVolunteers 
-      
+        }      
         return filteredVolunteers;
-    };
-      
+    };      
 
     // Allows the volunteer's skills to show
     toggleSkills = () => {
@@ -277,9 +279,9 @@ export default class VolunteerDetailsAdmin extends Component {
         return(
             <Card id="volunteerCard" sx={{ bgcolor: theme.palette.primary.main, mb: 2}} >
                 <Typography sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 1, color: 'white' }} gutterBottom>
-                    <strong>{"Volunteer"}</strong>
-                    <strong>{"Rating"}</strong>
-                    <strong>{"Attendance"}</strong>
+                    <strong>{}</strong>
+                    <strong>{"Volunteers"}</strong>
+                    <strong>{}</strong>
                 </Typography>
             </Card>
         );
@@ -288,6 +290,7 @@ export default class VolunteerDetailsAdmin extends Component {
     // Actual volunteer cards with information over a volunteer: Name, Rating, Attendance, and all their Skills
     basicCard(data, isActive, className, cardsToShow, count, filter) {
         const { selectedSkills } = this.props;
+        const { selectedEventDate } = this.props;
         let row = (data.row - 1);
 
         // For volunteers who are part of an event already, background color is red
@@ -295,6 +298,9 @@ export default class VolunteerDetailsAdmin extends Component {
 
         // Splitting the skills string into an array if it's not null or empty
         const skillsArray = data.skills ? data.skills.split(',') : [];
+
+        // Splitting the availability string into an array if it's not null or empty
+        const availabilityArray = data.availability ? data.availability.split(',') : [];
 
         return(
             <Card id="volunteerCard" event={data.event} innerIndex={count} onClick={() => this.cardClick(count, data.full_name, data, filter)} className={`volunteer-card ${isActive? className : ''}`} sx={{ bgcolor: theme.palette.primary.main, mb: 2, cursor: 'pointer', ...isPartOfEvent ? { backgroundColor: 'red' } : (isActive ? { backgroundColor: '#86C232' } : {}) }}>

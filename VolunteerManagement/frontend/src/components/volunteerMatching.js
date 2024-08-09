@@ -13,6 +13,7 @@ export default class VolunteerMatching extends Component {
           selectedSkills: "",
           selectedEvent: "",
           selectedEventName: "",
+          selectedEventDate: "",
           events: []
         };
     }
@@ -25,6 +26,14 @@ export default class VolunteerMatching extends Component {
             });
         });
     }
+
+    convertDateFormat = (dateString) => {
+        const date = new Date(dateString);
+        date.setDate(date.getDate() + 1);
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${month}/${day}/${date.getFullYear()}`;
+    };
 
     convertSelectedSkillsToStringArray = (selectedSkillsString) => {
       return selectedSkillsString.split(", ");
@@ -61,6 +70,14 @@ export default class VolunteerMatching extends Component {
                               this.state.selectedEvent = selectedRowId;
                               if (selectedEvent && selectedEvent.Name) {
                                 this.state.selectedEventName = selectedEvent.Name;
+                                if (selectedEvent.Date) {
+                                    let formattedDate = selectedEvent.Date;
+                                    // Check if the date is in YYYY-MM-DD format and convert it
+                                    if (/^\d{4}-\d{2}-\d{2}$/.test(selectedEvent.Date)) {
+                                        formattedDate = this.convertDateFormat(selectedEvent.Date);
+                                    }
+                                    this.state.selectedEventDate = formattedDate;
+                                }
                               }
                               else {
                                 this.state.selectedEventName = "";
@@ -91,7 +108,7 @@ export default class VolunteerMatching extends Component {
                   </div>
                     </div>
                     <div style={{ flex: 1 }}>
-                        <VolunteerDetailsAdmin selectedSkills={this.convertSelectedSkillsToStringArray(this.state.selectedSkills)} selectedEvent={this.state.selectedEvent} selectedEventName={this.state.selectedEventName} />
+                        <VolunteerDetailsAdmin selectedSkills={this.convertSelectedSkillsToStringArray(this.state.selectedSkills)} selectedEvent={this.state.selectedEvent} selectedEventName={this.state.selectedEventName} selectedEventDate={this.state.selectedEventDate} />
                     </div>
                 </div>
             </>
