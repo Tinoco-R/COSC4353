@@ -541,7 +541,7 @@ def resetPassword(request, email):
     # Video "Send Email in Python with Gmail 2024 - Tutorial by Mailtrap"
     # at https://www.youtube.com/watch?v=WZ_pUSAV5DA
     subject = "Helping Hands Password Reset Request"
-    url = "http://127.0.0.1:8000/api/resetPasswordFromLink/" + str(request.user)
+    url = "http://127.0.0.1:8000/api/resetPasswordFromLink/" + email
     body = "Visit the link below from your browser to reset your password (please copy and paste the link):  \n" + url
     sender = "ax.alvarenga19@gmail.com"
     password = "sgjk jbcd tbdw caur"
@@ -583,7 +583,15 @@ def changePassword(request):
     print("username to change password for:", decoded_request_body["user"])
     print("new password:", decoded_request_body["password"])
 
-    # Update the password
+    try:
+        # Update the password (source: user Svetiozar Angelov at https://stackoverflow.com/questions/1873806/how-to-allow-users-to-change-their-own-passwords-in-django)
+        user = User.objects.get(username__exact=decoded_request_body["user"])
+        user.set_password(decoded_request_body["password"])
+        user.save()
+        print("Password updated successfully")
+    except Exception as error:
+        print("Error updating the password")
+        print("error:", error)
 
     return HttpResponse('')
 
@@ -849,6 +857,8 @@ def LoginView(request):
         print(username, password)
         User = get_user_model()
         userAttemptingLogin = User.objects.get(username=username)
+        print("username:", username)
+        print("password:", password)
         user = authenticate(request, username=username, password=password)
         #user = True # not implementing the authentication quite yet (closely toupled with DB & Django)
         print(user)

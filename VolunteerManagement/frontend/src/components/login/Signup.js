@@ -8,7 +8,7 @@ import { useForm } from "react-hook-form";
 
 export default function Signup(){
 
-    const [isAdmin, setIsAdmin] = useState(true);
+    const [isAdmin, setIsAdmin] = useState(false);
     console.log("is admin main:");
     
     const toggleAdmin = () => {
@@ -126,7 +126,7 @@ export default function Signup(){
         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '100vh' }}>
         <p>
             Toggle Account Type
-            <p>Login Type: {isAdmin? 'Admin' : 'Volunteer'}</p>
+            <p>Account Type: {isAdmin? 'Admin' : 'Volunteer'}</p>
             <div>
                 <button onClick={toggleAdmin}>Change</button>
             </div>

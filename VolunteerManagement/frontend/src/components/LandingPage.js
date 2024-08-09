@@ -34,7 +34,7 @@ export default function LandingPageWithEvents(){
         <>
 
             {/*<ResponsiveBar />*/}
-            {ShowNotification('Welcome!', 'Thank you for visiting our site for the first time')}
+            {/*{ShowNotification('Welcome!', 'Thank you for visiting our site for the first time')}*/}
             <MyEventsHeader />
 
             <CustomCalendar />
