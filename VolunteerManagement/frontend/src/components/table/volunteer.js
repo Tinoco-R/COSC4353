@@ -13,7 +13,8 @@ import { volunteerCardData } from "../volunteerAdminMatchingCardData";
 import Grid from '@mui/material/Grid';
 import Slider from '@mui/material/Slider';
 import { ShowNotification, ShowDetails } from "../notification/NotificationComponent";
-import { fetchEventVolunteers } from "../eventData";
+import { fetchEventVolunteers, fetchProfiles } from "../eventData";
+import { columnsStateInitializer } from "@mui/x-data-grid/internals";
 
 // Slider code adapted from: https://mui.com/material-ui/react-slider/
 export default class VolunteerDetailsAdmin extends Component {
@@ -27,7 +28,8 @@ export default class VolunteerDetailsAdmin extends Component {
             filteredVolunteers: [],
             allVolunteers: [],
             eventMembers: [],
-            activeVolunteers: []
+            activeVolunteers: [],
+            profiles: [],
         };
     }
 
@@ -49,7 +51,7 @@ export default class VolunteerDetailsAdmin extends Component {
         formData.Event_ID = selectedEvent;
         formData.Volunteer = [];
         for (let index = 0; index < activeVolunteers.length; index++) {
-            const volunteerName = activeVolunteers[index].name;
+            const volunteerName = activeVolunteers[index].full_name;
             formData.Volunteer.push(volunteerName);
         }
 
@@ -71,7 +73,7 @@ export default class VolunteerDetailsAdmin extends Component {
                 let eventUrl = "http://localhost:8000/api/eventVolunteerMatch/";
 
                 for (let index = 0; index < activeVolunteers.length; index++) {
-                    const volunteerName = activeVolunteers[index].name;
+                    const volunteerName = activeVolunteers[index].full_name;
                     const volunteerData = {
                         Event_ID: selectedEvent,
                         Volunteer: volunteerName
@@ -113,10 +115,18 @@ export default class VolunteerDetailsAdmin extends Component {
     componentDidMount() {
         const filteredList = this.filterVolunteersBySkills();
 
-        this.setState({
+        fetchProfiles().then(profiles => {
+            this.setState({
+                filteredVolunteers: filteredList,
+                profiles: profiles,
+                allVolunteers: profiles
+            });
+        });
+
+/*         this.setState({
             filteredVolunteers: filteredList,
             allVolunteers: volunteerCardData
-        });
+        }); */
     }
 
     componentDidUpdate(prevProps) {
@@ -171,7 +181,7 @@ export default class VolunteerDetailsAdmin extends Component {
     filterVolunteersBySkills = ( skillsToMatch = 0, eventMembers = [] ) => {
         // Selected skills are the skills of the selected event
         const { selectedSkills } = this.props;
-        let volunteers = volunteerCardData;
+        let volunteers = this.state.profiles;
 
         // No filter
         if (selectedSkills[0] === "") {
@@ -183,7 +193,10 @@ export default class VolunteerDetailsAdmin extends Component {
         for (let i = 0; i < volunteers.length; i++) {
             const volunteer = volunteers[i];
             const skills = volunteer.skills;
-            const name = volunteer.name;
+            const skillsArray = skills ? skills.split(',') : [];
+
+            //const name = volunteer.name;
+            const name = volunteer.full_name;
 
             if (eventMembers.includes(name)) {
                 // Don't push volunteer as they are already part of the event; or maybe color them a different color?
@@ -191,8 +204,8 @@ export default class VolunteerDetailsAdmin extends Component {
 
             let skillsLeft = skillsToMatch
             // Loop through all skills of a volunteer
-            for (let j = 0; j < skills.length; j++) {
-                const skill = skills[j].skill;
+            for (let j = 0; j < skillsArray.length; j++) {
+                const skill = skillsArray[j];
                 // Check if skill is in selectedSkills
                 for (let k = 0; k < selectedSkills.length; k++) {
                     if (skill === selectedSkills[k]) {
@@ -276,25 +289,32 @@ export default class VolunteerDetailsAdmin extends Component {
     basicCard(data, isActive, className, cardsToShow, count, filter) {
         const { selectedSkills } = this.props;
         let row = (data.row - 1);
+
         // For volunteers who are part of an event already, background color is red
-        
-        const isPartOfEvent = this.state.eventMembers.includes(data.name);
+        const isPartOfEvent = this.state.eventMembers.includes(data.full_name);
+
+        // Splitting the skills string into an array if it's not null or empty
+        const skillsArray = data.skills ? data.skills.split(',') : [];
 
         return(
-            <Card id="volunteerCard" event={data.event} innerIndex={count} onClick={() => this.cardClick(count, data.name, data, filter)} className={`volunteer-card ${isActive? className : ''}`} sx={{ bgcolor: theme.palette.primary.main, mb: 2, cursor: 'pointer', ...isPartOfEvent ? { backgroundColor: 'red' } : (isActive ? { backgroundColor: '#86C232' } : {}) }}>
+            <Card id="volunteerCard" event={data.event} innerIndex={count} onClick={() => this.cardClick(count, data.full_name, data, filter)} className={`volunteer-card ${isActive? className : ''}`} sx={{ bgcolor: theme.palette.primary.main, mb: 2, cursor: 'pointer', ...isPartOfEvent ? { backgroundColor: 'red' } : (isActive ? { backgroundColor: '#86C232' } : {}) }}>
                 <CardContent>
                     <Typography sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 1, color: theme.palette.secondary.main }} gutterBottom>
-                        <strong>{data.name}</strong>
-                        <strong>{data.rating}</strong>
-                        <strong>{data.attendence}</strong>
+                        <strong>{data.full_name}</strong>
+                        {/*<strong>{data.attendence}</strong>*/}
                     </Typography>
-                    {this.state.showSkills && data.skills.map((skill, index) => {
+
+                    {this.state.showSkills && skillsArray.map((skill, index) => {
                         return(
-                            <Typography sx={{ fontSize: 14, color: selectedSkills.length !== 0 && selectedSkills.includes(skill.skill)? 'white' : theme.palette.secondary.main, fontWeight: selectedSkills.includes(skill.skill)? 'bold' : 'normal' }} key={index} gutterBottom>
-                                {skill.skill}
+                            <Typography sx={{ fontSize: 14, color: selectedSkills.length !== 0 && selectedSkills.includes(skill)? 'white' : theme.palette.secondary.main, fontWeight: selectedSkills.includes(skill)? 'bold' : 'normal' }} key={index} gutterBottom>
+                                {skill}
                             </Typography>
                         );
                     })}
+
+                    <Typography sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 1, color: 'white' }} gutterBottom>
+                        Preferences: {data.preferences}
+                    </Typography>
                     
                 </CardContent>
             </Card>

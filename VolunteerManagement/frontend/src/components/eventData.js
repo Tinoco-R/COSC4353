@@ -24,3 +24,12 @@ export const fetchVolunteerHistory = async () => {
   }
   return response.json();
 };
+
+// Fetches all events from the backend and sends it as json
+export const fetchProfiles = async () => {
+  const response = await fetch('/api/profilesView/');
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  }
+  return response.json();
+};

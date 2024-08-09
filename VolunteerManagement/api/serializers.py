@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Event, Event_Volunteers
+from .models import Event, Event_Volunteers, Profile
 import datetime
 
 # Axel's models:
@@ -23,6 +23,10 @@ class UpdateVolunteerHistorySerializer(serializers.ModelSerializer):
         fields = ('Event_ID', 'Volunteer', 'Attended')
         validators = []
 
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = ('__all__')
 
 class CreateEventSerializer(serializers.ModelSerializer):
     class Meta:

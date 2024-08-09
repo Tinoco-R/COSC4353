@@ -1,7 +1,7 @@
 import csv
 from django.shortcuts import render
 from rest_framework import generics, status
-from .serializers import EventSerializer, CreateEventSerializer, UpdateEventSerializer, DeleteEventSerializer, EventVolunteerMatchSerializer, CreateEventVolunteerMatchSerializer, VolunteerHistorySerializer, UpdateVolunteerHistorySerializer
+from .serializers import EventSerializer, CreateEventSerializer, UpdateEventSerializer, DeleteEventSerializer, EventVolunteerMatchSerializer, CreateEventVolunteerMatchSerializer, VolunteerHistorySerializer, UpdateVolunteerHistorySerializer,ProfileSerializer
 from .models import Event, Skill, Event_Volunteers, Event_Update_Volunteers, States
 from rest_framework.views import APIView;
 from rest_framework.response import Response;
@@ -252,6 +252,18 @@ def csvReportEvent(request):
     writer.writerows(data)
 
     return response
+
+# Allows us to view all volunteer profiles
+class ProfileListView(generics.ListAPIView):
+    queryset = Profile.objects.all() # Returns all profile objects
+    serializer_class = ProfileSerializer # Converts to json format
+    
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        profiles_data = serializer.data
+        
+        return Response(profiles_data)
 
 # Allows us to view all event details (not being used? maybe use to only output one event)
 class EventView(generics.CreateAPIView):
