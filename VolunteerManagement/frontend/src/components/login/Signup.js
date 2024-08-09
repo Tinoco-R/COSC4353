@@ -1,5 +1,5 @@
 import React from "react";
-
+import { useState } from "react";
 import GenericButton from "../GenericButton";
 import { Link } from "react-router-dom";
 
@@ -8,6 +8,15 @@ import { useForm } from "react-hook-form";
 
 export default function Signup(){
 
+    const [isAdmin, setIsAdmin] = useState(true);
+    console.log("is admin main:");
+    
+    const toggleAdmin = () => {
+        setIsAdmin(!isAdmin);
+        console.log("is admin:");
+        console.log(!isAdmin);
+    };
+    
     // React Hook Form (code for how to integrate the form from: https://www.youtube.com/watch?v=oSIHZ9zKzVA)
     const { register, handleSubmit, watch, formState: {errors} } = useForm({ 
         mode: 'onTouched', // credit for onBlur: AritrDB on https://stackoverflow.com/questions/62825841/react-hook-form-validation-before-submission
@@ -28,6 +37,13 @@ export default function Signup(){
         
         data.email
         data.password
+
+        console.log("admin:");
+        console.log(isAdmin);
+
+        var is_staff = false;
+        if (isAdmin)
+            is_staff = true;
 
         let url = 'http://127.0.0.1:8000/api/Register';
         console.log('Making fetch call to register user');
@@ -55,7 +71,7 @@ export default function Signup(){
                     first_name: "",
                     last_name: "",
                     email: "",
-                    is_staff: false,
+                    is_staff: is_staff,
                     is_active: false,
                     date_joined: null,
                     groups: [],
@@ -105,6 +121,18 @@ export default function Signup(){
             {/*</Link></>*/}
 
         </form>
+        
+
+        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '100vh' }}>
+        <p>
+            Toggle Account Type
+            <p>Login Type: {isAdmin? 'Admin' : 'Volunteer'}</p>
+            <div>
+                <button onClick={toggleAdmin}>Change</button>
+            </div>
+        </p>
+        </div>
+
         </div>
     );
 }

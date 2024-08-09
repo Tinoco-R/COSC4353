@@ -781,9 +781,13 @@ def RegisterView(request):
             
             #newUser.is_active = False # Set is_active to false by default
             #newUser() # Save change onde to is_active attribute
-            #newUser.is_active = False
-            #newUser.save()
-
+            if decoded_request_body["is_staff"] == True:
+                newUser.is_staff = True
+                newUser.save()
+                print("is admin, so is_staff:", newUser.is_staff)
+            else:
+                print("is not admin, so is_staff:", newUser.is_staff)
+                
             activateEmail(request, newUser, form.cleaned_data.get('username') )
             #newUser = User.objects.create_user(username=username, 
             #                                email=None, 

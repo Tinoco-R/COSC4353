@@ -50,8 +50,12 @@ export default function Login(){
         isAdmin =!isAdmin;
     }; */
     const [isAdmin, setIsAdmin] = useState(true);
+    console.log("is admin main:");
+    
     const toggleAdmin = () => {
         setIsAdmin(!isAdmin);
+        console.log("is admin:");
+        console.log(!isAdmin);
     };
 
     
@@ -86,6 +90,12 @@ export default function Login(){
         // Search in the database for the credentials
         data.email;
         data.Password;
+        console.log("is admin -submission:");
+        console.log(isAdmin);
+
+        var is_staff = false;
+        if (isAdmin)
+            is_staff = true;
 
 
         // Make API call to authenticate the username (email) and password
@@ -118,7 +128,7 @@ export default function Login(){
                     first_name: "",
                     last_name: "",
                     email: "",
-                    is_staff: false,
+                    is_staff: is_staff,
                     is_active: false,
                     date_joined: null,
                     groups: [],
@@ -160,7 +170,8 @@ export default function Login(){
             else {
                 // User has completed verification process,
                 // redirect 
-                navigate(newAbsoluteURL);
+                //navigate(newAbsoluteURL);
+                window.location.replace(newAbsoluteURL);
             }
 
 
@@ -294,15 +305,15 @@ export default function Login(){
 
         </p>
 
-        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '100vh' }}>
+        {/*<div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '100vh' }}>
             <p>
-                Toggle Admin [For Development Purposes]
+                Toggle Account Type
                 <p>Login Type: {isAdmin? 'Admin' : 'Volunteer'}</p>
                 <div>
-                    <button onClick={toggleAdmin}>Toggle Admin Login</button>
+                    <button onClick={toggleAdmin}>Change</button>
                 </div>
             </p>
-        </div>
+        </div>*/}
         </div>
     
     );
