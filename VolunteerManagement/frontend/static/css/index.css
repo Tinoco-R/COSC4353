@@ -158,3 +158,31 @@ html, body {
 .loginField {
     font-weight: bolder;
 }
+
+#login {
+    text-align: center;
+}
+
+#profile {
+    text-align: center;
+}
+
+#profile_state_dropdown {
+    padding-left: 25%;    
+    padding-right: 25%;
+    text-align: center;
+}
+
+#profile_skills_dropdown {
+    padding-left: 15%;
+    padding-right: 15%;
+    text-align: center;
+}
+
+.profile_label_text {
+    color: #b0df6e;
+}
+
+#signup {
+    text-align: center;
+}

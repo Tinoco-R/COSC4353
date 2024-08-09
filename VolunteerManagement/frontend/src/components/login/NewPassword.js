@@ -21,12 +21,13 @@ export default function ResetPassword(){
 
     const onSubmit = (data) => {
 
-        console.log('Associated email form submitted!');
-        console.log(data.email); // just put them in the console for now
-        var target_url = "http://127.0.0.1:8000/api/resetPassword/" + data.email;
-        console.log("target_url: " + target_url);
-        var email_url = fetch(target_url, {
-            //mode: "cors",
+        console.log('Login form submitted!');
+        console.log(data["newPassword"]); // just put them in the console for now
+        var user = window.location.pathname.split("/").pop() // credit: user Dblock247 on https://stackoverflow.com/questions/4758103/last-segment-of-url-with-javascript
+        console.log("user: " + user);
+        var change_password_url = "/api/changePassword";//" + user + "/" + data["newPassword"]
+        console.log("target url: " + change_password_url);
+        var submitt_form = fetch(change_password_url,{
             headers: {
                 "Content-Type": "application/json", // credit: https://rapidapi.com/guides/request-headers-fetch
                 "Host": "http://127.0.0.1:8000",
@@ -39,46 +40,49 @@ export default function ResetPassword(){
                 //"X-CSRF-Token": "",
                 "mode": "cors",
             },
-            method: "GET",
+            method: "POST",
+            body: JSON.stringify({
+                //user: data.user,
+                user: user,
+                password: data["newPassword"]
+            }),
             credentials: "same-origin"
-        }).then((res) =>{
+        }).then((res) => {
+
             if (res.ok){
-                console.log("Request succeded");
-                window.location.replace("http://127.0.0.1:8000/email-address-received/")
+                if (alert("Password reset successfully") === undefined){
+                    window.location.replace('/'); // Sends to the login page
+                }
+                else {
+                    alert("Could not reset password");
+                }
             }
-            else {
-                console.log("Request failed");
-            }
+
+  
+
+
         })
-        
     }
-    /*function onSubmit() {
-        console.log("associated email submiteed");
-    }*/
 
 
     return (
         <>
-        <h1>Reset my password</h1>
-        <p>Please provide the email associated with 
-            your account. Click on the link that will
-            be sent to this email to reset the password. </p>
+        <h1>New password</h1>
+        <p>Please enter your new password:</p>
 
-        <p> You can close this tab or go
-            back to the login menu.
-        </p>
+        
 
-        <form className="emailInputForm" onSubmit={handleSubmit(onSubmit)}>
-        <div className="emailField">
-                <label for='email'></label>
+        <form className="newPasswordInputForm" onSubmit={handleSubmit(onSubmit)}>
+        <div className="newPasswordField">
+                <label for='newPassword'></label>
                 <input
                 type='text'
-                placeholder='example@email.com' 
-                 {...register('email', { required: 'Email is required', pattern: { value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i, message: 'Incorrect email address' } , maxLength: { value:50, message: 'Max length is 50'}} )} />
-                <p className='inputValidationError'>{errors.email?.message}</p>
+                placeholder=''
+                 {...register('newPassword', { required: 'New password is required'} )} />
+                <p className='inputValidationError'>{errors.newPassword?.message}</p>
         </div>
-            {/*<Link to='/email-address-received'>*/}
-            <input type="submit" name="emailForPasswordReset" value="Submit" ></input>
+            {/*<Link to='/'>*/}
+            <input type="submit" name="newPassword" value="Submit new password" ></input>
             {/*</Link>*/}
 
         </form>

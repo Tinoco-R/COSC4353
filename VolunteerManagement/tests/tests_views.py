@@ -12,7 +12,8 @@ import datetime
 import json
 
 from django.contrib.auth.models import AnonymousUser
-from api.models import User
+#from api.models import User
+from django.contrib.auth.models import User
 from django.test import RequestFactory
 
 class testViews(TestCase):
@@ -212,6 +213,7 @@ class testViews(TestCase):
 
         
         try:
+            user_tmp = User.objects.create_user(username="myemail@example.com", password="myValidPassword")
             response = client.post(reverse('Login'), content_type='application/json',
                                 data=json.dumps({"username": "myemail@example.com","password": "myValidPassword"}))
                 #"username": "ax.alvarenga19@gmail.com",
@@ -222,6 +224,23 @@ class testViews(TestCase):
         
  
         #self.assertEquals(response.status_code, 200)
+
+    def test_LogoutUserView(self):
+        #client = Client()
+
+        try:
+            try:
+                user_tmp = User.objects.create_user(username="myemail@example.com", password="myValidPassword")
+            except:
+                print("Failed to create user or user already created in temporary database")
+
+            request = self.factory.get('/api/GetProfile')
+            request.user = "myemail@example.com"
+            response = LogoutUser(request=request)
+            self.assertEqual(response.status_code, 200)            
+            print("Successfully logged user out.")
+        except:
+            print("Logout failed.")
     
 
     def test_GetStates(self):
@@ -238,9 +257,12 @@ class testViews(TestCase):
 
     def test_GetProfile(self):
 
+        temporary_user = User.objects.create_user(username="sample@sample.com",
+                                password="secret@key2")
+
         # Case 1
         request = self.factory.get('/api/GetProfile')
-        request.user = "ax.alvarenga19@gmail.com"
+        request.user = "sample@sample.com"#"ax.alvarenga19@gmail.com"
         response = GetProfile(request=request)
         self.assertEqual(response.status_code, 200)
 
@@ -291,6 +313,8 @@ class testViews(TestCase):
 
     def test_CreateProfile(self):
         client = Client()
+        temporary_user = User.objects.create_user(username="sample@sample.com",
+                                password="secret@key2")
         body_data = {
             "user": "sample@sample.com",
             "full_name": "Mark White",
@@ -301,7 +325,7 @@ class testViews(TestCase):
             "zip_code": "78239", 
             "skills": "Plumbing,Construction,German - Language, Cooking, Cleaning, Mathematics Skills",
             "preferences": "Events near downtown are preferred. No events after 6 pm.",
-            "availability": "07/25/2024,07/26/2024,07/27/2024,08/03/2024,08/09/2024,09/15/2024"
+            "availability": "August 24 2024,August 25 2024"
         }
         response = client.post(reverse('CreateProfile'), content_type="application/json",
                                 data=json.dumps(body_data))
@@ -343,10 +367,12 @@ class testViews(TestCase):
                                     data=json.dumps(body_data3))
         except:
             print("SUCCESS: Create Profile with invalid data failed, as expected")
-            
+       
 
     def test_UpdateProfile(self):
         client = Client()
+        temporary_user = User.objects.create_user(username="sample@sample.com",
+                                password="secret@key2")
         body_data = {
             "user": "sample@sample.com",
             "full_name": "Mark White",
@@ -357,7 +383,7 @@ class testViews(TestCase):
             "zip_code": "78239", 
             "skills": "Plumbing,Construction,German - Language, Cooking, Cleaning, Mathematics Skills",
             "preferences": "Events near downtown are preferred. No events after 6 pm.",
-            "availability": "07/25/2024,07/26/2024,07/27/2024,08/03/2024,08/09/2024,09/15/2024"
+            "availability": "September 10 2024, October 21 2024"
         }
         response = client.post(reverse('UpdateProfile'), content_type="application/json",
                                 data=json.dumps(body_data))
@@ -400,7 +426,6 @@ class testViews(TestCase):
         except:
             print("SUCCESS: Create Profile with invalid data failed, as expected")
 
-
     def test_GetMonthlyEvents(self):
         client = Client()
         request = self.factory.get('/api/GetMonthlyEvents')
@@ -411,6 +436,13 @@ class testViews(TestCase):
 
         #response = client.get(reverse('GetMonthlyEvents'))
         #self.assertEquals(response.status_code, 200)
+
+    def test_resetPassword(self):
+        client = Client()
+        request = self.factory.get('/api/resetPassword')
+        request.user = "ax.alvarenga19@gmail.com"
+        response = resetPassword(request, "ax.alvarenga19@gmail.com")
+        self.assertEqual(response.status_code, 200)
 
 # Testing to see all volunteers for a given event
 class EventVolunteerListViewTests(TestCase):

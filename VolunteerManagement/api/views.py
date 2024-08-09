@@ -280,6 +280,9 @@ from .forms import RegisterForm
 # Axel's import of hard-coded data for Assignment 3
 from . import hard_coded_data
 from validator_collection import validators, checkers, errors
+# For password reset
+import smtplib
+from email.mime.text import MIMEText
 #############################################################
 
 
@@ -297,6 +300,61 @@ class SkillView(generics.CreateAPIView):
 
 ##########################################
 ####       Helper functions ##############
+@csrf_exempt
+def resetPassword(request, email):
+    # Credit: the reset password was developed following the tutorial
+    # from the youtube channel "Mailtrap". Such tutorial is the source
+    # of the code below (of course, adapted to fit the project needs)
+    # Original source: 
+    # Video "Send Email in Python with Gmail 2024 - Tutorial by Mailtrap"
+    # at https://www.youtube.com/watch?v=WZ_pUSAV5DA
+    subject = "Helping Hands Password Reset Request"
+    url = "http://127.0.0.1:8000/api/resetPasswordFromLink/" + str(request.user)
+    body = "Visit the link below from your browser to reset your password (please copy and paste the link):  \n" + url
+    sender = "ax.alvarenga19@gmail.com"
+    password = "sgjk jbcd tbdw caur"
+    print("email recipient:", email)
+    recipient = email
+
+    def send_email(subject, body, sender, recipient, password):
+        msg = MIMEText(body)
+        msg["Subject"] = subject
+        msg["From"] = sender
+        msg["To"] = recipient
+
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp_server:
+            smtp_server.login(sender, password)
+            smtp_server.sendmail(sender, recipient, msg.as_string())
+        print("email sent")
+        print("url sent to email:", url)
+
+    send_email(subject, body, sender, recipient, password)
+    return HttpResponse('')
+
+@csrf_exempt
+def resetPasswordFromLink(request, username):
+    #url = request.get_full_path()
+
+    #print("current url:", url)
+    print("username to change password for:", username)
+
+    return redirect('/new-password/' + username)
+
+
+@csrf_exempt
+def changePassword(request):
+    #url = request.get_full_path()
+
+    #print("current url:", url)
+    decoded_request_body = json.loads(request.body.decode("utf-8")) # https://www.freecodecamp.org/news/python-json-how-to-convert-a-string-to-json/
+
+    print("username to change password for:", decoded_request_body["user"])
+    print("new password:", decoded_request_body["password"])
+
+    # Update the password
+
+    return HttpResponse('')
+
 
 def activate(request, uidb64, token):
     print('Activate function called')
@@ -317,9 +375,9 @@ def activate(request, uidb64, token):
         print('Account activated successfully')
 
         if (user.is_staff):
-            return redirect('/admin/home') # Redirecting everyone to here for now
+            return redirect('/') # Redirecting everyone to here for now
         else:
-            return redirect('/volunteer/landing')
+            return redirect('/')
     else:
         messages.success(request, "Activation link is invalid")
     
@@ -758,7 +816,7 @@ def CreateProfile(request): # POST REQUEST ONLY
     skills_is_valid = None
     print(decoded_request_body["skills"])
     for skill in decoded_request_body["skills"]:
-        print(skill["value"])
+        #print(skill["value"])
         try:
             skills_is_valid = checkers.is_string(skill, minimum_length=1)
             if skills_is_valid is False:
@@ -1108,7 +1166,7 @@ def UpdateProfile(request): # POST REQUEST ONLY
     skills_is_valid = None
     print(decoded_request_body["skills"])
     for skill in decoded_request_body["skills"]:
-        print(skill["value"])
+        #print(skill["value"])
         try:
             skills_is_valid = checkers.is_string(skill, minimum_length=1)
             if skills_is_valid is False:

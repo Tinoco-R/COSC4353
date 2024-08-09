@@ -6,6 +6,7 @@ import LandingPageWithEvents from "./LandingPage";
 import Signup from "./login/Signup";
 import InitialVerification from "./login/InitialVerification";
 import ResetPassword from "./login/ResetPassword";
+import NewPassword from "./login/NewPassword";
 import Logout from "./login/Logout";
 import EmailAddressReceivedConfirmation from "./login/EmailAddressReceivedConfirmation";
 import { ShowNotification } from "./notification/NotificationComponent";
@@ -33,6 +34,7 @@ export default class VolunteerHomePage extends Component {
                     <Route path='/sign-up' element = {<Signup />} />
                     <Route path='/verification' element = {<InitialVerification />} />
                     <Route path='/reset-password' element = {<ResetPassword />} />
+                    <Route path='/new-password/:username' element = {<NewPassword />} />
                     <Route path='/email-address-received' element = {<EmailAddressReceivedConfirmation />} />
 
                     // Volunteer Homepage

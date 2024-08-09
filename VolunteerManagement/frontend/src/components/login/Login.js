@@ -239,7 +239,7 @@ export default function Login(){
 
 
     return (
-        <>
+        <div id="login" >
         <h1 className="titleLoginPage">Helping Hands</h1>
         <h2 className="loginTextInLoginPage">Login</h2>
 
@@ -250,7 +250,7 @@ export default function Login(){
             
 
             <div className="loginField">
-                <label for='email'>Email</label>
+                <label for='email'>Email <br></br> </label>
                 <input
                 type='text'
                 placeholder='example@email.com' 
@@ -259,7 +259,7 @@ export default function Login(){
             </div>
 
             <div className="loginField">
-                <label for='Password'>Password</label>
+                <label for='Password'>Password <br></br> </label>
                 <input {...register('Password', { required: 'Password is required', minLength: { value: 8, message: 'Min length is 8'}} )} />
                 <p className='inputValidationError'>{errors.Password?.message}</p>
 
@@ -303,7 +303,7 @@ export default function Login(){
                 </div>
             </p>
         </div>
-        </>
+        </div>
     
     );
 }

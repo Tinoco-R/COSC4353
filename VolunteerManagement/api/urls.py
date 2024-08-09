@@ -5,7 +5,7 @@ from .views import EventView, CreateEventView, UpdateEventView, EventsListView, 
 from .views import UserView#, UserDetail
 from .views import RegisterView
 from .views import LoginView, LogoutUser
-from .views import activate
+from .views import activate, resetPassword, resetPasswordFromLink, changePassword
 from .views import CreateProfile, GetProfile, UpdateProfile
 from .views import GetStates, GetSkills, GetMonthlyEvents
 from .views import GetMatchNotifications, GetUpdateNotifications, GetReminderNotifications, acknowledgeNotification
@@ -19,6 +19,9 @@ urlpatterns = [
     path('Login', LoginView, name='Login'),
     path('LogoutUser', LogoutUser, name='LogoutUser'), # New: Logout user function
     path('activate/<uidb64>/<token>', activate, name='activate'),
+    path('resetPasswordFromLink/<str:username>', resetPasswordFromLink, name='resetPasswordFromLink'), 
+    path('changePassword', changePassword, name='changePassword'), 
+    path('resetPassword/<str:email>', resetPassword, name='resetPassword'),     
     path('GetStates', GetStates, name='GetStates'),
     path('GetSkills', GetSkills, name='GetSkills'),
     path('GetMonthlyEvents', GetMonthlyEvents, name='GetMonthlyEvents'),

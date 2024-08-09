@@ -71,12 +71,13 @@ export default function Signup(){
         }
         else {
             console.log('User registered successfully');
+            alert("You have registered successfully. \n Check your email to verify your account")
         }
     
     }
     
     return (
-        <>
+        <div id="signup">
         <h1>Sign Up</h1>
 
         <form className="loginForm" onSubmit={handleSubmit(onSubmit)} >
@@ -104,6 +105,6 @@ export default function Signup(){
             {/*</Link></>*/}
 
         </form>
-        </>
+        </div>
     );
 }
