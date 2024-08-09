@@ -1,3 +1,6 @@
+import { useTheme } from '@mui/material/styles';
+import React from 'react';
+
 export const eventMatchingColumns = [
     { field: 'Event_ID', headerName: 'ID', flex: 1 },
     { field: 'Name', headerName: 'Name', flex: 2 },
@@ -12,7 +15,20 @@ export const volunteerViewColumns = [
     { field: 'id', headerName: 'ID', flex: 1 },
     { field: 'Event_ID', headerName: 'Event ID', flex: 1 },
     { field: 'Volunteer', headerName: 'Volunteer', flex: 1 },
-    { field: 'Attended', headerName: 'Attended', flex: 1 },
+    {
+        field: 'Attended',
+        headerName: 'Attended',
+        flex: 1,
+        renderCell: (params) => {
+            const theme = useTheme();
+            if (params.value === "N") {
+                return <span style={{ color: theme.palette.error.main }}>No</span>;
+            }
+            else {
+                return <span style={{ color: theme.palette.success.main }}>Yes</span>;
+            }
+        },
+    },
 ];
 
 export const eventModificationColumns = [

@@ -312,6 +312,8 @@ export default class VolunteerDetailsAdmin extends Component {
                         );
                     })}
 
+                    <br></br>
+
                     <Typography sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 1, color: 'white' }} gutterBottom>
                         Preferences: {data.preferences}
                     </Typography>
